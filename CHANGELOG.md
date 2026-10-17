@@ -6,6 +6,11 @@ All notable changes. Dates are absolute. Versions follow semver; 0.x may change 
 
 ### Added
 
+- **`screen_sanctions` tool and the `sanctions/` module**: UK Sanctions List, EU consolidated list and OFAC SDN downloaded (once per 24 h), parsed per designation, cached as snapshots and matched locally by name (exact, reordered, fuzzy, containment, low-quality-alias cap) and by entity registration number. Results are `match`, `possible_match`, `no_match` or `incomplete`, always with list version dates and a caveat (D36, D37).
+- `HttpClient.getText` for bulk downloads (size and time overrides, allow-listed redirect hosts, streamed decoding).
+- Staleness guard: a warning after 14 days and `incomplete` after 45 days.
+- Second `xhigh` code review of the sanctions code: 13 defects fixed with regression tests.
+
 - Documentation set: module reference, development guide, tool reference, coverage matrix, security and
   privacy, code-review process (`docs/20`-`25`), documentation index.
 - Claude Code skills for thorough review: `review-code`, `review-adapter`, `review-security`,
@@ -15,6 +20,8 @@ All notable changes. Dates are absolute. Versions follow semver; 0.x may change 
 - Golden-set test harness (`test/golden/`).
 
 ### Changed
+
+- UK designations now come from the **UK Sanctions List (FCDO)**. The first build used the OFSI Consolidated List, which closed on 2026-01-28 while its old URL kept serving a frozen file (D36).
 
 - Crosswalks are an adapter capability; the services layer no longer imports a concrete adapter.
 - The adapter catalogue (`src/adapters/registry.ts`) now owns construction and the identifier schemes

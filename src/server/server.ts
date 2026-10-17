@@ -3,6 +3,7 @@ import type { Runtime } from "../runtime.js";
 import { registerCoverage } from "./tools/coverage.js";
 import { registerGetEntity } from "./tools/getEntity.js";
 import { registerResolveIdentifier } from "./tools/resolveIdentifier.js";
+import { registerScreenSanctions } from "./tools/screenSanctions.js";
 import { registerSearch } from "./tools/search.js";
 
 export const SERVER_NAME = "entity-intel-mcp";
@@ -23,5 +24,6 @@ export function createServer(rt: Runtime): McpServer {
   registerSearch(server, rt);
   registerGetEntity(server, rt);
   registerResolveIdentifier(server, rt);
+  registerScreenSanctions(server, rt);
   return server;
 }

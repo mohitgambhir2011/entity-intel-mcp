@@ -9,13 +9,14 @@ afterEach(async () => {
 });
 
 describe("tool listing", () => {
-  it("exposes the four tools as read-only", async () => {
+  it("exposes the five tools as read-only", async () => {
     h = await startHarness();
     const { tools } = await h.client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([
       "check_coverage",
       "get_entity",
       "resolve_identifier",
+      "screen_sanctions",
       "search_entities",
     ]);
     for (const t of tools) expect(t.annotations?.readOnlyHint).toBe(true);

@@ -9,6 +9,7 @@ const args: Record<string, Record<string, unknown>> = {
   search_entities: { query: "Tesco PLC", country: "GB", limit: 2 },
   resolve_identifier: { identifier: "2138002P5RNKC5W2JZ46" },
   check_coverage: { country: "GB" },
+  screen_sanctions: { name: "BNK UK Limited", type: "entity" },
 };
 const r = await h.call(which, args[which]!);
 console.log(JSON.stringify(r.json, null, 2));

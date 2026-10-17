@@ -226,8 +226,8 @@ interface InsolvencyRecord {
 
 interface SanctionsScreening {
   screenedAt: ISODateTime;
-  listsChecked: { list: "OFSI" | "EU" | "OFAC_SDN" | "UN"; listVersionDate: ISODate }[];
-  result: "no_match" | "possible_match" | "match";
+  listsChecked: { list: "UK" | "EU" | "OFAC_SDN"; versionDate?: ISODate; state: "checked" | "unavailable"; stale?: boolean }[];
+  result: "no_match" | "possible_match" | "match" | "incomplete";   // incomplete: a list missing/stale, or nothing screenable by name
   hits: SanctionsHit[];
   caveat: string;                   // screening is name-based and not a legal determination
 }

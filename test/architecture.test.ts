@@ -16,7 +16,7 @@ const ALLOWED: Record<string, string[]> = {
   adapters: ["core", "infra"],
   services: ["core", "resolution", "adapters", "infra", "sanctions", "runtime"],
   server: ["core", "services", "runtime"],
-  runtime: ["core", "infra", "adapters"],
+  runtime: ["core", "infra", "adapters", "sanctions"],
   index: ["core", "runtime", "server"],
 };
 
@@ -43,9 +43,9 @@ function importsOf(file: string): { spec: string; target: string }[] {
   return out;
 }
 
-describe("architecture", () => {
-  const all = files(SRC);
+const all = files(SRC);
 
+describe("architecture", () => {
   it("every source area is covered by the layering table", () => {
     const unknown = [...new Set(all.map(area))].filter((a) => !(a in ALLOWED));
     expect(unknown, "add the new area to ALLOWED in test/architecture.test.ts").toEqual([]);
@@ -83,6 +83,18 @@ describe("architecture", () => {
     const offenders = all.filter((f) =>
       /\beval\s*\(|new Function\s*\(|child_process/.test(readFileSync(f, "utf8")),
     );
+    expect(offenders.map((f) => relative(SRC, f))).toEqual([]);
+  });
+});
+
+describe("source hygiene", () => {
+  it("contains no stray control characters (a lost regex escape once left a backspace in a pattern)", () => {
+    const hasControlChar = (text: string): boolean =>
+      [...text].some((ch) => {
+        const c = ch.charCodeAt(0);
+        return c < 32 && c !== 9 && c !== 10 && c !== 13; // allow tab, LF, CR
+      });
+    const offenders = all.filter((f) => hasControlChar(readFileSync(f, "utf8")));
     expect(offenders.map((f) => relative(SRC, f))).toEqual([]);
   });
 });

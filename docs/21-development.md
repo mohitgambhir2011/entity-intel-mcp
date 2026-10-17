@@ -25,6 +25,7 @@ code sits behind an interface so it can be replaced if the API changes.
 | `npm run build` | Compile `src/` to `dist/` |
 | `npm run dev` | Run the server from source over stdio |
 | `npx tsx scripts/live-smoke.ts` | Real calls to GLEIF, VIES, Companies House |
+| `npx tsx scripts/live-sanctions.ts` | Downloads the real UK, EU and OFAC lists (about 100 MB), prints entry counts, versions and timings, and screens sample names. Run it after touching `src/sanctions/` and whenever a publisher changes a list |
 | `npx tsx scripts/live-mcp-smoke.ts` | Spawns the built server and calls every tool over stdio against real services |
 | `npx tsx scripts/print-examples.ts <tool>` | Prints a tool response from the recorded fixtures (keeps docs honest) |
 

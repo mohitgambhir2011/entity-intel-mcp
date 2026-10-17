@@ -18,10 +18,11 @@ Allowed dependencies (a module may import its own area plus):
 | `core` | nothing |
 | `resolution` | core |
 | `infra` | core |
+| `sanctions` | core, infra, resolution |
 | `adapters` | core, infra |
-| `services` | core, resolution, adapters, infra, runtime (types) |
+| `services` | core, resolution, adapters, infra, sanctions, runtime (types) |
 | `server` | core, services, runtime |
-| `runtime` | core, infra, adapters |
+| `runtime` | core, infra, adapters, sanctions |
 | `index` | core, runtime, server |
 
 ## core/ - vocabulary with no I/O
@@ -49,12 +50,23 @@ Allowed dependencies (a module may import its own area plus):
 | File | Responsibility | Invariants |
 | --- | --- | --- |
 | `ratelimit.ts` | Sliding-window limiter per host, plus `penalise(retryAfter)` after a 429 | Waits up to 30 s, then throws `rate_limited` instead of hanging a tool call |
-| `http.ts` | `HttpClient.getJson`: rate limit, timeout (20 s), one retry on 429/5xx/network error, manual redirects (same host + https only, 3 hops), bounded body read (5 MB), JSON parse. `DEFAULT_HOST_RULES` | Credential headers can never reach another host. Errors never contain header values or upstream text. A refused redirect is final (not retried) |
+| `http.ts` | `HttpClient.getJson` / `getText`: rate limit, timeout (20 s, per-request override), one retry on 429/5xx/network error, manual redirects (same host + https; other hosts only if listed in `allowRedirectHosts` with a dot-boundary match, and then without custom headers; 3 hops), streamed bounded body read (5 MB default, per-request override), error bodies discarded. `DEFAULT_HOST_RULES` | Credential headers can never reach another host. Errors never contain header values or upstream text. A refused redirect is final (not retried) |
 | `cache.ts` | `Cache.getOrFetch(key, opts, fetcher)` over `Storage` | Never serves expired rows (D28). Storage failure or a corrupt row degrades to "uncached", never fails the lookup. `null` results ("not found") live 120 s. Personal data TTL is capped (D11) |
 | `audit.ts` | One metadata row per tool call (D14) | A failed audit write is logged to stderr and never breaks a lookup |
 | `storage/index.ts` | `Storage` interface (cache + audit) | Implementations are swappable (D31) |
 | `storage/sqlite.ts` | `node:sqlite` implementation, WAL, parameter-bound SQL | Default path: per-user data dir, overridable with `EIM_DB_PATH` |
 | `storage/memory.ts` | In-memory implementation (tests, fallback if SQLite can't open) | Same behaviour as SQLite |
+
+## sanctions/ - sanctions lists (no MCP, no registry knowledge)
+
+| File | Responsibility | Invariants |
+| --- | --- | --- |
+| `types.ts` | `SanctionEntry` (normalised designation), `ListSnapshot`, `SanctionsHit`, `SanctionsScreening`, `SCREENING_CAVEAT` | List ids: `UK`, `EU`, `OFAC_SDN` |
+| `xml.ts` | Safe XML helpers: chunk-per-designation parsing, entity processing OFF (manual decode of the five standard entities), `acceptIdentifier` (6-30 letters/digits, at least one digit, never a date), `assertComplete` | A DOCTYPE or custom entity can never expand; truncated files are rejected |
+| `parsers/uk.ts`, `eu.ts`, `ofac.ts` | One parser per list -> `SanctionEntry[]` + version date | Each checks the document type and that it ends with its root closing tag; OFAC also checks the declared `Record_Count`. Personal documents (passports, national ids, dates of birth) are not read; identifiers are indexed for entities and vessels only |
+| `lists.ts` | Catalogue: id, label, URL, allowed redirect hosts, minimum plausible size, parser | OFAC may redirect to `.treasury.gov`, `.treas.gov`, `.amazonaws.com` only |
+| `matching.ts` | `ListIndex`: in-memory name and identifier index; scoring; weak-alias cap | Fuzzy matching only for names of 8+ characters; identifiers 8+ characters; weak aliases never reach the match threshold |
+| `index.ts` | `SanctionsIndex`: download (cap 150 MB, 180 s, streamed), parse, floor check, cache the snapshot 24 h, hold the index; `warmFromCache()` at startup | One in-flight load per list; failures are never cached; staleness measured from download time; startup never touches the network |
 
 ## adapters/ - one folder per source
 
@@ -78,6 +90,7 @@ for failures; `undefined` only for "no such record"; full `Provenance`. Checklis
 | `gather.ts` | From a seed identifier: run every enabled adapter that supports it, follow newly revealed identifiers (up to 3 rounds), run crosswalks concurrently with lookups | One warning per failing source; disabled-but-relevant adapters are named in a warning with the reason; `fromCache` is true only if all data was cached |
 | `merge.ts` | `PartialEntity[] -> EntityProfile`: priority per `sources.ts`, conflicts recorded, provenance merged only from sources that agree, entity id chosen | A value from a source that said "unknown" never outranks a real value and is never credited as corroboration |
 | `search.ts` | Name search across adapters with `search`; identifier queries resolve exactly | Candidates merge only across **different** sources; two records from one source stay separate. Sorted by score, then operating first. Never auto-picks |
+| `screen.ts` | Sanctions screening orchestration: resolve the entity (via `gather`) or take a name, load the requested lists, screen, derive `match / possible_match / no_match / incomplete`, add warnings (unavailable, stale >14 d, stale >45 d forces incomplete, nameless entity, identifier-only hits) | Never reports `no_match` when any list is missing, cut off or stale, or when nothing could be screened by name |
 | `audit.ts` | `auditSubject(query)`: identifiers as typed, names as `name#<hash> (<n> chars)` | Free-text names never reach the audit log |
 
 ## server/ - MCP surface
@@ -87,7 +100,7 @@ for failures; `undefined` only for "no such record"; full `Provenance`. Checklis
 | `server.ts` | Creates the `McpServer`, sets `instructions` (registry text is data), registers tools |
 | `envelope.ts` | `ok()` builds `{ summary, warnings, data, meta, disclaimer? }`; `fail()`; `guard()` maps `InvalidInputError` to a tool error and anything else to a generic error (details to stderr) |
 | `tools/shared.ts` | Flat entity-reference argument shape, read-only annotations |
-| `tools/search.ts`, `getEntity.ts`, `resolveIdentifier.ts`, `coverage.ts` | One file per tool: parse, call one service, shape the envelope, write one audit row |
+| `tools/search.ts`, `getEntity.ts`, `resolveIdentifier.ts`, `screenSanctions.ts`, `coverage.ts` | One file per tool: parse, call one service, shape the envelope, write one audit row |
 
 Rule: no business logic here. `summary` and `warnings` are written by the server and must not
 contain registry text.

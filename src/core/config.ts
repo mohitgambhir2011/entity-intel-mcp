@@ -8,6 +8,8 @@ export interface Config {
   auditRetentionDays: number;
   sanctionsMatch: number;
   sanctionsPossible: number;
+  /** Replacement for the EU sanctions download URL (https only). */
+  euSanctionsUrl?: string;
   /** Human-readable problems found while loading (invalid values replaced by defaults). */
   problems: string[];
 }
@@ -50,6 +52,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     sanctionsPossible = Math.min(0.8, sanctionsMatch);
   }
 
+  let euSanctionsUrl = opt(env.EIM_EU_SANCTIONS_URL);
+  if (euSanctionsUrl && !euSanctionsUrl.startsWith("https://")) {
+    problems.push("EIM_EU_SANCTIONS_URL must be an https:// URL; using the default");
+    euSanctionsUrl = undefined;
+  }
+
   return {
     companiesHouseApiKey: opt(env.COMPANIES_HOUSE_API_KEY),
     fcaAuthEmail: opt(env.FCA_AUTH_EMAIL),
@@ -63,6 +71,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     auditRetentionDays: bounded(env, "EIM_AUDIT_RETENTION_DAYS", 365, 1, 3650, problems),
     sanctionsMatch,
     sanctionsPossible,
+    euSanctionsUrl,
     problems,
   };
 }

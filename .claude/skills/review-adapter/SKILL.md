@@ -58,6 +58,13 @@ real failure mode seen in this codebase or in registries like it.
 - [ ] Identifiers: `validated` is true only when checksum/format or the issuing service confirmed it.
 - [ ] The adapter reports what it cannot provide through coverage, not by returning empty arrays.
 
+## Currency (is the source still being published?)
+
+- [ ] The version/update date of the data is surfaced to the user (in the file, a header, or both) and compared with today. A source that answers 200 with a frozen file is the failure that keeps passing every other check (the OFSI list closed on 2026-01-28 yet `ConList.xml` still downloaded).
+- [ ] Read the publisher's own page for deprecation or migration notices, not just the API docs.
+- [ ] For bulk files: verify completeness (closing root tag, declared counts) and a minimum plausible size; never cache a failed check.
+- [ ] Stale data degrades the answer (warning, then `incomplete`), it is not silently served as current.
+
 ## Licence and terms
 
 - [ ] `docs/10-source-assessment.md` records: access, auth, limits, caching/redistribution terms,

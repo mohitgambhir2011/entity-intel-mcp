@@ -90,4 +90,5 @@ export const TTL = {
   search: 15 * 60,
   gleif: 6 * 60 * 60,
   vies: 24 * 60 * 60,
+  sanctions: 24 * 60 * 60,
 } as const;

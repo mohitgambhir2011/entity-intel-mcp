@@ -10,6 +10,26 @@ const GLEIF = "https://api.gleif.org/api/v1";
 const CH = "https://api.company-information.service.gov.uk";
 const VIES = "https://ec.europa.eu/taxation_customs/vies/rest-api/ms";
 
+/** Small real samples of the three sanctions lists (OFAC is served via the S3 redirect it uses). */
+export function sanctionsRoutes(): Record<string, FakeRoute | FakeRoute[]> {
+  const s3 =
+    "https://wc2h-sls-prod-public-published.s3.us-gov-west-1.amazonaws.com/Published/x/SDN.XML";
+  return {
+    "https://sanctionslist.fcdo.gov.uk/docs/UK-Sanctions-List.xml": {
+      body: fixtureText("sanctions/uk-sample.xml"),
+    },
+    "https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content": {
+      body: fixtureText("sanctions/eu-sample.xml"),
+    },
+    "https://www.treasury.gov/ofac/downloads/sdn.xml": {
+      status: 302,
+      body: "",
+      headers: { location: `${s3}?X-Amz-Expires=3600` },
+    },
+    [s3]: { body: fixtureText("sanctions/ofac-sample.xml") },
+  };
+}
+
 /** Recorded responses for the Tesco PLC golden entity and a few VAT numbers. */
 export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   return {
@@ -25,6 +45,7 @@ export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
     [`${VIES}/IE/vat/6388047V`]: { body: fixtureText("vies/ie-valid.json") },
     [`${VIES}/DE/vat/811128135`]: { body: fixtureText("vies/de-name-withheld.json") },
     [`${VIES}/NL/vat/820571204B01`]: { body: fixtureText("vies/nl-invalid.json") },
+    ...sanctionsRoutes(),
   };
 }
 
@@ -55,6 +76,7 @@ export async function startHarness(
     fetch: f,
     storage: new MemoryStorage(),
     clock: instantClock(),
+    sanctionsMinEntries: 1,
   });
   const server = createServer(rt);
   const client = new Client({ name: "test", version: "0" });

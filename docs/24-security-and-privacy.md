@@ -49,9 +49,15 @@ Retention defaults are conservative; adjust to your policy.
 When added, every sanctions result states that it is a name-based screen against the listed versions
 and is not a legal determination. Documentation never claims completeness.
 
+## Sanctions lists
+- **Local matching.** Names and numbers being screened are compared on your machine against downloaded lists; they are never sent to the list publishers. (Resolving an entity first queries the registries as usual.)
+- **Download hardening.** Fixed official URLs only; https; redirects only to a short host allow-list (OFAC's CDN) and without custom headers; 150 MB cap with a streamed read; 180 s timeout; XML parsed one designation at a time with entity processing off (no expansion, XXE or billion-laughs); the document must end with its root closing tag and (OFAC) match its declared record count; a minimum plausible size is enforced; failures are never cached.
+- **Currency.** Each result shows every list's version date; a warning appears after 14 days and a list older than 45 days can only yield `incomplete`.
+- **List text is untrusted.** Names, remarks and programmes appear only inside `data`.
+- **Personal data in lists.** The lists name individuals. We keep only names, aliases, programme, dates of designation and countries; dates of birth, passports and other documents are not read.
+
 ## Known gaps (tracked)
-- No `--clear-cache` command yet (D11).
-- Sanctions list download hardening (size cap, XML entity expansion off) arrives with that module.
+- No `--clear-cache` command yet (D11); the sanctions snapshots live in the same cache file.
 - FCA rate limit unverified; a conservative local limit is configured.
 - Responses are verbose; large profiles cost tokens. A compact mode is planned.
 

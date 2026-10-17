@@ -120,11 +120,57 @@ it returns `found: false` as a normal result, not an error.
             "notes": [] } }
 ```
 
+## `screen_sanctions`
+
+Arguments: `name` (2-200 chars) **or** an entity (`entity_id` / `identifier` + optional `scheme`, `country`); `type` (`person|entity|any`, for names); `lists` (subset of `UK|EU|OFAC_SDN`, default all); `fresh` (re-download the lists).
+
+Behaviour:
+1. Each requested list is loaded (downloaded at most once per 24 h, cached as a parsed snapshot, indexed in memory). Matching is done locally: the name you screen is never sent to a list publisher.
+2. A **name** is compared with every designated name and alias; an **entity** is first resolved (as in `get_entity`) and then screened under its legal, former and trading names **and** its LEI / UK company number / VAT number against the registration numbers on the lists (entities only, 8+ characters; personal documents are never read).
+3. Scores: 1.0 identical after normalisation (case, punctuation, diacritics, legal form such as Ltd/PJSC/GmbH); 0.98 same words, different order; fuzzy edit-distance below that (names of 8+ characters only); 0.85 when all words of a distinctive multi-word name are contained in the other. Aliases the list marks low quality are capped below the match threshold.
+4. **Result**: `match` (top score >= 0.95 or an exact registration number), `possible_match` (>= 0.80), `no_match`, or `incomplete`.
+
+`incomplete` means "this is not a clear result". It is returned when any requested list could not be loaded, is cut off or older than 45 days, or when the entity has no published name (for example a German VAT number, whose name VIES withholds). A hit found on the lists that did load is still reported as `match`/`possible_match` with a warning.
+
+Every response carries the list versions and the caveat in `disclaimer`. Identifier hits add a warning: numbers are compared without the issuing country, so check the jurisdiction. Up to 25 hits are returned, highest score first.
+
+```jsonc
+// screen_sanctions { "name": "BNK UK Limited", "type": "entity" }
+{
+  "summary": "Result: match; 1 hit(s); 3 of 3 list(s) checked. Name-based screen, not a legal determination: review every hit.",
+  "warnings": [],
+  "data": {
+    "screening": {
+      "screenedAt": "2026-10-17T13:20:11.000Z",
+      "result": "match",
+      "listsChecked": [
+        { "list": "UK", "state": "checked", "versionDate": "2026-10-16", "fetchedAt": "...", "entries": 6408, "ageDays": 1 },
+        { "list": "EU", "state": "checked", "versionDate": "2026-10-15", "entries": 6234, "ageDays": 2 },
+        { "list": "OFAC_SDN", "state": "checked", "versionDate": "2026-10-15", "entries": 19457, "ageDays": 2 }
+      ],
+      "hits": [
+        { "list": "UK", "entryId": "BEL0107", "entryName": "BNK (UK) Ltd", "matchedName": "BNK UK Limited",
+          "score": 1, "basis": "exact_name", "subjectType": "entity",
+          "programmes": ["The Republic of Belarus (Sanctions) (EU Exit) Regulations 2019"],
+          "listedOn": "2021-06-21", "countries": ["United Kingdom"] }
+      ],
+      "thresholds": { "match": 0.95, "possible": 0.8 },
+      "caveat": "This is an automated, name- and identifier-based screen ..."
+    },
+    "screened": { "names": ["BNK UK Limited"], "identifiers": [] }
+  }
+}
+```
+
+Hit `basis`: `exact_identifier`, `exact_name` (primary designated name), `alias` (an alias matched exactly), `fuzzy_name`. `weakAlias: true` marks a match to a low-quality alias. `remarks` is list text (untrusted, capped at 300 characters).
+
+Errors: neither or both of name and entity given; a name with no letters or digits; an entity that cannot be found ("nothing to screen").
+
 ## `check_coverage`
 
 Argument: `country` (optional ISO code). Returns every catalogued source with `enabled`, `reason`
 (`enabled`, `missing credentials: NAME`, `not in EIM_ADAPTERS allow-list`, `not implemented yet`),
-`requiredEnv` (names), `schemes`, plus `familiesSupported` and `familiesNotYetSupported`.
+`requiredEnv` (names), `schemes`, the state of each sanctions list (`not_loaded`, `loading`, `loaded` with version date and entry count, or `error`), plus `familiesSupported` and `familiesNotYetSupported`.
 
 ## Common warnings
 
@@ -135,3 +181,6 @@ Argument: `country` (optional ISO code). Returns every catalogued source with `e
 | `Local rate limit reached for companies_house; next slot in 41s` | Protecting your key | Wait or narrow the request |
 | `Sources disagree on: status (see data.conflicts)` | Registries differ | Inspect `conflicts`; treat as a finding, not an error |
 | `This looks like a company number; add country=GB ...` | Bare digits in a name search | Repeat with `country=GB` |
+| `EU could not be checked: ...` / `Not all requested lists were checked, so this is NOT a clear result` | A sanctions list failed to load | Retry; never treat `incomplete` as clear |
+| `UK is 21 days old (version ...): the publisher may have stopped updating it` | List older than 14 days (over 45 days it forces `incomplete`) | Check the publisher; try `fresh: true` |
+| `This entity has no published name, so it was screened by identifier only` | VIES withheld the name | Screen by the company's name once known |

@@ -1,6 +1,6 @@
 # Phase 4 — Architecture (DRAFT v0.1)
 
-> **Implementation status (2026-10-17):** the layers `core`, `resolution`, `infra`, `adapters`, `services`, `server` exist and the layering below is enforced by `test/architecture.test.ts`. Differences from this plan: crosswalks are an adapter capability (`SourceAdapter.crosswalks`), the adapter catalogue in `src/adapters/registry.ts` owns construction, text folding lives in `core/text.ts`, source priority in `core/sources.ts`, tools are one file each. Not built yet: `sanctions/`, `--clear-cache`, ownership traversal. Authoritative module descriptions: [20-modules.md](20-modules.md).
+> **Implementation status (2026-10-17):** the layers `core`, `resolution`, `infra`, `adapters`, `services`, `server` exist and the layering below is enforced by `test/architecture.test.ts`. Differences from this plan: crosswalks are an adapter capability (`SourceAdapter.crosswalks`), the adapter catalogue in `src/adapters/registry.ts` owns construction, text folding lives in `core/text.ts`, source priority in `core/sources.ts`, tools are one file each. Sanctions are built (`src/sanctions/`, `services/screen.ts`, `screen_sanctions`): lists are cached as parsed snapshots in the shared cache and indexed in memory rather than stored in dedicated SQLite tables. Not built yet: `--clear-cache`, ownership traversal. Authoritative module descriptions: [20-modules.md](20-modules.md).
 
 Implements D9 (TypeScript), D10 (stdio), D11 (SQLite), D29–D32. Data model: `11-data-model.md`. Tools: `12-tool-spec.md`.
 
@@ -74,7 +74,8 @@ entity-intel-mcp/
 | `EIM_CACHE_TTL_*` | per-source TTL overrides | per D7 table |
 | `EIM_PERSONAL_DATA_TTL_DAYS` | retention for officer/PSC cache (D11) | 30 |
 | `EIM_AUDIT_RETENTION_DAYS` | audit log retention (D14) | 365 |
-| `EIM_SANCTIONS_MATCH` / `_POSSIBLE` | thresholds (D27) | 0.95 / 0.80 |
+| `EIM_SANCTIONS_MATCH` / `_POSSIBLE` | thresholds (D27, D37), range 0.5-1, possible <= match | 0.95 / 0.80 |
+| `EIM_EU_SANCTIONS_URL` | replacement https URL for the EU list (D36) | built-in public URL |
 Missing optional credential → adapter disabled, reported in `check_coverage`, never an exception at startup.
 
 ### 3.2 HTTP client

@@ -48,6 +48,21 @@ async function call(name: string, args: Record<string, unknown>): Promise<void> 
         .join(" "),
     );
     console.log("conflict:", d.conflicts.length, "| sources:", d.sources.join(","));
+  } else if (name === "screen_sanctions") {
+    const sc = j.data.screening;
+    console.log(
+      "result  :",
+      sc.result,
+      "| lists:",
+      sc.listsChecked
+        .map(
+          (c: { list: string; state: string; versionDate?: string }) =>
+            `${c.list}=${c.state}@${c.versionDate}`,
+        )
+        .join(" "),
+    );
+    for (const hit of sc.hits.slice(0, 3))
+      console.log(` - ${hit.list} ${hit.entryName} ${hit.score} ${hit.basis}`);
   } else if (name === "resolve_identifier") {
     console.log("data    :", JSON.stringify(j.data).slice(0, 400));
   }
@@ -61,4 +76,6 @@ await call("get_entity", { identifier: "00445790", country: "GB" });
 await call("resolve_identifier", { identifier: "IE6388047V" });
 await call("resolve_identifier", { identifier: "DE811128135" });
 await call("get_entity", { identifier: "NOTANID" });
+await call("screen_sanctions", { name: "Gazprom Neft", type: "entity" });
+await call("screen_sanctions", { identifier: "00445790", country: "GB" });
 await client.close();

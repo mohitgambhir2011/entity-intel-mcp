@@ -16,6 +16,8 @@ async function main(): Promise<void> {
   await server.connect(new StdioServerTransport());
   // stdout is the protocol channel; log to stderr only.
   console.error("entity-intel-mcp running on stdio");
+  // Index already-cached sanctions lists (no network); others download on first screening.
+  rt.sanctions.warmFromCache();
 }
 
 main().catch((err) => {

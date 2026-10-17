@@ -67,5 +67,11 @@ review of this codebase (2026-10-17) found 15 defects, all fixed with regression
 | Credential forwarding | Automatic redirects sent custom auth headers | Manual same-host redirects |
 | Sloppy limits | 429 penalty blocked a whole window; config 95 vs 0.95 | Tests with prior traffic; range-checked config |
 | Over-crediting provenance | A source that said "unknown" listed as supporting | Weak values don't corroborate |
+| A source that silently froze | The OFSI list closed 2026-01-28 but its URL kept returning a stale file | Report each list's version date; warn at 14 days, `incomplete` past 45; the `review-adapter` skill requires a currency check |
+| Free-text "identifier" extraction | Dates and "Organization Established Date" values indexed as registration numbers | One `acceptIdentifier()` (shape, digit, not a date) and an explicit allow-list of id types |
+| Silent truncation | A cut-off XML file parsed fine into a partial list | Closing root tag, declared record count, minimum size; never cache a failed check |
+| A clean result from nothing | A blank name or a nameless entity returned `no_match` | Reject degenerate input; `incomplete` when nothing could be screened by name |
 | Shell-escaped regexes | A lost backslash silently broke matching | Read generated files back; tests with real inputs |
 | Privacy drift | Audit log stored names despite "metadata only" | Hash free text; test the audit rows |
+
+The second `xhigh` review (sanctions module, 2026-10-17) found 13 more defects, all fixed with tests in `test/unit/sanctions-review.test.ts` and `test/integration/sanctions.test.ts`. A live run after the review then exposed the stale OFSI feed, which no review of the code could have found: **review the code, then run it against the real world.**

@@ -1,6 +1,7 @@
 import { adapterStatuses, buildAdapters, type AdapterStatus } from "./adapters/registry.js";
 import type { SourceAdapter } from "./adapters/types.js";
 import type { Config } from "./core/config.js";
+import { SanctionsIndex } from "./sanctions/index.js";
 import { AuditLog } from "./infra/audit.js";
 import { Cache } from "./infra/cache.js";
 import { DEFAULT_HOST_RULES, HttpClient, type FetchLike } from "./infra/http.js";
@@ -20,6 +21,7 @@ export interface Runtime {
   http: HttpClient;
   cache: Cache;
   audit: AuditLog;
+  sanctions: SanctionsIndex;
   /** Only adapters that are enabled and usable. */
   adapters: SourceAdapter[];
   statuses: AdapterStatus[];
@@ -31,6 +33,8 @@ export interface RuntimeOverrides {
   fetch?: FetchLike;
   storage?: Storage;
   clock?: Clock;
+  /** Tests: lowers the sanctions "list looks truncated" floor so small fixtures load. */
+  sanctionsMinEntries?: number;
 }
 
 function openStorage(env: NodeJS.ProcessEnv): Storage {
@@ -60,6 +64,14 @@ export function createRuntime(config: Config, overrides: RuntimeOverrides = {}):
   const cache = new Cache(storage, config.personalDataTtlDays * 86_400, clockNow);
   const audit = new AuditLog(storage, config.auditRetentionDays, clockNow);
 
+  const sanctions = new SanctionsIndex({
+    http,
+    cache,
+    now: clockNow,
+    euUrl: config.euSanctionsUrl,
+    minEntries: overrides.sanctionsMinEntries,
+  });
+
   const statuses = adapterStatuses(config, env);
   const adapters = buildAdapters(config, statuses);
 
@@ -77,6 +89,7 @@ export function createRuntime(config: Config, overrides: RuntimeOverrides = {}):
     http,
     cache,
     audit,
+    sanctions,
     adapters,
     statuses,
     now: () => new Date(clockNow()),

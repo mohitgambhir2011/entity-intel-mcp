@@ -65,3 +65,16 @@ Per source record: access, auth, limits, licence/caching/redistribution terms, f
 - **Companies House**: HTTP Basic with the key as username; `X-Ratelimit-*` response headers confirmed (limit 600, window 5m). Search relevance is loose (unrelated names appear in the top results), so ranking is done by this server.
 - **FCA**: base URL, headers and a successful search verified; rate limit still unverified (no rate-limit headers returned).
 - **Denmark / Ireland / France / Netherlands / Belgium**: still UNVERIFIED beyond the notes above.
+
+## Sanctions lists (verified live 2026-10-17)
+
+| List | URL | Size | Version signal | Structure | Notes |
+| --- | --- | --- | --- | --- | --- |
+| UK Sanctions List (FCDO) | https://sanctionslist.fcdo.gov.uk/docs/UK-Sanctions-List.xml | 22 MB | `<DateGenerated>dd/mm/yyyy` in the file; `Last-Modified` agrees | `<Designations>` of `<Designation>` (UniqueID, OFSIGroupID, Names/Name with Name1..Name6 + NameType + AliasStrength, NonLatinNames, RegimeName, IndividualEntityShip, DateDesignated, Addresses, EntityDetails/BusinessRegistrationNumbers, ShipDetails/IMONumbers) | 6,408 designations. **Replaced the OFSI Consolidated List on 2026-01-28.** Free text in BusinessRegistrationNumber ("UK Company no. 06527449") |
+| ~~OFSI Consolidated List~~ (`ofsistorage.blob.core.windows.net/.../ConList.xml`) | closed | 54 MB | `Last-Modified: 2026-06-03` | one row per name, GroupID | Still answers 200 but is frozen. **Do not use.** Found by noticing a months-old version date |
+| EU consolidated financial sanctions list | https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw | 26 MB | `generationDate` attribute; `Last-Modified` agrees | `<export>` of `<sanctionEntity>` (nameAlias wholeName/strong, subjectType person|enterprise, regulation programme, identification, citizenship) | 6,234 entities. The token is a fixed public value (base64 of "token-2017"); override with EIM_EU_SANCTIONS_URL |
+| OFAC SDN | https://www.treasury.gov/ofac/downloads/sdn.xml | 29 MB | `<Publish_Date>MM/DD/YYYY</Publish_Date>`, `<Record_Count>` | `<sdnList>` of `<sdnEntry>` (uid, firstName/lastName, sdnType, programList, akaList/aka with category strong|weak, idList/id with idType + idNumber, addressList) | 19,457 entries. 302 to a pre-signed S3 URL (`*.amazonaws.com`), so that host family is explicitly allowed for this download |
+
+ID types seen on OFAC entities: "Registration Number", "Tax ID No.", "Business Registration Number", "Company Number", "V.A.T. Number", "Legal Entity Number", "SWIFT/BIC", "Commercial Registry Number", "Unified Social Credit Code (USCC)" and many non-identifiers ("Organization Established Date", "Secondary sanctions risk:", "Website"): only an allow-list of registration-style types is indexed.
+
+Licence/terms: all three are official publications intended for public use. Redistribution terms are not asserted by this project; the lists are downloaded by each user's own server.

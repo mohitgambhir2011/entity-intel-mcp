@@ -1,6 +1,6 @@
 # Phase 3 — MCP tool specification (DRAFT v0.1)
 
-> **Implementation status (2026-10-17):** `check_coverage`, `search_entities`, `get_entity` (identity family only) and `resolve_identifier` are implemented. `get_officers`, `get_ownership`, `get_filings_and_insolvency`, `screen_sanctions` and the `kyb_check` prompt are not.
+> **Implementation status (2026-10-17):** `check_coverage`, `search_entities`, `get_entity` (identity family only), `resolve_identifier` and `screen_sanctions` are implemented. `get_officers`, `get_ownership`, `get_filings_and_insolvency` and the `kyb_check` prompt are not. `screen_sanctions` differs from section 1.7: lists are `UK | EU | OFAC_SDN` (D36), it screens a name or one entity (officer/owner scopes come with those families), and its result adds `incomplete` (D37). The authoritative description is [22-tool-reference.md](22-tool-reference.md).
 
 Implements D24 (8 tools + prompt), D25 (response shape), D26 (search), D27 (sanctions), D28 (errors). Types refer to `11-data-model.md`. Transport: stdio (D10). Server name: `entity-intel-mcp`.
 

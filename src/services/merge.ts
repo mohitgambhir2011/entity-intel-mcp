@@ -194,7 +194,11 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
       filings: { state: "not_yet_supported", sourcesTried: [] },
       regulatory: { state: "not_yet_supported", sourcesTried: [] },
       insolvency: { state: "not_yet_supported", sourcesTried: [] },
-      sanctions: { state: "not_yet_supported", sourcesTried: [] },
+      sanctions: {
+        state: "available",
+        sourcesTried: [],
+        note: "Call screen_sanctions with this entity_id (UK, EU, OFAC SDN)",
+      },
     },
   };
 
