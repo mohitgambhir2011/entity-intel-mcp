@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "dates": [
+        {
+          "date": "2008-11-20",
+          "type": "wound-up-on"
+        }
+      ],
+      "number": "1",
+      "practitioners": [
+        {
+          "address": {
+            "address_line_1": "1 Test Street",
+            "postal_code": "TE1 1ST"
+          },
+          "name": "Test Practitioner 1",
+          "role": "practitioner"
+        },
+        {
+          "address": {
+            "address_line_1": "1 Test Street",
+            "postal_code": "TE1 1ST"
+          },
+          "name": "Test Practitioner 2",
+          "role": "practitioner"
+        },
+        {
+          "address": {
+            "address_line_1": "1 Test Street",
+            "postal_code": "TE1 1ST"
+          },
+          "name": "Test Practitioner 3",
+          "role": "practitioner"
+        }
+      ],
+      "type": "compulsory-liquidation"
+    }
+  ],
+  "etag": "c5c230bb66f7e0a6309b63a877876fc40e9347e3",
+  "status": [
+    "liquidation"
+  ]
+}

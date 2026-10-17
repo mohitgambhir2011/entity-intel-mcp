@@ -1,4 +1,5 @@
-import type { Address } from "../../core/types.js";
+import type { Address, Provenance } from "../../core/types.js";
+import { iso } from "../types.js";
 
 export const BASE = "https://api.company-information.service.gov.uk";
 export const LICENCE = "Open Government Licence v3.0";
@@ -29,6 +30,26 @@ export function mapAddress(a: ChAddress | undefined): Address | undefined {
     postalCode: a.postal_code,
     country: "GB",
     formatted: parts.join(", "),
+  };
+}
+
+/** What is cached: the data without provenance, which describes *this* fetch, not the stored one. */
+export type Cached<T> = Omit<T, "provenance">;
+
+/** Provenance of one Companies House page for a company (D2). */
+export function provenance(
+  number: string,
+  path: string,
+  fetchedAt: number,
+  fromCache: boolean,
+): Provenance {
+  return {
+    source: "companies_house",
+    sourceRecordId: number,
+    sourceUrl: `https://find-and-update.company-information.service.gov.uk/company/${number}/${path}`,
+    retrievedAt: iso(fetchedAt),
+    fromCache,
+    licence: LICENCE,
   };
 }
 

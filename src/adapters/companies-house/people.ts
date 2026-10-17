@@ -11,31 +11,13 @@ import {
   type OfficerRole,
   type OfficersResult,
 } from "../../core/people.js";
-import type { Identifier, Provenance } from "../../core/types.js";
+import type { Identifier } from "../../core/types.js";
 import { TTL } from "../../infra/cache.js";
-import { iso, type AdapterContext } from "../types.js";
-import { BASE, LICENCE, mapAddress, type ChAddress } from "./shared.js";
+import type { AdapterContext } from "../types.js";
+import { BASE, mapAddress, provenance, type Cached, type ChAddress } from "./shared.js";
 
 const SOURCE = "companies_house";
 
-/** What is cached: the data without provenance, which describes *this* fetch, not the stored one. */
-type Cached<T> = Omit<T, "provenance">;
-
-function provenance(
-  number: string,
-  path: string,
-  fetchedAt: number,
-  fromCache: boolean,
-): Provenance {
-  return {
-    source: "companies_house",
-    sourceRecordId: number,
-    sourceUrl: `https://find-and-update.company-information.service.gov.uk/company/${number}/${path}`,
-    retrievedAt: iso(fetchedAt),
-    fromCache,
-    licence: LICENCE,
-  };
-}
 const PAGE_SIZE = 100;
 /** Hard stop on paging: 500 officers is far beyond any real company; flagged as truncated. */
 const MAX_PAGES = 5;

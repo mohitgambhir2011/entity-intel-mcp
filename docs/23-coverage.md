@@ -30,7 +30,7 @@ State words are used precisely:
 
 | Wave | Countries | Source | Access (as assessed) | Identity | Officers | Owners | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Core | GB | Companies House | free key | yes | **done** | **done** (PSC chain) | Filings, charges, insolvency planned |
+| Core | GB | Companies House | free key | yes | **done** | **done** (PSC chain) | **Filings, charges, insolvency done** (`get_filings_and_insolvency`); documents not fetched |
 | Core | GB | FCA Register | free key (verified 2026-10-17) | planned | planned | - | Regulatory status; headers `X-Auth-Email`/`X-Auth-Key` verified, rate limit unverified |
 | Core | EU | GLEIF Level 2 | free | planned | - | partial: only entities that report parents | Direct/ultimate parent relationships |
 | Core | all | UK, EU, OFAC sanctions lists | free downloads | - | - | - | **Done**: `screen_sanctions`, local index, 24 h refresh |
@@ -51,7 +51,7 @@ State words are used precisely:
 | Beneficial owners | **Implemented for the UK PSC register** (`get_ownership`). **Restricted** in most EU registers since the 2022 CJEU ruling (public access removed; obliged entities only), including Norway and Finland: the server reports `unavailable: restricted_access` with that explanation rather than an empty list. UK PSC data remains public |
 | Filings, accounts | Document links only; availability varies |
 | Regulatory | UK (FCA) planned; EU needs ESMA / national regulator registers |
-| Insolvency, charges | UK via Companies House; EU insolvency registers are national and fragmented |
+| Filings, charges, insolvency | **Implemented for the UK** (`get_filings_and_insolvency`): filing history, charges, insolvency cases and practitioners. Other countries report `not_yet_supported`; EU insolvency registers are national and fragmented |
 | Sanctions | **Implemented** (`screen_sanctions`): UK Sanctions List, EU consolidated list, OFAC SDN; name- and registration-number-based (LEI, UK company number, VAT; Norwegian and Finnish registry numbers are deliberately not compared with list identifiers because bare 8-9 digit numbers collide); refreshed every 24 h; not a legal determination. An entity's officers (UK, Norway) and owners (UK) can be screened with it; dates of birth are not used |
 
 ## How the server reports gaps

@@ -13,6 +13,7 @@ import type {
 import { TTL } from "../../infra/cache.js";
 import { iso, type AdapterContext, type SourceAdapter } from "../types.js";
 import { fetchControllers, fetchOfficers } from "./people.js";
+import { fetchCharges, fetchFilings, fetchInsolvency } from "./records.js";
 import { authHeader, BASE, LICENCE, mapAddress, type ChAddress } from "./shared.js";
 
 interface ChCompany {
@@ -93,6 +94,21 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
     country: "GB",
 
     supports: (id) => id.scheme === "GB_CRN",
+
+    async filings(identifier, query, ctx) {
+      const number = normalizeGbCompanyNumber(identifier.value);
+      return number ? fetchFilings(ctx, authHeader(requireKey()), number, query) : undefined;
+    },
+
+    async charges(identifier, ctx) {
+      const number = normalizeGbCompanyNumber(identifier.value);
+      return number ? fetchCharges(ctx, authHeader(requireKey()), number) : undefined;
+    },
+
+    async insolvency(identifier, ctx) {
+      const number = normalizeGbCompanyNumber(identifier.value);
+      return number ? fetchInsolvency(ctx, authHeader(requireKey()), number) : undefined;
+    },
 
     async officers(identifier, ctx) {
       const number = normalizeGbCompanyNumber(identifier.value);

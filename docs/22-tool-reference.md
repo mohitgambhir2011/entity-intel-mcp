@@ -143,6 +143,20 @@ Companies outside the UK: Norway and Finland answer `unavailable` with `restrict
 
 Terminal reasons: `natural_person`, `exempt` (only exemptions in force today), `statement` (e.g. "no person or entity with significant control"), `all_ceased`, `no_controllers_published`, `not_followable` (registered outside Companies House or without details), `redacted` (protected identity), `depth_limit`, `budget`, `error`. Person node ids are pseudonymous hashes of the published identity (one person = one node across the graph). Real example (`00519500`): Tesco Stores Limited <- Tesco Holdings Limited (75-100% shares and voting, right to appoint directors) <- Tesco Plc (terminal `exempt`: shares traded on a regulated market).
 
+## `get_filings_and_insolvency`
+
+Arguments: entity reference, `include` (any of `filings|charges|insolvency`, at least one; default all), `category` (a registry filing category such as `accounts`, `confirmation-statement`, `capital`, `change-of-name`, `incorporation`, `liquidation`, `officers`, `resolution`; lower-case letters and hyphens only), `limit` (1-100, default 25) and `offset` for the filings.
+
+`data` holds `company`, `families` (those requested) and one availability object per family (`available` with data, `unavailable` with a reason - `requires_credentials`, `not_enabled`, `no_such_record` -, `not_yet_supported` for countries without an adapter, or `error` with a warning):
+
+- `filings.data`: `items[]` (`transactionId`, `date`, `category`, `type` such as `AA` or `SH06`, `description` (the registry's code), `actionDate`, `paperFiled`, `pages`, `documentUrl` only when it points at the registry's document API), `total` (matching the category on the register), `offset`. `meta.page` carries total, limit and offset. The filing text is the registry's wording and is untrusted.
+- `charges.data`: `charges[]` (`number`, `status`, `createdOn`, `deliveredOn`, `satisfiedOn`, `classification`, `particulars` cut to 300 characters, `personsEntitled`), `total`, `outstanding` (everything not fully satisfied, so a part-satisfied charge counts), `satisfied`, `partSatisfied`, `truncated`. At most 500 charges are fetched; more is flagged with a warning. A 404 on the charges endpoint is reported as `unavailable: no_such_record`, never as "no charges".
+- `insolvency.data`: `cases[]` (`number`, `type`, `dates[]`, `practitioners[]` with `name`, `role`, `appointedOn`, `ceasedToActOn`) and `statusFlags`. Companies House answers 404 for a company with no insolvency record, which is reported as an empty `cases` list. When the company's status says it is in liquidation or insolvent but no case is listed, a warning says to check the register.
+
+Personal data: practitioners and charge holders can be named individuals, so these two families are cached as personal data (capped lifetime) and the response carries the personal-data disclaimer when either is present.
+
+Real example (Tesco PLC, `00445790`): 8,372 filings (newest `SH03`), 9 charges of which 2 outstanding, no insolvency case. A liquidated Northern Ireland company (`NI017460`): status `in_liquidation`, one `compulsory-liquidation` case.
+
 ## `screen_sanctions`
 
 Arguments: `name` (2-200 chars) **or** an entity (`entity_id` / `identifier` + optional `scheme`, `country`); `type` (`person|entity|any`, for names); `lists` (subset of `UK|EU|OFAC_SDN`, default all); `fresh` (re-download the lists).
@@ -205,6 +219,8 @@ Argument: `country` (optional ISO code). Returns every catalogued source with `e
 | `companies_house is unavailable (HTTP 503)` | Source failed after one retry | Retry later; the rest of the answer is still valid |
 | `Local rate limit reached for companies_house; next slot in 41s` | Protecting your key | Wait or narrow the request |
 | `Sources disagree on: status (see data.conflicts)` | Registries differ | Inspect `conflicts`; treat as a finding, not an error |
+| `The register lists 136 charges but only 100 could be read` | More charges than the 500 fetched, or a page failed | The list is incomplete; check the register |
+| `The company's status is distressed but the registry lists no insolvency case` | Status and case list disagree | Check the register directly |
 | `This looks like a company number; add country=GB, country=NO or country=FI ...` | Bare digits in a name search | Repeat with the right `country` |
 | `The registry lists 16 officers but only 15 could be read` | The register listed roles the server could not read (no usable name) | The list is incomplete; a screen built on it is `incomplete` |
 | `brreg_no is unavailable (HTTP 500)` / `... is rate limiting requests (HTTP 429)` | The Norwegian (or Finnish) register failed after one retry | The profile still holds what GLEIF and the others said; retry later |

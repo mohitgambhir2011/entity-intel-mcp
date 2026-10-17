@@ -1,4 +1,4 @@
-import type { SourceAdapter } from "../adapters/types.js";
+import type { Capability, SourceAdapter } from "../adapters/types.js";
 import type { EntityProfile, FamilyCoverage } from "../core/entity.js";
 import { InvalidInputError } from "../core/errors.js";
 import type { Availability } from "../core/people.js";
@@ -70,10 +70,20 @@ export function buildProfile(
     "controllers",
     "get_ownership",
   );
+  profile.coverage.families.filings = family(
+    findRegistry(rt, profile, "filings"),
+    "filings",
+    "get_filings_and_insolvency",
+  );
+  profile.coverage.families.insolvency = family(
+    findRegistry(rt, profile, "insolvency"),
+    "insolvency",
+    "get_filings_and_insolvency",
+  );
   return profile;
 }
 
-export type Capability = "officers" | "controllers";
+export type { Capability };
 
 export interface RegistryHandle {
   adapter: SourceAdapter;
@@ -113,6 +123,9 @@ export function findControllersRegistry(
 const FAMILY_LABEL: Record<Capability, string> = {
   officers: "Officer",
   controllers: "Ownership",
+  filings: "Filing",
+  charges: "Charge",
+  insolvency: "Insolvency",
 };
 
 /**

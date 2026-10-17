@@ -1,0 +1,44 @@
+{
+  "filing_history_status": "filing-history-available",
+  "items": [
+    {
+      "transaction_id": "MzUzNDMwNDQ5M2FkaXF6a2N4",
+      "barcode": "AF6FAFN7",
+      "type": "AA",
+      "date": "2026-07-25",
+      "category": "accounts",
+      "description": "accounts-with-accounts-type-group",
+      "description_values": {
+        "made_up_date": "2026-02-28"
+      },
+      "pages": 236,
+      "action_date": "2026-02-28",
+      "paper_filed": true,
+      "links": {
+        "self": "/company/00445790/filing-history/MzUzNDMwNDQ5M2FkaXF6a2N4",
+        "document_metadata": "https://document-api.company-information.service.gov.uk/document/-uIFIZvVQM2_WxuNYmjA10Fv96C0Yuxb-wNWhAqNezY"
+      }
+    },
+    {
+      "transaction_id": "MzQ3MzY5NzQ1OWFkaXF6a2N4",
+      "barcode": "AE6K3U7E",
+      "type": "AA",
+      "date": "2025-07-15",
+      "category": "accounts",
+      "description": "accounts-with-accounts-type-group",
+      "description_values": {
+        "made_up_date": "2025-02-26"
+      },
+      "pages": 250,
+      "action_date": "2025-02-26",
+      "paper_filed": true,
+      "links": {
+        "self": "/company/00445790/filing-history/MzQ3MzY5NzQ1OWFkaXF6a2N4",
+        "document_metadata": "https://document-api.company-information.service.gov.uk/document/gnhHdY1QS-LnojDWaLlg1pl1nSkI0KgAXbY2NKwEJTA"
+      }
+    }
+  ],
+  "items_per_page": 2,
+  "start_index": 0,
+  "total_count": 55
+}

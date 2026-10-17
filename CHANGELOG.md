@@ -6,6 +6,7 @@ All notable changes. Dates are absolute. Versions follow semver; 0.x may change 
 
 ### Added
 
+- **`get_filings_and_insolvency`** (UK, Companies House, D41): filing history (paged, optional category), charges with outstanding / satisfied counts, and insolvency cases with practitioners, each family with its own availability state. `scripts/live-records.ts`. Fifth `xhigh` code review: 9 findings fixed with regression tests.
 - **Norway and Finland, no key needed (D40).** `no-brreg` (Enhetsregisteret): identity, name search and roles (CEO, chair, board, deputies, auditor, accountant, signatories; full published birth date; no appointment dates). `fi-prh` (PRH open data v3): identity and name search, with status inferred from company situations and the trade-register entry. Identifiers `NO_ORGNR` and `FI_YTUNNUS` with check-digit validation, entity ids `NO:BR:<orgnr>` and `FI:PRH:<id>`, LEI crosswalks through GLEIF (RA000472, RA000188), Finnish VAT computed from the business ID and validated by VIES, Norwegian `NO...MVA` read as the organisation number.
 - **Per-country restrictions.** Adapters declare what a country will not provide (`restrictions`): Norway and Finland ownership `restricted_access`, Finnish officers `not_published_by_source`; the tools say so instead of "not yet supported". New unavailable reason `not_enabled`. Adapters declare their `country`; `get_officers` takes the new roles (`ceo`, `chair`, `board_member`, `deputy`, `auditor`, `accountant`, `authorised_signatory`).
 - `scripts/live-nordic.ts` (real-world check of both registers).

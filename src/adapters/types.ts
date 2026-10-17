@@ -1,4 +1,5 @@
 import type { ControllersResult, OfficersResult, UnavailableReason } from "../core/people.js";
+import type { ChargesResult, FilingsResult, InsolvencyResult } from "../core/records.js";
 import type { Cache } from "../infra/cache.js";
 import type { HttpClient } from "../infra/http.js";
 import type {
@@ -8,6 +9,15 @@ import type {
   SearchHit,
   SourceId,
 } from "../core/types.js";
+
+/** The data families an adapter can provide beyond identity. */
+export type Capability = "officers" | "controllers" | "filings" | "charges" | "insolvency";
+
+export interface FilingsQuery {
+  category?: string;
+  limit: number;
+  offset: number;
+}
 
 export interface AdapterContext {
   http: HttpClient;
@@ -42,7 +52,7 @@ export interface SourceAdapter {
    * beneficial owners). Lets the tools say "restricted" instead of "not yet supported".
    */
   readonly restrictions?: Partial<
-    Record<"officers" | "controllers", { reason: UnavailableReason; detail: string }>
+    Record<Capability, { reason: UnavailableReason; detail: string }>
   >;
   /** Optional identifier translations this source can provide. */
   readonly crosswalks?: Crosswalk[];
@@ -50,6 +60,16 @@ export interface SourceAdapter {
   officers?(identifier: Identifier, ctx: AdapterContext): Promise<OfficersResult | undefined>;
   /** Optional: persons / entities with significant control (beneficial owners). */
   controllers?(identifier: Identifier, ctx: AdapterContext): Promise<ControllersResult | undefined>;
+  /** Optional: one page of the filing history, optionally limited to a registry category. */
+  filings?(
+    identifier: Identifier,
+    query: FilingsQuery,
+    ctx: AdapterContext,
+  ): Promise<FilingsResult | undefined>;
+  /** Optional: charges (mortgages, security) registered against the company. */
+  charges?(identifier: Identifier, ctx: AdapterContext): Promise<ChargesResult | undefined>;
+  /** Optional: insolvency cases and practitioners. undefined = no such company. */
+  insolvency?(identifier: Identifier, ctx: AdapterContext): Promise<InsolvencyResult | undefined>;
   /** Optional name search. */
   search?(query: string, ctx: AdapterContext, limit?: number): Promise<SearchHit[]>;
 }

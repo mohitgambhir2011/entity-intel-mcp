@@ -9,12 +9,13 @@ afterEach(async () => {
 });
 
 describe("tool listing", () => {
-  it("exposes the seven tools as read-only", async () => {
+  it("exposes the eight tools as read-only", async () => {
     h = await startHarness();
     const { tools } = await h.client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([
       "check_coverage",
       "get_entity",
+      "get_filings_and_insolvency",
       "get_officers",
       "get_ownership",
       "resolve_identifier",

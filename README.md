@@ -10,8 +10,8 @@ Built for **KYB / due diligence first, research second**. It is honest about gap
 does not publish a data family, or a source is down or stale, the result says so instead of
 returning silence or a false all-clear.
 
-> **Status: early development (v0.0.1).** Seven tools work (below). Filings, regulatory status and
-> insolvency are **not implemented yet**. National registry adapters exist for the **UK**, **Norway**
+> **Status: early development (v0.0.1).** Eight tools work (below). Regulatory status (FCA) is
+> **not implemented yet**. National registry adapters exist for the **UK**, **Norway**
 > and **Finland**: officers are available for UK and Norwegian companies, ownership for UK companies
 > only (Norway and Finland do not publish beneficial owners, and the result says so). See
 > [Coverage](#coverage) and the [roadmap](docs/01-DECISIONS.md) (D12).
@@ -33,6 +33,7 @@ returning silence or a false all-clear.
 | "Give me the profile of Norwegian company 923 609 016 / Finnish business ID 0112038-9" | `get_entity`                      |
 | "Who are its directors, and who ultimately owns and controls it?" (UK; Norway: board)  | `get_officers`, `get_ownership`   |
 | "Are any of its directors or owners sanctioned?" (UK; Norway: officers)                | `screen_sanctions` with `include` |
+| "What has it filed, what security is registered against it, is it in insolvency?" (UK) | `get_filings_and_insolvency`      |
 | "What can this server actually tell me about Norway today?"                            | `check_coverage`                  |
 
 Design rules that shape every answer:
@@ -126,6 +127,10 @@ Current directors, secretaries and other officers of a **UK** company from Compa
 
 Traces who controls a **UK** company: its persons with significant control (PSC) and, for each corporate controller registered at Companies House, theirs in turn, up to `depth` levels (default 3, max 10). Returns a graph (owner-to-owned edges with the published share / voting bands and board-control flags) and the ends of the chains, each with the reason the chain stops: a natural person, a company **exempt** from PSC reporting (for example listed on a regulated market), a company's statement, all controllers ceased, a foreign or unidentified entity, a protected identity, or the depth / request limit. Bands are not multiplied along the chain. Norway and Finland do not publish beneficial owners openly, so their companies answer `unavailable: restricted_access` with that explanation. **Contains personal data.**
 
+### `get_filings_and_insolvency`
+
+A **UK** company's history from Companies House: the **filing history** (accounts, confirmation statements, changes of name, capital and so on; newest first, paged with `limit` / `offset`, optionally one registry `category`), its **charges** (mortgages and security: status, dates, what kind, short particulars, who is entitled; counts of outstanding and satisfied, a part-satisfied charge counts as outstanding) and its **insolvency cases** (type, dates, appointed practitioners). `include` picks the families (default all three). Each family has its own availability state, so one failing never hides the others; other countries say why they are unavailable. Documents themselves are not fetched. **Contains personal data** (practitioners and charge holders can be named individuals).
+
 ### `screen_sanctions`
 
 Screens a **name** (`name`, optional `type`: `person|entity|any`) **or** a resolved entity
@@ -175,16 +180,16 @@ Out-of-range values are replaced by the default and reported on stderr at startu
 What the server can return **today** (v0.0.1). "Identity" = names, identifiers, status, legal form,
 dates, address.
 
-| Source                | Countries             | Identity                                                 |   Officers    | Owners            | Filings | Regulatory | Insolvency | Sanctions |
-| --------------------- | --------------------- | -------------------------------------------------------- | :-----------: | ----------------- | :-----: | :--------: | :--------: | --------- |
-| Companies House (key) | GB                    | yes                                                      |      yes      | yes (PSC chain)   |    -    |     -      |     -      | -         |
-| Enhetsregisteret      | NO                    | yes (incl. LEI and VAT crosswalk)                        |  yes (roles)  | not public        |    -    |     -      |     -      | -         |
-| PRH open data         | FI                    | yes (incl. LEI and VAT crosswalk; status inferred)       | not published | not public        |    -    |     -      |     -      | -         |
-| GLEIF                 | LEI holders worldwide | yes                                                      |       -       | parents (planned) |    -    |     -      |     -      | -         |
-| VIES                  | EU member states + XI | VAT validity; name/address where the state releases them |       -       | -                 |    -    |     -      |     -      | -         |
-| UK Sanctions List     | UK designations       | -                                                        |       -       | -                 |    -    |     -      |     -      | yes       |
-| EU consolidated list  | EU designations       | -                                                        |       -       | -                 |    -    |     -      |     -      | yes       |
-| OFAC SDN              | US designations       | -                                                        |       -       | -                 |    -    |     -      |     -      | yes       |
+| Source                | Countries             | Identity                                                 |   Officers    | Owners            |     Filings     | Regulatory | Insolvency | Sanctions |
+| --------------------- | --------------------- | -------------------------------------------------------- | :-----------: | ----------------- | :-------------: | :--------: | :--------: | --------- |
+| Companies House (key) | GB                    | yes                                                      |      yes      | yes (PSC chain)   | yes (+ charges) |     -      |    yes     | -         |
+| Enhetsregisteret      | NO                    | yes (incl. LEI and VAT crosswalk)                        |  yes (roles)  | not public        |        -        |     -      |     -      | -         |
+| PRH open data         | FI                    | yes (incl. LEI and VAT crosswalk; status inferred)       | not published | not public        |        -        |     -      |     -      | -         |
+| GLEIF                 | LEI holders worldwide | yes                                                      |       -       | parents (planned) |        -        |     -      |     -      | -         |
+| VIES                  | EU member states + XI | VAT validity; name/address where the state releases them |       -       | -                 |        -        |     -      |     -      | -         |
+| UK Sanctions List     | UK designations       | -                                                        |       -       | -                 |        -        |     -      |     -      | yes       |
+| EU consolidated list  | EU designations       | -                                                        |       -       | -                 |        -        |     -      |     -      | yes       |
+| OFAC SDN              | US designations       | -                                                        |       -       | -                 |        -        |     -      |     -      | yes       |
 
 `-` = not implemented yet. Planned order and per-country detail, including data that will stay
 unavailable for legal reasons (for example most EU beneficial-owner registers since 2022):

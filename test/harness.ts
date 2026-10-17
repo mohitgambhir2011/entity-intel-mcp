@@ -88,11 +88,34 @@ export function peopleRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   };
 }
 
+/** Filing history, charges and insolvency (Tesco PLC; a liquidated Northern Ireland company). */
+export function recordsRoutes(): Record<string, FakeRoute | FakeRoute[]> {
+  const f = (path: string): FakeRoute => ({ body: fixtureText(path) });
+  const tesco = `${CH}/company/00445790`;
+  const ni = `${CH}/company/NI017460`;
+  return {
+    [`${tesco}/filing-history?items_per_page=2&start_index=0&category=accounts`]: f(
+      "companies_house/filing-history-tesco-accounts.json",
+    ),
+    [`${tesco}/filing-history`]: f("companies_house/filing-history-tesco.json"),
+    [`${tesco}/charges`]: [
+      f("companies_house/charges-tesco.json"),
+      { body: JSON.stringify({ items: [] }) },
+    ],
+    [`${tesco}/insolvency`]: { status: 404, body: "" },
+    [`${ni}/insolvency`]: f("companies_house/insolvency-case.json"),
+    [`${ni}/charges`]: { body: JSON.stringify({ items: [], total_count: 0 }) },
+    [`${ni}/filing-history`]: { body: JSON.stringify({ items: [], total_count: 0 }) },
+    [ni]: f("companies_house/company-ni017460.json"),
+  };
+}
+
 /** Recorded responses for the Tesco PLC golden entity and a few VAT numbers. */
 export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   return {
     ...peopleRoutes(),
     ...nordicRoutes(),
+    ...recordsRoutes(),
     [`${GLEIF}/lei-records/2138002P5RNKC5W2JZ46`]: { body: fixtureText("gleif/lei-tesco.json") },
     [`${GLEIF}/lei-records?filter[entity.registeredAs]=00445790`]: {
       body: fixtureText("gleif/by-registration-tesco.json"),

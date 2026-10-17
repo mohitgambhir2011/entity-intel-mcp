@@ -199,10 +199,8 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
     jurisdiction,
     families: {
       identity: { state: partials.length > 0 ? "available" : "unavailable", sourcesTried },
-      // officers and ownership depend on which sources are enabled: buildProfile fills them in.
-      filings: { state: "not_yet_supported", sourcesTried: [] },
+      // officers, ownership, filings and insolvency depend on which sources are enabled: buildProfile fills them in.
       regulatory: { state: "not_yet_supported", sourcesTried: [] },
-      insolvency: { state: "not_yet_supported", sourcesTried: [] },
       sanctions: {
         state: "available",
         sourcesTried: [],

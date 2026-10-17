@@ -27,6 +27,7 @@ code sits behind an interface so it can be replaced if the API changes.
 | `npx tsx scripts/live-smoke.ts` | Real calls to GLEIF, VIES, Companies House |
 | `npx tsx scripts/live-people.ts` | Real Companies House officers / PSC for the Tesco group and a related-party sanctions screen (prints counts and company names only). Needs your key |
 | `npx tsx scripts/live-nordic.ts` | Real Norwegian and Finnish registers (no key): Equinor ASA and Nokia Oyj through identifier, LEI and VAT forms, a ceased and a bankrupt company, roles and the reasons ownership and Finnish officers are unavailable, and name searches. Prints counts and company data only (no individuals' names). Run it after touching `src/adapters/no-brreg`, `fi-prh` or the GLEIF crosswalks |
+| `npx tsx scripts/live-records.ts` | Real Companies House filing history, charges and insolvency for Tesco PLC, Tesco Stores and a liquidated company (counts and types only). Needs your key |
 | `npx tsx scripts/live-sanctions.ts` | Downloads the real UK, EU and OFAC lists (about 100 MB), prints entry counts, versions and timings, and screens sample names. Run it after touching `src/sanctions/` and whenever a publisher changes a list |
 | `npx tsx scripts/live-mcp-smoke.ts` | Spawns the built server and calls every tool over stdio against real services |
 | `npx tsx scripts/print-examples.ts <tool>` | Prints a tool response from the recorded fixtures (keeps docs honest) |
