@@ -18,14 +18,14 @@ export interface AdapterStatus extends AdapterInfo {
 }
 
 export const ADAPTERS: AdapterInfo[] = [
-  { id: "gleif", country: "EU", label: "GLEIF LEI records", requiredEnv: [], implemented: false },
-  { id: "vies", country: "EU", label: "VIES VAT validation", requiredEnv: [], implemented: false },
+  { id: "gleif", country: "EU", label: "GLEIF LEI records", requiredEnv: [], implemented: true },
+  { id: "vies", country: "EU", label: "VIES VAT validation", requiredEnv: [], implemented: true },
   {
     id: "gb",
     country: "GB",
     label: "Companies House",
     requiredEnv: ["COMPANIES_HOUSE_API_KEY"],
-    implemented: false,
+    implemented: true,
   },
   {
     id: "gb-fca",

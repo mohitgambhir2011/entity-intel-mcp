@@ -1,0 +1,442 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-10-17T00:00:00Z"
+    },
+    "pagination": {
+      "currentPage": 1,
+      "perPage": 3,
+      "from": 1,
+      "to": 3,
+      "total": 11,
+      "lastPage": 4
+    }
+  },
+  "links": {
+    "first": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=TESCO+PLC&page%5Bnumber%5D=1&page%5Bsize%5D=3",
+    "next": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=TESCO+PLC&page%5Bnumber%5D=2&page%5Bsize%5D=3",
+    "last": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=TESCO+PLC&page%5Bnumber%5D=4&page%5Bsize%5D=3"
+  },
+  "data": [
+    {
+      "type": "lei-records",
+      "id": "2138002P5RNKC5W2JZ46",
+      "attributes": {
+        "lei": "2138002P5RNKC5W2JZ46",
+        "entity": {
+          "legalName": {
+            "name": "TESCO PLC",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "TESCO HOUSE",
+              "SHIRE PARK, KESTREL WAY"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "WELWYN GARDEN CITY",
+            "region": "GB-HRT",
+            "country": "GB",
+            "postalCode": "AL7 1GA"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "TESCO HOUSE",
+              "SHIRE PARK, KESTREL WAY"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "WELWYN GARDEN CITY",
+            "region": "GB-HRT",
+            "country": "GB",
+            "postalCode": "AL7 1GA"
+          },
+          "registeredAt": {
+            "id": "RA000585",
+            "other": null
+          },
+          "registeredAs": "00445790",
+          "jurisdiction": "GB",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "B6ES",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "1947-11-27T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2013-12-19T00:00:00Z",
+          "lastUpdateDate": "2025-11-21T07:42:21Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-01-10T00:00:00Z",
+          "managingLou": "213800WAVVOPS85N2205",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000585",
+            "other": null
+          },
+          "validatedAs": "00445790",
+          "otherValidationAuthorities": []
+        },
+        "bic": [
+          "TSCOGB2LTPF",
+          "TSCOGB2LXXX"
+        ],
+        "mic": null,
+        "ocid": "gb/00445790",
+        "qcc": "QGB15S1TEG",
+        "gem": null,
+        "spglobal": [
+          "413744"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/ultimate-parent-reporting-exception"
+          }
+        },
+        "direct-children": {
+          "links": {
+            "relationship-records": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/direct-child-relationships",
+            "related": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/direct-children"
+          }
+        },
+        "ultimate-children": {
+          "links": {
+            "relationship-records": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/ultimate-child-relationships",
+            "related": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/ultimate-children"
+          }
+        },
+        "isins": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46/isins"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/2138002P5RNKC5W2JZ46"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "213800DJFYY7MSLDKD28",
+      "attributes": {
+        "lei": "213800DJFYY7MSLDKD28",
+        "entity": {
+          "legalName": {
+            "name": "TESCO TREASURY SERVICES PLC",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "TESCO HOUSE",
+              "SHIRE PARK, KESTREL WAY"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "WELWYN GARDEN CITY",
+            "region": null,
+            "country": "GB",
+            "postalCode": "AL7 1GA"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "TESCO HOUSE",
+              "SHIRE PARK, KESTREL WAY"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "WELWYN GARDEN CITY",
+            "region": null,
+            "country": "GB",
+            "postalCode": "AL7 1GA"
+          },
+          "registeredAt": {
+            "id": "RA000585",
+            "other": null
+          },
+          "registeredAs": "07656305",
+          "jurisdiction": "GB",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "B6ES",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "INACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2011-06-02T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": [
+            {
+              "groupType": "STANDALONE",
+              "events": [
+                {
+                  "validationDocuments": "ACCOUNTS_FILING",
+                  "effectiveDate": "2021-01-12T00:00:00Z",
+                  "recordedDate": "2024-09-03T06:47:52Z",
+                  "type": "DISSOLUTION",
+                  "status": "COMPLETED"
+                }
+              ]
+            }
+          ]
+        },
+        "registration": {
+          "initialRegistrationDate": "2013-12-19T00:00:00Z",
+          "lastUpdateDate": "2024-12-16T17:06:10Z",
+          "status": "RETIRED",
+          "nextRenewalDate": "2017-12-19T00:00:00Z",
+          "managingLou": "213800WAVVOPS85N2205",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000585",
+            "other": null
+          },
+          "validatedAs": "07656305",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QGBRCPGG22",
+        "gem": null,
+        "spglobal": [
+          "172235203"
+        ],
+        "conformityFlag": "NOT_APPLICABLE"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/213800DJFYY7MSLDKD28/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/213800DJFYY7MSLDKD28/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/213800DJFYY7MSLDKD28/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/213800DJFYY7MSLDKD28/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/213800DJFYY7MSLDKD28/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/213800DJFYY7MSLDKD28"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "JL5Y1BHW3R0NH5H6C288",
+      "attributes": {
+        "lei": "JL5Y1BHW3R0NH5H6C288",
+        "entity": {
+          "legalName": {
+            "name": "TESCO PLC PENSION SCHEME",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O TESCO PENSION TRUSTEES LIMITED",
+              "TESCO HOUSE, SHIRE PARK, KESTREL WAY"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "WELWYN GARDEN CITY",
+            "region": "GB-HRT",
+            "country": "GB",
+            "postalCode": "AL7 1GA"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O TESCO PENSION INVESTMENT LIMITED",
+              "125 FINSBURY PAVEMENT"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "LONDON",
+            "region": "GB-LND",
+            "country": "GB",
+            "postalCode": "EC2A 1NQ"
+          },
+          "registeredAt": {
+            "id": "RA999999",
+            "other": null
+          },
+          "registeredAs": null,
+          "jurisdiction": "GB",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "8888",
+            "other": "PENSION SCHEME"
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "1976-05-24T05:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2012-11-26T09:02:00Z",
+          "lastUpdateDate": "2025-11-27T12:50:03Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-01-23T00:00:00Z",
+          "managingLou": "213800WAVVOPS85N2205",
+          "corroborationLevel": "ENTITY_SUPPLIED_ONLY",
+          "validatedAt": {
+            "id": "RA999999",
+            "other": null
+          },
+          "validatedAs": null,
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": null,
+        "gem": null,
+        "spglobal": [
+          "213674671"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/ultimate-parent-reporting-exception"
+          }
+        },
+        "direct-children": {
+          "links": {
+            "relationship-records": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/direct-child-relationships",
+            "related": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/direct-children"
+          }
+        },
+        "ultimate-children": {
+          "links": {
+            "relationship-records": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/ultimate-child-relationships",
+            "related": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288/ultimate-children"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/JL5Y1BHW3R0NH5H6C288"
+      }
+    }
+  ]
+}
