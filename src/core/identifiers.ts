@@ -67,8 +67,49 @@ export function parseVat(input: string): ParsedVat | undefined {
   const country = raw.slice(0, 2);
   const number = raw.slice(2);
   if (!VIES_COUNTRIES.has(country) || number.length < 4 || number.length > 14) return undefined;
-  if (!/^[A-Z0-9]+$/.test(number)) return undefined;
+  if (!/^[A-Z0-9+*]+$/.test(number) || !/[0-9]/.test(number)) return undefined;
   return { country, number };
+}
+
+/**
+ * Published VAT number shapes per VIES country (number part, without the country prefix).
+ * Used to decide whether free text is a VAT number: parseVat alone is too lenient, because many
+ * company names start with a country code ("Deutsche Bank" -> DE + UTSCHEBANK).
+ */
+const VAT_SHAPES: Record<string, RegExp> = {
+  AT: /^U\d{8}$/,
+  BE: /^[01]\d{9}$/,
+  BG: /^\d{9,10}$/,
+  CY: /^\d{8}[A-Z]$/,
+  CZ: /^\d{8,10}$/,
+  DE: /^\d{9}$/,
+  DK: /^\d{8}$/,
+  EE: /^\d{9}$/,
+  EL: /^\d{9}$/,
+  ES: /^[A-Z0-9]\d{7}[A-Z0-9]$/,
+  FI: /^\d{8}$/,
+  FR: /^[A-Z0-9]{2}\d{9}$/,
+  HR: /^\d{11}$/,
+  HU: /^\d{8}$/,
+  IE: /^(\d{7}[A-W][A-IW]?|d[A-Z+*]\d{5}[A-W])$/,
+  IT: /^\d{11}$/,
+  LT: /^(\d{9}|\d{12})$/,
+  LU: /^\d{8}$/,
+  LV: /^\d{11}$/,
+  MT: /^\d{8}$/,
+  NL: /^\d{9}B\d{2}$/,
+  PL: /^\d{10}$/,
+  PT: /^\d{9}$/,
+  RO: /^\d{2,10}$/,
+  SE: /^\d{12}$/,
+  SI: /^\d{8}$/,
+  SK: /^\d{10}$/,
+  XI: /^(\d{9}|\d{12}|GD\d{3}|HA\d{3})$/,
+};
+
+/** True when the number part has the published shape for its country. */
+export function hasVatShape(vat: ParsedVat): boolean {
+  return VAT_SHAPES[vat.country]?.test(vat.number) ?? false;
 }
 
 export interface DetectedIdentifier {
@@ -87,10 +128,8 @@ export function detectIdentifier(
 ): DetectedIdentifier | undefined {
   const raw = stripSeparators(input);
   if (raw.length === 20 && isValidLei(raw)) return { scheme: "LEI", value: raw };
-  const vat = /^[A-Z]{2}/.test(raw) ? parseVat(raw) : undefined;
-  if (vat && !/^(SC|NI|OC|SO|OE|NC|FC|SL|LP|SP|R0|IP|NP|RC|NV|ZC|GE|GS|IC|NL)[0-9]{6}$/.test(raw)) {
-    return { scheme: "VAT", value: raw, country: vat.country };
-  }
+  const vat = parseVat(raw);
+  if (vat && hasVatShape(vat)) return { scheme: "VAT", value: raw, country: vat.country };
   const gb = normalizeGbCompanyNumber(raw);
   if (gb && (country?.toUpperCase() === "GB" || /^[A-Z]{2}[0-9]{6}$/.test(gb))) {
     return { scheme: "GB_CRN", value: gb, country: "GB" };

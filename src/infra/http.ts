@@ -55,6 +55,68 @@ export class HttpClient {
     return l;
   }
 
+  /**
+   * Sends the request without letting fetch follow redirects: automatic redirects would forward
+   * custom credential headers (e.g. the FCA's X-Auth-Key) to whatever host is named. Only
+   * same-host https redirects are followed, up to three hops.
+   */
+  private async fetchFollowingSameHostRedirects(
+    startUrl: string,
+    host: string,
+    req: RequestOptions,
+  ): Promise<Response> {
+    let url = startUrl;
+    for (let hop = 0; hop <= 3; hop++) {
+      const res = await this.fetchImpl(url, {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          "user-agent": this.opts.userAgent ?? "entity-intel-mcp",
+          ...req.headers,
+        },
+        redirect: "manual",
+        signal: AbortSignal.timeout(this.opts.timeoutMs ?? 20_000),
+      });
+      const location = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null;
+      if (!location) return res;
+
+      const next = new URL(location, url);
+      if (next.host !== host || next.protocol !== "https:") {
+        throw new SourceError(
+          `${req.source} redirected to another host or to an insecure URL`,
+          req.source,
+          "bad_response",
+        );
+      }
+      url = next.toString();
+    }
+    throw new SourceError(`${req.source} redirected too many times`, req.source, "bad_response");
+  }
+
+  /** Reads the body but stops as soon as it exceeds the size cap, instead of buffering it all. */
+  private async readBounded(res: Response, source: string): Promise<string> {
+    const max = this.opts.maxBytes ?? 5_000_000;
+    const declared = Number(res.headers.get("content-length"));
+    if (Number.isFinite(declared) && declared > max) {
+      throw new SourceError(`${source} response too large`, source, "bad_response");
+    }
+    if (!res.body) return "";
+    const reader = res.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > max) {
+        await reader.cancel();
+        throw new SourceError(`${source} response too large`, source, "bad_response");
+      }
+      chunks.push(value);
+    }
+    return new TextDecoder().decode(Buffer.concat(chunks));
+  }
+
   async getJson<T = unknown>(url: string, req: RequestOptions): Promise<HttpResponse<T>> {
     const host = new URL(url).host;
     const limiter = this.limiter(host, req.source);
@@ -64,16 +126,10 @@ export class HttpClient {
       await limiter.acquire();
       let res: Response;
       try {
-        res = await this.fetchImpl(url, {
-          method: "GET",
-          headers: {
-            accept: "application/json",
-            "user-agent": this.opts.userAgent ?? "entity-intel-mcp",
-            ...req.headers,
-          },
-          signal: AbortSignal.timeout(this.opts.timeoutMs ?? 20_000),
-        });
+        res = await this.fetchFollowingSameHostRedirects(url, host, req);
       } catch (err) {
+        // Policy errors (e.g. a refused redirect) are final: do not retry or relabel them.
+        if (err instanceof SourceError) throw err;
         if (attempt === 0) {
           await this.clock.sleep(jitter(500));
           continue;
@@ -82,14 +138,6 @@ export class HttpClient {
           `${req.source} request failed: ${err instanceof Error ? err.name : "network error"}`,
           req.source,
           "unavailable",
-        );
-      }
-
-      if (res.url && new URL(res.url).host !== host) {
-        throw new SourceError(
-          `${req.source} redirected to another host`,
-          req.source,
-          "bad_response",
         );
       }
 
@@ -122,10 +170,7 @@ export class HttpClient {
         );
       }
 
-      const text = await res.text();
-      if (text.length > (this.opts.maxBytes ?? 5_000_000)) {
-        throw new SourceError(`${req.source} response too large`, req.source, "bad_response");
-      }
+      const text = await this.readBounded(res, req.source);
       let body: unknown = null;
       if (text.length > 0) {
         try {

@@ -15,14 +15,8 @@ import type {
   SourceId,
   Sourced,
 } from "../core/types.js";
+import { sourceRank } from "../core/sources.js";
 import { normaliseName } from "../resolution/normalise.js";
-
-/** Home registry first, then GLEIF, then VIES (VIES only confirms VAT validity). */
-const PRIORITY: SourceId[] = ["companies_house", "gleif", "vies"];
-const rank = (s: SourceId): number => {
-  const i = PRIORITY.indexOf(s);
-  return i === -1 ? PRIORITY.length : i;
-};
 
 type Field =
   | "legalForm"
@@ -46,7 +40,7 @@ function pickField<T>(
   const label = field as string;
   const candidates = partials
     .filter((p) => p[field] !== undefined)
-    .sort((a, b) => rank(a.source) - rank(b.source))
+    .sort((a, b) => sourceRank(a.source) - sourceRank(b.source))
     .map((p) => p[field] as unknown as Sourced<T>)
     // A weak value (e.g. status "unknown") never outranks a real one from a lower-priority source.
     .sort((a, b) => Number(isWeak(a.value)) - Number(isWeak(b.value)));
@@ -56,8 +50,10 @@ function pickField<T>(
   let provenance = first.provenance;
   const disagreeing: Sourced<T>[] = [];
   for (const other of candidates.slice(1)) {
-    if (same(first.value, other.value)) provenance = mergeProvenance(provenance, other.provenance);
-    else disagreeing.push(other);
+    if (!same(first.value, other.value)) disagreeing.push(other);
+    // A weak value ("unknown") is compatible with anything but corroborates nothing, so its
+    // source must not be credited as supporting the chosen value.
+    else if (!isWeak(other.value)) provenance = mergeProvenance(provenance, other.provenance);
   }
   if (disagreeing.length > 0) {
     conflicts.push({ field: label, values: [first, ...disagreeing] });
@@ -89,7 +85,7 @@ function mergeIdentifiers(partials: PartialEntity[]): Identifier[] {
 
 function mergeNames(partials: PartialEntity[]): EntityName[] {
   const map = new Map<string, EntityName>();
-  for (const p of [...partials].sort((a, b) => rank(a.source) - rank(b.source))) {
+  for (const p of [...partials].sort((a, b) => sourceRank(a.source) - sourceRank(b.source))) {
     for (const n of p.names) {
       const k = `${n.kind}|${n.name.trim().toLowerCase()}`;
       const prev = map.get(k);
@@ -122,7 +118,7 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
   const names = mergeNames(partials);
   const legalNames = partials
     .flatMap((p) => p.names.filter((n) => n.kind === "legal").map((n) => ({ p, n })))
-    .sort((a, b) => rank(a.p.source) - rank(b.p.source));
+    .sort((a, b) => sourceRank(a.p.source) - sourceRank(b.p.source));
   const firstLegal = legalNames[0];
   if (firstLegal) {
     const key = normaliseName(firstLegal.n.name).key;
@@ -178,7 +174,7 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
 
   const identifiers = mergeIdentifiers(partials);
   const jurisdiction = [...partials]
-    .sort((a, b) => rank(a.source) - rank(b.source))
+    .sort((a, b) => sourceRank(a.source) - sourceRank(b.source))
     .map((p) => p.jurisdiction)
     .find(Boolean);
 

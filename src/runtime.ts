@@ -1,8 +1,5 @@
-import { createCompaniesHouseAdapter } from "./adapters/companies-house/index.js";
-import { gleifAdapter } from "./adapters/gleif/index.js";
-import { adapterStatuses, type AdapterStatus } from "./adapters/registry.js";
+import { adapterStatuses, buildAdapters, type AdapterStatus } from "./adapters/registry.js";
 import type { SourceAdapter } from "./adapters/types.js";
-import { viesAdapter } from "./adapters/vies/index.js";
 import type { Config } from "./core/config.js";
 import { AuditLog } from "./infra/audit.js";
 import { Cache } from "./infra/cache.js";
@@ -50,6 +47,7 @@ function openStorage(env: NodeJS.ProcessEnv): Storage {
 
 export function createRuntime(config: Config, overrides: RuntimeOverrides = {}): Runtime {
   const env = overrides.env ?? process.env;
+  for (const problem of config.problems) console.error(`config: ${problem}`);
   const storage = overrides.storage ?? openStorage(env);
   const clockNow = overrides.clock ? () => overrides.clock!.now() : Date.now;
 
@@ -63,11 +61,7 @@ export function createRuntime(config: Config, overrides: RuntimeOverrides = {}):
   const audit = new AuditLog(storage, config.auditRetentionDays, clockNow);
 
   const statuses = adapterStatuses(config, env);
-  const enabled = new Set(statuses.filter((s) => s.enabled).map((s) => s.id));
-  const adapters: SourceAdapter[] = [];
-  if (enabled.has("gleif")) adapters.push(gleifAdapter);
-  if (enabled.has("vies")) adapters.push(viesAdapter);
-  if (enabled.has("gb")) adapters.push(createCompaniesHouseAdapter(config.companiesHouseApiKey));
+  const adapters = buildAdapters(config, statuses);
 
   // Housekeeping: drop expired cache rows and audit rows past retention (D11, D14).
   try {

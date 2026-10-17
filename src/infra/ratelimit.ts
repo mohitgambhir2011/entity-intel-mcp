@@ -22,6 +22,8 @@ export const systemClock: Clock = {
  */
 export class RateLimiter {
   private readonly stamps: number[] = [];
+  /** Set by penalise(): no request may start before this time. */
+  private blockedUntil = 0;
 
   constructor(
     private readonly rule: RateLimitRule,
@@ -33,6 +35,10 @@ export class RateLimiter {
   async acquire(): Promise<void> {
     for (;;) {
       const now = this.clock.now();
+      if (now < this.blockedUntil) {
+        await this.waitOrFail(this.blockedUntil - now);
+        continue;
+      }
       while (this.stamps.length > 0 && now - this.stamps[0]! >= this.rule.windowMs) {
         this.stamps.shift();
       }
@@ -40,21 +46,23 @@ export class RateLimiter {
         this.stamps.push(now);
         return;
       }
-      const wait = this.stamps[0]! + this.rule.windowMs - now;
-      if (wait > this.maxWaitMs) {
-        throw new SourceError(
-          `Local rate limit reached for ${this.source}; next slot in ${Math.ceil(wait / 1000)}s`,
-          this.source,
-          "rate_limited",
-        );
-      }
-      await this.clock.sleep(wait);
+      await this.waitOrFail(this.stamps[0]! + this.rule.windowMs - now);
     }
   }
 
-  /** Called when the server says we are limited (HTTP 429): hold all slots until the window passes. */
+  private async waitOrFail(waitMs: number): Promise<void> {
+    if (waitMs > this.maxWaitMs) {
+      throw new SourceError(
+        `Local rate limit reached for ${this.source}; next slot in ${Math.ceil(waitMs / 1000)}s`,
+        this.source,
+        "rate_limited",
+      );
+    }
+    await this.clock.sleep(waitMs);
+  }
+
+  /** Called when the server says we are limited (HTTP 429): hold every request until then. */
   penalise(retryAfterMs: number): void {
-    const until = this.clock.now() + retryAfterMs - this.rule.windowMs;
-    while (this.stamps.length < this.rule.max) this.stamps.push(until);
+    this.blockedUntil = Math.max(this.blockedUntil, this.clock.now() + retryAfterMs);
   }
 }

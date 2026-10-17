@@ -44,10 +44,12 @@ export async function startHarness(
   opts: {
     env?: NodeJS.ProcessEnv;
     routes?: Record<string, FakeRoute | FakeRoute[]>;
+    /** Replaces the default fake fetch, e.g. to add latency. */
+    fetchImpl?: FakeFetch;
   } = {},
 ): Promise<Harness> {
   const env = opts.env ?? { COMPANIES_HOUSE_API_KEY: "test-key" };
-  const f = fakeFetch(opts.routes ?? defaultRoutes());
+  const f = opts.fetchImpl ?? fakeFetch(opts.routes ?? defaultRoutes());
   const rt = createRuntime(loadConfig(env), {
     env,
     fetch: f,

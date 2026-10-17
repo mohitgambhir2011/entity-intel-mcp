@@ -1,5 +1,4 @@
-import { findLeiByCompaniesHouseNumber } from "../adapters/gleif/index.js";
-import type { AdapterContext } from "../adapters/types.js";
+import type { AdapterContext, SourceAdapter } from "../adapters/types.js";
 import { SourceError } from "../core/errors.js";
 import type { Identifier, PartialEntity, Provenance, SourceId } from "../core/types.js";
 import type { Runtime } from "../runtime.js";
@@ -12,6 +11,8 @@ export interface GatherResult {
   /** True only when every piece of data came from the cache. */
   fromCache: boolean;
 }
+
+const MAX_ROUNDS = 3;
 
 export function adapterContext(rt: Runtime, fresh?: boolean): AdapterContext {
   return { http: rt.http, cache: rt.cache, fresh, now: rt.now };
@@ -33,9 +34,15 @@ export function describeFailure(source: string, err: unknown): string {
   return `${source}: unexpected error`;
 }
 
+interface Job<T> {
+  adapter: SourceAdapter;
+  run: () => Promise<T>;
+}
+
 /**
- * Starts from one identifier, asks every enabled adapter that understands it, and follows any new
- * identifiers they reveal (e.g. GLEIF -> Companies House number) for up to three rounds.
+ * Starts from one identifier, asks every enabled adapter that understands it, and follows the
+ * identifiers they reveal (lookups) or can be translated into (crosswalks, e.g. UK company number
+ * to LEI) for up to three rounds. Lookups and crosswalks of one round run concurrently.
  * Source failures become warnings so the caller still gets whatever data was available (D28).
  */
 export async function gather(
@@ -50,77 +57,63 @@ export async function gather(
   const queried = new Set<SourceId>();
   const warnings: string[] = [];
   const failed = new Set<string>();
-  let crosswalkTried = false;
 
-  for (let round = 0; round < 3; round++) {
-    const jobs: {
-      id: Identifier;
-      run: () => Promise<PartialEntity | undefined>;
-      source: SourceId;
-    }[] = [];
+  const warn = (source: string, reason: unknown): void => {
+    if (failed.has(source)) return; // one warning per source is enough
+    failed.add(source);
+    warnings.push(describeFailure(source, reason));
+  };
+
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    const lookups: Job<PartialEntity | undefined>[] = [];
+    const crosswalks: Job<Identifier | undefined>[] = [];
+    const schemesKnown = new Set([...known.values()].map((i) => i.scheme));
+
     for (const id of known.values()) {
       for (const adapter of rt.adapters) {
-        const jobKey = `${adapter.id}|${key(id)}`;
-        if (done.has(jobKey) || !adapter.supports(id)) continue;
-        done.add(jobKey);
-        jobs.push({ id, source: adapter.id, run: () => adapter.lookup(id, ctx) });
-      }
-    }
-
-    if (jobs.length > 0) {
-      const results = await Promise.allSettled(
-        jobs.map((j) => {
-          queried.add(j.source);
-          return j.run();
-        }),
-      );
-      results.forEach((r, i) => {
-        const job = jobs[i]!;
-        if (r.status === "fulfilled") {
-          if (r.value) {
-            partials.push(r.value);
-            for (const found of r.value.identifiers) {
-              if (!known.has(key(found))) known.set(key(found), found);
-            }
-          }
-        } else if (!failed.has(job.source)) {
-          failed.add(job.source);
-          warnings.push(describeFailure(job.source, r.reason));
+        const lookupKey = `${adapter.id}|lookup|${key(id)}`;
+        if (!done.has(lookupKey) && adapter.supports(id)) {
+          done.add(lookupKey);
+          lookups.push({ adapter, run: () => adapter.lookup(id, ctx) });
         }
-      });
-      continue;
-    }
-
-    // No lookups left: try the reverse crosswalk UK company number -> LEI once.
-    const crn = [...known.values()].find((i) => i.scheme === "GB_CRN");
-    const hasLei = [...known.values()].some((i) => i.scheme === "LEI");
-    const gleifOn = rt.adapters.some((a) => a.id === "gleif");
-    if (crn && !hasLei && gleifOn && !crosswalkTried) {
-      crosswalkTried = true;
-      queried.add("gleif");
-      try {
-        const lei = await findLeiByCompaniesHouseNumber(crn.value, ctx);
-        if (lei) {
-          const found: Identifier = { scheme: "LEI", value: lei, validated: true, provenance: [] };
-          known.set(key(found), found);
-          continue;
-        }
-      } catch (err) {
-        if (!failed.has("gleif")) {
-          failed.add("gleif");
-          warnings.push(describeFailure("gleif", err));
+        for (const cw of adapter.crosswalks ?? []) {
+          const cwKey = `${adapter.id}|${cw.from}>${cw.to}|${key(id)}`;
+          // Only translate when we do not already know an identifier of the target scheme.
+          if (id.scheme !== cw.from || schemesKnown.has(cw.to) || done.has(cwKey)) continue;
+          done.add(cwKey);
+          crosswalks.push({ adapter, run: () => cw.find(id, ctx) });
         }
       }
     }
-    break;
+    if (lookups.length === 0 && crosswalks.length === 0) break;
+    for (const job of [...lookups, ...crosswalks]) queried.add(job.adapter.id);
+
+    const [lookupResults, crosswalkResults] = await Promise.all([
+      Promise.allSettled(lookups.map((j) => j.run())),
+      Promise.allSettled(crosswalks.map((j) => j.run())),
+    ]);
+
+    lookupResults.forEach((r, i) => {
+      const source = lookups[i]!.adapter.id;
+      if (r.status === "rejected") return warn(source, r.reason);
+      if (!r.value) return;
+      partials.push(r.value);
+      for (const found of r.value.identifiers) {
+        if (!known.has(key(found))) known.set(key(found), found);
+      }
+    });
+    crosswalkResults.forEach((r, i) => {
+      const source = crosswalks[i]!.adapter.id;
+      if (r.status === "rejected") return warn(source, r.reason);
+      if (r.value && !known.has(key(r.value))) known.set(key(r.value), r.value);
+    });
   }
 
-  if (!rt.adapters.some((a) => a.supports(seed))) {
-    warnings.push(missingSourceWarning(rt, seed));
-  } else if (seed.scheme !== "GB_CRN") {
-    const crn = [...known.values()].find((i) => i.scheme === "GB_CRN");
-    if (crn && !rt.adapters.some((a) => a.supports(crn))) {
-      warnings.push(missingSourceWarning(rt, crn));
+  // Say why an identifier could not be followed because its source is switched off.
+  for (const id of known.values()) {
+    if (!rt.adapters.some((a) => a.supports(id))) {
+      const why = missingSourceWarning(rt, id, id === seed);
+      if (why) warnings.push(why);
     }
   }
 
@@ -133,10 +126,16 @@ export async function gather(
   };
 }
 
-function missingSourceWarning(rt: Runtime, id: Identifier): string {
-  if (id.scheme === "GB_CRN") {
-    const s = rt.statuses.find((x) => x.id === "gb");
-    return `Companies House not queried: ${s?.reason ?? "not enabled"}`;
+/**
+ * Explains why no enabled adapter handles `id`: names the disabled adapter that would, with its
+ * reason (e.g. the missing environment variable). Identifiers discovered along the way (not the
+ * seed) are only reported when a disabled adapter exists for them; a bare "no source" would be
+ * noise for schemes we have never supported.
+ */
+function missingSourceWarning(rt: Runtime, id: Identifier, isSeed: boolean): string | undefined {
+  const disabled = rt.statuses.filter((s) => !s.enabled && s.schemes.includes(id.scheme));
+  if (disabled.length > 0) {
+    return disabled.map((s) => `${s.label} not queried: ${s.reason}`).join("; ");
   }
-  return `No enabled source can look up ${id.scheme} identifiers`;
+  return isSeed ? `No enabled source can look up ${id.scheme} identifiers` : undefined;
 }

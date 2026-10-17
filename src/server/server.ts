@@ -1,7 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Runtime } from "../runtime.js";
 import { registerCoverage } from "./tools/coverage.js";
-import { registerEntityTools } from "./tools/entity.js";
+import { registerGetEntity } from "./tools/getEntity.js";
+import { registerResolveIdentifier } from "./tools/resolveIdentifier.js";
 import { registerSearch } from "./tools/search.js";
 
 export const SERVER_NAME = "entity-intel-mcp";
@@ -20,6 +21,7 @@ export function createServer(rt: Runtime): McpServer {
   );
   registerCoverage(server, rt);
   registerSearch(server, rt);
-  registerEntityTools(server, rt);
+  registerGetEntity(server, rt);
+  registerResolveIdentifier(server, rt);
   return server;
 }

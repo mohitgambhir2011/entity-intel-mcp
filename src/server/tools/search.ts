@@ -2,7 +2,9 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { Runtime } from "../../runtime.js";
 import { searchEntities } from "../../services/search.js";
+import { auditSubject } from "../../services/audit.js";
 import { guard, ok } from "../envelope.js";
+import { READ_ONLY } from "./shared.js";
 
 export function registerSearch(server: McpServer, rt: Runtime): void {
   server.registerTool(
@@ -30,7 +32,7 @@ export function registerSearch(server: McpServer, rt: Runtime): void {
         limit: z.number().int().min(1).max(25).optional().describe("Default 10"),
         fresh: z.boolean().optional().describe("Bypass the cache"),
       },
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+      annotations: READ_ONLY,
     },
     (args) =>
       guard(async () => {
@@ -38,7 +40,7 @@ export function registerSearch(server: McpServer, rt: Runtime): void {
         const out = await searchEntities(rt, args);
         rt.audit.record({
           tool: "search_entities",
-          subject: args.query,
+          subject: auditSubject(args.query),
           sources: out.sourcesQueried,
           cacheHit: out.fromCache,
         });

@@ -143,7 +143,18 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
             headers: authHeader(key),
             allowStatus: [404],
           });
-          return r.status === 404 ? null : r.body;
+          if (r.status === 404) return null;
+          if (
+            typeof r.body?.company_number !== "string" ||
+            typeof r.body.company_name !== "string"
+          ) {
+            throw new SourceError(
+              "companies_house returned an unexpected response",
+              "companies_house",
+              "bad_response",
+            );
+          }
+          return r.body;
         },
       );
       const c = res.value;
@@ -153,7 +164,7 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
         source: "companies_house",
         sourceRecordId: c.company_number,
         sourceUrl: `https://find-and-update.company-information.service.gov.uk/company/${c.company_number}`,
-        retrievedAt: iso(ctx, res.fetchedAt),
+        retrievedAt: iso(res.fetchedAt),
         fromCache: res.fromCache,
         licence: LICENCE,
       };
@@ -226,7 +237,7 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
       const prov: Provenance = {
         source: "companies_house",
         sourceRecordId: "search",
-        retrievedAt: iso(ctx, res.fetchedAt),
+        retrievedAt: iso(res.fetchedAt),
         fromCache: res.fromCache,
         licence: LICENCE,
       };

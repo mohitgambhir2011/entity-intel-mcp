@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { defaultRoutes, startHarness, type Harness } from "../harness.js";
+import { fakeFetch, fixtureText } from "../helpers.js";
 
 let h: Harness | undefined;
 afterEach(async () => {
@@ -268,5 +269,59 @@ describe("safety and audit", () => {
     expect(r.text).not.toContain("super-secret-key-value");
     const gb = r.json.data.adapters.find((a: any) => a.id === "gb");
     expect(gb.enabled).toBe(true);
+  });
+});
+
+describe("review regressions (integration)", () => {
+  it("keeps two records of the same source with the same name as separate candidates", async () => {
+    const base = JSON.parse(fixtureText("gleif/search-tesco.json"));
+    const a = base.data[0];
+    const b = structuredClone(a);
+    b.attributes.lei = "5493001KJTIIGC8Y1R12";
+    base.data = [a, b];
+    const routes = defaultRoutes();
+    routes["https://api.gleif.org/api/v1/lei-records?filter[entity.legalName]="] = {
+      body: JSON.stringify(base),
+    };
+    h = await startHarness({ env: {}, routes });
+    const r = await h.call("search_entities", { query: "Tesco PLC", country: "GB" });
+    const exact = r.json.data.candidates.filter((c: any) => c.name === "TESCO PLC");
+    expect(exact).toHaveLength(2);
+    expect(exact.map((c: any) => c.entityId).sort()).toEqual([
+      "ID:LEI:2138002P5RNKC5W2JZ46",
+      "ID:LEI:5493001KJTIIGC8Y1R12",
+    ]);
+    expect(exact[0].match.warnings.join(" ")).toContain("several entities share this name");
+  });
+
+  it("does not treat a company name as a VAT number in search", async () => {
+    h = await startHarness();
+    const r = await h.call("search_entities", { query: "Deutsche Bank" });
+    expect(r.json.meta.sourcesQueried).not.toContain("vies");
+    expect(r.json.summary).not.toContain("Exact identifier");
+  });
+
+  it("looks up Companies House and the LEI crosswalk concurrently", async () => {
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const routes = defaultRoutes();
+    const inner = fakeFetch(routes);
+    const slow: typeof inner = Object.assign(
+      async (url: string, init?: RequestInit) => {
+        inFlight++;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise((r) => setTimeout(r, 15));
+        try {
+          return await inner(url, init);
+        } finally {
+          inFlight--;
+        }
+      },
+      { calls: inner.calls },
+    );
+    h = await startHarness({ fetchImpl: slow });
+    const r = await h.call("get_entity", { identifier: "00445790", country: "GB" });
+    expect(r.json.data.entityId).toBe("GB:CH:00445790");
+    expect(maxInFlight).toBeGreaterThanOrEqual(2);
   });
 });

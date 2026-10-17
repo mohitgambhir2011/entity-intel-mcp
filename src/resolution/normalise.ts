@@ -3,6 +3,10 @@
  * always what we show. Legal-form suffixes are stripped so "Tesco PLC" matches "TESCO P.L.C.".
  */
 
+import { tokenize } from "../core/text.js";
+
+export { tokenize } from "../core/text.js";
+
 const PHRASES: string[][] = [
   ["public", "limited", "company"],
   ["private", "limited", "company"],
@@ -65,21 +69,6 @@ const SUFFIXES = new Set([
   "ehf",
   "hf",
 ]);
-
-export function stripDiacritics(s: string): string {
-  return s.normalize("NFKD").replace(/\p{M}/gu, "");
-}
-
-export function tokenize(name: string): string[] {
-  return stripDiacritics(name)
-    .toLowerCase()
-    .replace(/&/g, " and ")
-    .replace(/[.'’`/]/g, "") // "S.A." -> "sa", "A/S" -> "as", "Tesco's" -> "tescos"
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .split(" ")
-    .filter(Boolean);
-}
 
 export interface Normalised {
   /** Tokens without the trailing legal form. */

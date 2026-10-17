@@ -13,6 +13,8 @@ interface ViesResponse {
   name?: string;
   address?: string;
   vatNumber?: string;
+  /** Present on some error responses instead of isValid. */
+  errorWrappers?: { error?: string }[];
 }
 
 /** VIES uses "---" for fields the member state does not release (e.g. Germany withholds names). */
@@ -46,7 +48,7 @@ export const viesAdapter: SourceAdapter = {
       async () => {
         const r = await ctx.http.getJson<ViesResponse>(url, { source: "vies", allowStatus: [400] });
         const body = r.body ?? {};
-        const err = body.userError ?? "";
+        const err = body.userError ?? body.errorWrappers?.[0]?.error ?? "";
         if (TRANSIENT_ERRORS.has(err)) {
           throw new SourceError(
             `VIES: member state service unavailable (${err})`,
@@ -57,6 +59,11 @@ export const viesAdapter: SourceAdapter = {
         if (err === "INVALID_INPUT") {
           throw new SourceError("VIES rejected the VAT number format", "vies", "bad_response");
         }
+        // Only a definite answer may be cached. A body with no boolean isValid is an error in
+        // disguise; reporting it as "invalid" would be a false negative that stays cached for a day.
+        if (typeof body.isValid !== "boolean") {
+          throw new SourceError("VIES returned no validity result", "vies", "unavailable");
+        }
         return body;
       },
     );
@@ -66,7 +73,7 @@ export const viesAdapter: SourceAdapter = {
       source: "vies",
       sourceRecordId: `${country}${number}`,
       sourceUrl: url,
-      retrievedAt: iso(ctx, res.fetchedAt),
+      retrievedAt: iso(res.fetchedAt),
       fromCache: res.fromCache,
     };
     const valid = body.isValid === true;

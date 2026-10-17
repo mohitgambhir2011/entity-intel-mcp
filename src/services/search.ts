@@ -1,6 +1,7 @@
 import type { SourceAdapter } from "../adapters/types.js";
 import { detectIdentifier, makeIdentifier } from "../core/identifiers.js";
 import type { EntityStatus, Identifier, SearchHit, SourceId } from "../core/types.js";
+import { sourceRank } from "../core/sources.js";
 import { normaliseName } from "../resolution/normalise.js";
 import { scoreName, type ConfidenceBand } from "../resolution/score.js";
 import type { Runtime } from "../runtime.js";
@@ -33,12 +34,6 @@ export interface SearchInput {
   limit?: number;
   fresh?: boolean;
 }
-
-const PRIORITY: SourceId[] = ["companies_house", "gleif", "vies"];
-const rank = (s: SourceId): number => {
-  const i = PRIORITY.indexOf(s);
-  return i === -1 ? PRIORITY.length : i;
-};
 
 export async function searchEntities(rt: Runtime, input: SearchInput): Promise<SearchOutcome> {
   const limit = Math.min(Math.max(input.limit ?? 10, 1), 25);
@@ -149,15 +144,24 @@ async function searchByIdentifier(
   };
 }
 
-/** Merges hits that are the same name in the same country (e.g. GLEIF + Companies House). */
+/**
+ * Merges hits that are the same name in the same country but come from DIFFERENT sources (e.g. the
+ * GLEIF and Companies House records of one company). Two records from the same source are two
+ * entities, however similar their names: name-only matches never merge entities.
+ */
 function group(hits: SearchHit[], query: string): Candidate[] {
-  const groups = new Map<string, SearchHit[]>();
+  const groups = new Map<string, SearchHit[][]>();
   for (const h of hits) {
     const k = `${h.jurisdiction ?? "?"}|${normaliseName(h.name).key}`;
-    groups.set(k, [...(groups.get(k) ?? []), h]);
+    const buckets = groups.get(k) ?? [];
+    // Put the hit in the first bucket that has no record from its source yet.
+    const bucket = buckets.find((b) => !b.some((x) => x.source === h.source));
+    if (bucket) bucket.push(h);
+    else buckets.push([h]);
+    groups.set(k, buckets);
   }
-  return [...groups.values()].map((g) => {
-    const sorted = [...g].sort((a, b) => rank(a.source) - rank(b.source));
+  return [...groups.values()].flat().map((g) => {
+    const sorted = [...g].sort((a, b) => sourceRank(a.source) - sourceRank(b.source));
     const best = sorted[0]!;
     const identifiers: Identifier[] = sorted.map((h) => h.identifier);
     const m = scoreName(query, best.name);

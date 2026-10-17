@@ -50,20 +50,30 @@ interface GleifResponse {
   data: GleifRecord | GleifRecord[];
 }
 
+/**
+ * GLEIF only distinguishes ACTIVE from INACTIVE (and NULL). INACTIVE can mean dissolved or simply
+ * no longer operating, so it is not mapped to an "ended" status: we do not over-claim.
+ */
 export function mapGleifStatus(entityStatus: string | undefined): EntityStatus {
   const text = entityStatus ?? "";
-  switch (text.toUpperCase()) {
-    case "ACTIVE":
-      return makeStatus("active", text);
-    case "INACTIVE":
-      // GLEIF "INACTIVE" can mean dissolved or simply not operating; do not over-claim.
-      return makeStatus("unknown", text);
-    case "NULL":
-    case "":
-      return makeStatus("unknown", text);
-    default:
-      return makeStatus("unknown", text);
+  return makeStatus(text.toUpperCase() === "ACTIVE" ? "active" : "unknown", text);
+}
+
+/** A response without a `data` member is an error body, not an empty result: never cache it. */
+function checkedBody(body: GleifResponse | null | undefined): GleifResponse {
+  if (!body || typeof body !== "object" || body.data === undefined || body.data === null) {
+    throw new SourceError("gleif returned an unexpected response", "gleif", "bad_response");
   }
+  return body;
+}
+
+/** Records that have the fields we rely on; anything malformed is skipped rather than crashing. */
+function recordsOf(body: GleifResponse): GleifRecord[] {
+  const list = Array.isArray(body.data) ? body.data : [body.data];
+  return list.filter(
+    (r): r is GleifRecord =>
+      typeof r?.attributes?.lei === "string" && typeof r.attributes.entity === "object",
+  );
 }
 
 function mapAddress(a: GleifAddress | undefined): Address | undefined {
@@ -159,7 +169,7 @@ function mapLeiStatus(s: string | undefined): Identifier["status"] {
  * Reverse crosswalk: find the LEI for a UK company number. GLEIF cannot filter on registration
  * authority and number together, so we filter on the number and check the authority ourselves.
  */
-export async function findLeiByCompaniesHouseNumber(
+async function findLeiByCompaniesHouseNumber(
   crn: string,
   ctx: AdapterContext,
 ): Promise<string | undefined> {
@@ -168,10 +178,11 @@ export async function findLeiByCompaniesHouseNumber(
     `gleif:byreg:${crn}`,
     { ttlSeconds: TTL.gleif, source: "gleif", fresh: ctx.fresh },
     async () =>
-      (await ctx.http.getJson<GleifResponse>(url, { source: "gleif", headers: HEADERS })).body,
+      checkedBody(
+        (await ctx.http.getJson<GleifResponse>(url, { source: "gleif", headers: HEADERS })).body,
+      ),
   );
-  const records = Array.isArray(res.value.data) ? res.value.data : [res.value.data];
-  const match = records.find(
+  const match = recordsOf(res.value).find(
     (r) =>
       r.attributes.entity.registeredAt?.id === RA_GB_COMPANIES_HOUSE &&
       r.attributes.entity.registeredAs === crn,
@@ -183,6 +194,17 @@ export const gleifAdapter: SourceAdapter = {
   id: "gleif",
 
   supports: (id) => id.scheme === "LEI",
+
+  crosswalks: [
+    {
+      from: "GB_CRN",
+      to: "LEI",
+      async find(identifier, ctx) {
+        const lei = await findLeiByCompaniesHouseNumber(identifier.value, ctx);
+        return lei ? { scheme: "LEI", value: lei, validated: true, provenance: [] } : undefined;
+      },
+    },
+  ],
 
   async lookup(identifier, ctx) {
     const lei = identifier.value.toUpperCase();
@@ -197,17 +219,17 @@ export const gleifAdapter: SourceAdapter = {
           headers: HEADERS,
           allowStatus: [404],
         });
-        return r.status === 404 ? null : r.body;
+        return r.status === 404 ? null : checkedBody(r.body);
       },
     );
     if (!res.value) return undefined;
-    const rec = Array.isArray(res.value.data) ? res.value.data[0] : res.value.data;
+    const rec = recordsOf(res.value)[0];
     if (!rec) throw new SourceError("gleif returned an empty record", "gleif", "bad_response");
     return mapRecord(rec, {
       source: "gleif",
       sourceRecordId: rec.attributes.lei,
       sourceUrl: url,
-      retrievedAt: iso(ctx, res.fetchedAt),
+      retrievedAt: iso(res.fetchedAt),
       fromCache: res.fromCache,
     });
   },
@@ -220,13 +242,15 @@ export const gleifAdapter: SourceAdapter = {
       `gleif:search:${q.toLowerCase()}:${limit}`,
       { ttlSeconds: TTL.search, source: "gleif", fresh: ctx.fresh },
       async () =>
-        (await ctx.http.getJson<GleifResponse>(url, { source: "gleif", headers: HEADERS })).body,
+        checkedBody(
+          (await ctx.http.getJson<GleifResponse>(url, { source: "gleif", headers: HEADERS })).body,
+        ),
     );
-    const records = Array.isArray(res.value.data) ? res.value.data : [res.value.data];
+    const records = recordsOf(res.value);
     const prov: Provenance = {
       source: "gleif",
       sourceRecordId: "search",
-      retrievedAt: iso(ctx, res.fetchedAt),
+      retrievedAt: iso(res.fetchedAt),
       fromCache: res.fromCache,
     };
     return records.map((rec) => {
