@@ -1,5 +1,7 @@
 # Phase 3 — MCP tool specification (DRAFT v0.1)
 
+> **Implementation status (2026-10-17):** `check_coverage`, `search_entities`, `get_entity` (identity family only) and `resolve_identifier` are implemented. `get_officers`, `get_ownership`, `get_filings_and_insolvency`, `screen_sanctions` and the `kyb_check` prompt are not.
+
 Implements D24 (8 tools + prompt), D25 (response shape), D26 (search), D27 (sanctions), D28 (errors). Types refer to `11-data-model.md`. Transport: stdio (D10). Server name: `entity-intel-mcp`.
 
 ## 0. Conventions
@@ -20,7 +22,7 @@ interface ToolResult<T> {
   disclaimer?: string;             // personal-data notice (D13) on tools returning people data
 }
 ```
-**Inputs common to entity tools:** `entity` is `{ entityId } | { identifier: { scheme, value, country? } }`. Names are never accepted here (D26).
+**Inputs common to entity tools (amended by D33):** flat arguments `entity_id` **or** `identifier`, plus optional `scheme` (LEI | GB_CRN | VAT), `country`, `fresh`. Exactly one of `entity_id` / `identifier` is required. Names are never accepted here (D26). Wherever this spec says `entity`, read it as these arguments.
 **Common options:** `fresh?: boolean` (bypass cache, D7), `limit?` (default 25), `offset?`.
 **Annotations:** all tools are read-only, idempotent, open-world (they call external services).
 

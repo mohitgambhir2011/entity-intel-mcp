@@ -2,7 +2,7 @@
 
 An [MCP](https://modelcontextprotocol.io) server for legal entity intelligence across the UK and Europe: company registries, GLEIF, VIES and sanctions lists, with source provenance on every field.
 
-> **Status: early scaffold (v0.0.1).** One MCP tool (`check_coverage`) works. Core types, HTTP client, SQLite cache and the GLEIF, VIES and Companies House adapters exist and are tested, but are not yet exposed as MCP tools. See [docs/](docs/) for the plan, decisions and design.
+> **Status: early development (v0.0.1).** Four MCP tools work: `check_coverage`, `search_entities`, `get_entity` (identity only) and `resolve_identifier`, backed by GLEIF, VIES and Companies House. Officers, ownership, filings, regulatory status, insolvency and sanctions are not implemented yet. See [docs/](docs/) for the plan, decisions and design.
 
 ## What it will do
 

@@ -6,6 +6,14 @@ export function makeEntityId(country: CountryCode, registry: string, number: str
   return `${country.toUpperCase()}:${registry.toUpperCase()}:${number}`;
 }
 
+/**
+ * Used when an entity has no home-registry number we can build an id from, but does have another
+ * stable identifier (LEI, VAT). Prefer this over the name hash (D33).
+ */
+export function makeIdentifierEntityId(scheme: string, value: string): string {
+  return `ID:${scheme}:${value}`;
+}
+
 /** D20 fallback when no registry number is known: hash of normalised name + country. */
 export function fallbackEntityId(name: string, country: CountryCode): string {
   const norm = name

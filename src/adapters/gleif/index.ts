@@ -155,6 +155,30 @@ function mapLeiStatus(s: string | undefined): Identifier["status"] {
   }
 }
 
+/**
+ * Reverse crosswalk: find the LEI for a UK company number. GLEIF cannot filter on registration
+ * authority and number together, so we filter on the number and check the authority ourselves.
+ */
+export async function findLeiByCompaniesHouseNumber(
+  crn: string,
+  ctx: AdapterContext,
+): Promise<string | undefined> {
+  const url = `${BASE}/lei-records?filter[entity.registeredAs]=${encodeURIComponent(crn)}&page[size]=5`;
+  const res = await ctx.cache.getOrFetch(
+    `gleif:byreg:${crn}`,
+    { ttlSeconds: TTL.gleif, source: "gleif", fresh: ctx.fresh },
+    async () =>
+      (await ctx.http.getJson<GleifResponse>(url, { source: "gleif", headers: HEADERS })).body,
+  );
+  const records = Array.isArray(res.value.data) ? res.value.data : [res.value.data];
+  const match = records.find(
+    (r) =>
+      r.attributes.entity.registeredAt?.id === RA_GB_COMPANIES_HOUSE &&
+      r.attributes.entity.registeredAs === crn,
+  );
+  return match?.attributes.lei;
+}
+
 export const gleifAdapter: SourceAdapter = {
   id: "gleif",
 
