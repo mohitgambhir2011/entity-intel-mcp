@@ -6,6 +6,10 @@ All notable changes. Dates are absolute. Versions follow semver; 0.x may change 
 
 ### Added
 
+- **Norway and Finland, no key needed (D40).** `no-brreg` (Enhetsregisteret): identity, name search and roles (CEO, chair, board, deputies, auditor, accountant, signatories; full published birth date; no appointment dates). `fi-prh` (PRH open data v3): identity and name search, with status inferred from company situations and the trade-register entry. Identifiers `NO_ORGNR` and `FI_YTUNNUS` with check-digit validation, entity ids `NO:BR:<orgnr>` and `FI:PRH:<id>`, LEI crosswalks through GLEIF (RA000472, RA000188), Finnish VAT computed from the business ID and validated by VIES, Norwegian `NO...MVA` read as the organisation number.
+- **Per-country restrictions.** Adapters declare what a country will not provide (`restrictions`): Norway and Finland ownership `restricted_access`, Finnish officers `not_published_by_source`; the tools say so instead of "not yet supported". New unavailable reason `not_enabled`. Adapters declare their `country`; `get_officers` takes the new roles (`ceo`, `chair`, `board_member`, `deputy`, `auditor`, `accountant`, `authorised_signatory`).
+- `scripts/live-nordic.ts` (real-world check of both registers).
+- Fourth `xhigh` code review (Nordic adapters and the generalisation): 15 defects fixed with regression tests.
 - **`get_officers` and `get_ownership`** (UK, Companies House): officers with roles, dates and published personal details; the PSC chain followed upwards (default 3 levels, max 10; 30 companies per call fetched 5 at a time) with owner-to-owned edges, control bands, and a reason where each chain ends (D38).
 - **`screen_sanctions` `include` / `owners_depth`**: also screen an entity's current officers and owners; `overall` is the worst result and is `incomplete` whenever a requested group could not be fully screened (D39).
 - Third `xhigh` code review (officers, ownership, related screening): 13 defects fixed with regression tests.
@@ -25,6 +29,11 @@ All notable changes. Dates are absolute. Versions follow semver; 0.x may change 
 
 ### Changed
 
+- A country-filtered `search_entities` asks only that country's register (and GLEIF).
+- A profile's `officers` and `ownership` coverage is worked out per company from the enabled adapters instead of a fixed text; `check_coverage` lists the officer and ownership countries from them.
+- Norwegian and Finnish registry numbers are not compared with sanctions-list identifiers (bare 8-9 digit numbers collide with unrelated entries); those companies are screened by name, LEI and VAT.
+- A Finnish business ID may be written without its leading zero (`112038-9`).
+- Registry codes are looked up with `ownEntry()` (own properties only), including the existing Companies House tables.
 - UK designations now come from the **UK Sanctions List (FCDO)**. The first build used the OFSI Consolidated List, which closed on 2026-01-28 while its old URL kept serving a frozen file (D36).
 
 - Crosswalks are an adapter capability; the services layer no longer imports a concrete adapter.

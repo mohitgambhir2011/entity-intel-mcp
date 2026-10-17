@@ -268,5 +268,8 @@ export const DEFAULT_HOST_RULES: Record<string, RateLimitRule> = {
   // Sanctions bulk downloads: a handful of files per day is enough.
   "sanctionslist.fcdo.gov.uk": { max: 3, windowMs: 60_000 },
   "webgate.ec.europa.eu": { max: 3, windowMs: 60_000 },
+  // No published limits (UNVERIFIED): conservative fair-use rates.
+  "data.brreg.no": { max: 10, windowMs: 1000 },
+  "avoindata.prh.fi": { max: 5, windowMs: 1000 },
   "www.treasury.gov": { max: 3, windowMs: 60_000 },
 };

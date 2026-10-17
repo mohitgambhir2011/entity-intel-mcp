@@ -118,7 +118,7 @@ Unit tests for identifiers, normaliser, scoring, merge. Adapter tests replay rec
 6. sanctions: ofsi, eu, ofac + `screen_sanctions`.
 7. `search_entities` with resolution; `get_officers`; `get_ownership` (PSC + GLEIF L2).
 8. gb-fca; `get_filings_and_insolvency`.
-9. Wave 1: no-brreg, fi-prh, dk-cvr (after access), ie-cro.
+9. Wave 1: no-brreg and fi-prh (done, D40), dk-cvr (after access), ie-cro.
 10. `kyb_check` prompt, README, golden set, manual KYB trial, release.
 
 ## 5. Open items

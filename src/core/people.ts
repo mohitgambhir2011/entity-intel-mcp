@@ -7,6 +7,8 @@ export type UnavailableReason =
   | "restricted_access"
   | "requires_paid_access"
   | "requires_credentials"
+  /** The adapter exists but is switched off (for example excluded by EIM_ADAPTERS). */
+  | "not_enabled"
   | "no_such_record";
 
 export type Availability<T> =
@@ -22,7 +24,20 @@ export interface BirthDate {
   day?: number;
 }
 
-export type OfficerRole = "director" | "secretary" | "llp_member" | "manager" | "other";
+/** Normalised roles across registries; the registry's own wording is always kept in sourceRole. */
+export type OfficerRole =
+  | "director"
+  | "ceo"
+  | "chair"
+  | "board_member"
+  | "deputy"
+  | "secretary"
+  | "llp_member"
+  | "manager"
+  | "auditor"
+  | "accountant"
+  | "authorised_signatory"
+  | "other";
 
 export interface Officer {
   kind: "person" | "corporate";
@@ -36,6 +51,8 @@ export interface Officer {
   appointedOn?: string;
   resignedOn?: string;
   active: boolean;
+  /** The registry marks this person as deceased. */
+  deceased?: boolean;
   birth?: BirthDate;
   nationality?: string;
   countryOfResidence?: string;

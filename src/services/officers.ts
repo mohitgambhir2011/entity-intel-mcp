@@ -4,7 +4,12 @@ import type { Availability, Officer, OfficerRole } from "../core/people.js";
 import type { Identifier, Provenance, SourceId } from "../core/types.js";
 import type { Runtime } from "../runtime.js";
 import { adapterContext, describeFailure } from "./gather.js";
-import { resolveCompany, whyUnavailable, type CompanyContext } from "./company.js";
+import {
+  findRegistry,
+  resolveCompany,
+  unavailableBecause,
+  type CompanyContext,
+} from "./company.js";
 
 export interface OfficersInput {
   seed: Identifier;
@@ -59,14 +64,19 @@ export async function getOfficers(rt: Runtime, input: OfficersInput): Promise<Of
     offset,
   });
 
-  const adapter = company.ukNumber
-    ? rt.adapters.find((a) => a.officers && a.supports(company.ukNumber!))
-    : undefined;
-  if (!company.ukNumber || !adapter) return done(whyUnavailable(rt, company, adapter, "Officer"));
+  const registry = findRegistry(rt, company.profile, "officers");
+  if (!registry) return done(unavailableBecause(rt, company.profile, "officers"));
+  const { adapter, identifier } = registry;
 
   try {
-    const res = await adapter.officers!(company.ukNumber, adapterContext(rt, input.fresh));
-    if (!res) return done(whyUnavailable(rt, company, adapter, "Officer"));
+    const res = await adapter.officers!(identifier, adapterContext(rt, input.fresh));
+    if (!res) {
+      return done({
+        state: "unavailable",
+        reason: "no_such_record",
+        detail: "The registry has no such company",
+      });
+    }
 
     const all = res.officers.filter(
       (o) =>
@@ -75,7 +85,7 @@ export async function getOfficers(rt: Runtime, input: OfficersInput): Promise<Of
     all.sort(byRecency);
     if (res.truncated) {
       warnings.push(
-        `The registry lists ${res.total} officers but only ${res.officers.length} could be fetched`,
+        `The registry lists ${res.total} officers but only ${res.officers.length} could be read`,
       );
     }
     return done(

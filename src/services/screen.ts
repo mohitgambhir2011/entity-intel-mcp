@@ -113,7 +113,6 @@ export async function screenSanctions(rt: Runtime, input: ScreenInput): Promise<
     entityFromCache = g.fromCache;
     companyCtx = {
       profile,
-      ukNumber: profile.identifiers.find((i) => i.scheme === "GB_CRN"),
       warnings: [...g.warnings],
       sourcesQueried: g.sourcesQueried,
       fromCache: g.fromCache,

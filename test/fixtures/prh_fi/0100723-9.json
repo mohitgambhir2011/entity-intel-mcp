@@ -1,0 +1,246 @@
+{
+  "totalResults": 1,
+  "companies": [
+    {
+      "businessId": {
+        "value": "0100723-9",
+        "registrationDate": "1978-03-15",
+        "source": "3"
+      },
+      "euId": {
+        "value": "FIFPRO.0100723-9",
+        "source": "1"
+      },
+      "names": [
+        {
+          "name": "Konttorivalvonta Oy",
+          "type": "1",
+          "registrationDate": "1981-10-08",
+          "version": 1,
+          "source": "1"
+        },
+        {
+          "name": "Konttorivalvonta Oy - Kontorskontroll Ab",
+          "type": "1",
+          "registrationDate": "1973-10-12",
+          "endDate": "1981-10-07",
+          "version": 2,
+          "source": "1"
+        },
+        {
+          "name": "Kontorskontroll Ab",
+          "type": "2",
+          "registrationDate": "1981-10-08",
+          "version": 1,
+          "source": "1"
+        }
+      ],
+      "mainBusinessLine": {
+        "type": "69201",
+        "descriptions": [
+          {
+            "languageCode": "3",
+            "description": "Accounting and bookkeeping activities; tax consultancy"
+          },
+          {
+            "languageCode": "1",
+            "description": "Laskentatoimi, kirjanpito ja veroneuvonta"
+          },
+          {
+            "languageCode": "2",
+            "description": "Redovisning och bokföring; skatterådgivning"
+          }
+        ],
+        "typeCodeSet": "TOIMI4",
+        "registrationDate": "2026-01-01",
+        "source": "2"
+      },
+      "companyForms": [
+        {
+          "type": "16",
+          "descriptions": [
+            {
+              "languageCode": "2",
+              "description": "Aktiebolag"
+            },
+            {
+              "languageCode": "3",
+              "description": "Limited company"
+            },
+            {
+              "languageCode": "1",
+              "description": "Osakeyhtiö"
+            }
+          ],
+          "version": 1,
+          "source": "1"
+        }
+      ],
+      "companySituations": [
+        {
+          "type": "SELTILA",
+          "registrationDate": "2023-03-29",
+          "source": "1"
+        }
+      ],
+      "registeredEntries": [
+        {
+          "type": "1",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Registered"
+            },
+            {
+              "languageCode": "2",
+              "description": "Registrerad"
+            },
+            {
+              "languageCode": "1",
+              "description": "Rekisterissä"
+            }
+          ],
+          "registrationDate": "1973-10-12",
+          "register": "1",
+          "authority": "2"
+        },
+        {
+          "type": "1",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Registered"
+            },
+            {
+              "languageCode": "2",
+              "description": "Registrerad"
+            },
+            {
+              "languageCode": "1",
+              "description": "Rekisterissä"
+            }
+          ],
+          "registrationDate": "1978-03-15",
+          "register": "4",
+          "authority": "1"
+        },
+        {
+          "type": "55",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Registered"
+            },
+            {
+              "languageCode": "2",
+              "description": "Registrerad"
+            },
+            {
+              "languageCode": "1",
+              "description": "Rekisterissä"
+            }
+          ],
+          "registrationDate": "1995-03-01",
+          "endDate": "2021-05-31",
+          "register": "5",
+          "authority": "1"
+        },
+        {
+          "type": "80",
+          "descriptions": [
+            {
+              "languageCode": "1",
+              "description": "Liiketoiminnasta arvonlisäverovelvollinen"
+            },
+            {
+              "languageCode": "2",
+              "description": "Momsskyldig för rörelseverksamhet"
+            },
+            {
+              "languageCode": "3",
+              "description": "VAT-liable for business activity"
+            }
+          ],
+          "registrationDate": "1994-06-01",
+          "endDate": "2021-06-30",
+          "register": "6",
+          "authority": "1"
+        },
+        {
+          "type": "41",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Registered"
+            },
+            {
+              "languageCode": "2",
+              "description": "Registrerad"
+            },
+            {
+              "languageCode": "1",
+              "description": "Rekisterissä"
+            }
+          ],
+          "registrationDate": "1975-01-01",
+          "endDate": "2021-08-31",
+          "register": "7",
+          "authority": "1"
+        }
+      ],
+      "addresses": [
+        {
+          "type": 1,
+          "street": "VIHERLAAKSONRANTA",
+          "postCode": "02710",
+          "postOffices": [
+            {
+              "city": "ESBO",
+              "languageCode": "2",
+              "municipalityCode": "049"
+            },
+            {
+              "city": "ESPOO",
+              "languageCode": "1",
+              "municipalityCode": "049"
+            }
+          ],
+          "postOfficeBox": "",
+          "buildingNumber": "14",
+          "entrance": "A",
+          "apartmentNumber": "",
+          "apartmentIdSuffix": "",
+          "co": "",
+          "registrationDate": "1996-10-25",
+          "source": "0"
+        },
+        {
+          "type": 2,
+          "street": "Alberganesplanadi",
+          "postCode": "02600",
+          "postOffices": [
+            {
+              "city": "ESBO",
+              "languageCode": "2",
+              "municipalityCode": "049"
+            },
+            {
+              "city": "ESPOO",
+              "languageCode": "1",
+              "municipalityCode": "049"
+            }
+          ],
+          "buildingNumber": "9",
+          "entrance": "B",
+          "co": "c/o AAT Fagerholm-Mård",
+          "registrationDate": "2022-05-23",
+          "source": "0"
+        }
+      ],
+      "tradeRegisterStatus": "1",
+      "status": "2",
+      "registrationDate": "1973-10-12",
+      "lastModified": "2026-05-05T08:13:01"
+    }
+  ]
+}

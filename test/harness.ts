@@ -31,6 +31,41 @@ export function sanctionsRoutes(): Record<string, FakeRoute | FakeRoute[]> {
 }
 
 /**
+ * Norway (Equinor ASA, a bankrupt company) and Finland (Nokia Oyj, plus real ceased, bankrupt,
+ * in-liquidation and housing companies) with their GLEIF and VIES records. Individuals in the
+ * Norwegian roles are synthetic. Specific URLs come before the shorter ones they extend.
+ */
+export function nordicRoutes(): Record<string, FakeRoute | FakeRoute[]> {
+  const BR = "https://data.brreg.no/enhetsregisteret/api";
+  const PRH = "https://avoindata.prh.fi/opendata-ytj-api/v3/companies";
+  const f = (path: string): FakeRoute => ({ body: fixtureText(path) });
+  const empty: FakeRoute = { body: JSON.stringify({ totalResults: 0, companies: [] }) };
+  return {
+    [`${BR}/enheter/923609016/roller`]: f("brreg_no/equinor-roller.json"),
+    [`${BR}/enheter/923609016`]: f("brreg_no/equinor.json"),
+    [`${BR}/enheter/935567645/roller`]: { body: JSON.stringify({ rollegrupper: [] }) },
+    [`${BR}/enheter/935567645`]: f("brreg_no/konkurs.json"),
+    [`${BR}/enheter?navn=`]: f("brreg_no/search-equinor.json"),
+    [`${PRH}?businessId=0112038-9`]: f("prh_fi/nokia.json"),
+    [`${PRH}?businessId=0100002-9`]: f("prh_fi/0100002-9.json"),
+    [`${PRH}?businessId=0104057-3`]: f("prh_fi/0104057-3.json"),
+    [`${PRH}?businessId=0100723-9`]: f("prh_fi/0100723-9.json"),
+    [`${PRH}?businessId=0100024-8`]: f("prh_fi/0100024-8.json"),
+    [`${PRH}?businessId=`]: empty,
+    [`${PRH}?name=`]: f("prh_fi/search-nokia.json"),
+    [`${GLEIF}/lei-records/OW6OFBNCKXC4US5C7523`]: f("gleif/lei-equinor.json"),
+    [`${GLEIF}/lei-records/549300A0JPRWG1KI7U06`]: f("gleif/lei-nokia.json"),
+    [`${GLEIF}/lei-records?filter[entity.registeredAs]=923%20609%20016`]: f(
+      "gleif/by-registration-equinor.json",
+    ),
+    [`${GLEIF}/lei-records?filter[entity.registeredAs]=0112038-9`]: f(
+      "gleif/by-registration-nokia.json",
+    ),
+    [`${VIES}/FI/vat/01120389`]: f("vies/fi-valid.json"),
+  };
+}
+
+/**
  * Officers, PSC and the Tesco group chain (Tesco Stores -> Tesco Holdings -> Tesco PLC, which is
  * exempt from PSC reporting as a listed company). Individuals are synthetic; companies are real.
  * Sub-resource URLs must be listed before the plain company URL they share a prefix with.
@@ -57,6 +92,7 @@ export function peopleRoutes(): Record<string, FakeRoute | FakeRoute[]> {
 export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   return {
     ...peopleRoutes(),
+    ...nordicRoutes(),
     [`${GLEIF}/lei-records/2138002P5RNKC5W2JZ46`]: { body: fixtureText("gleif/lei-tesco.json") },
     [`${GLEIF}/lei-records?filter[entity.registeredAs]=00445790`]: {
       body: fixtureText("gleif/by-registration-tesco.json"),

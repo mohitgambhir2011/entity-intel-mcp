@@ -1,5 +1,6 @@
 import { SourceError } from "../../core/errors.js";
 import { normalizeGbCompanyNumber } from "../../core/identifiers.js";
+import { ownEntry } from "../../core/tables.js";
 import {
   displayPersonName,
   type BirthDate,
@@ -281,7 +282,7 @@ export function describeExemption(code: string): string {
 }
 
 export function describeStatement(code: string): string {
-  return STATEMENT_TEXT[code] ?? `PSC statement: ${code}`;
+  return ownEntry(STATEMENT_TEXT, code) ?? `PSC statement: ${code}`;
 }
 
 // ---------------------------------------------------------------- fetching

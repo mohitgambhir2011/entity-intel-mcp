@@ -87,5 +87,10 @@ export const SCREENING_CAVEAT =
   "Transliteration variants, name changes and unlisted aliases can be missed; every hit " +
   "needs human review against the official list.";
 
-/** Identifier schemes whose values are compared with the registration numbers on the lists. */
+/**
+ * Identifier schemes whose values are compared with the registration numbers on the lists. The
+ * Norwegian and Finnish numbers are left out on purpose: the lists record identifiers without
+ * their type, so a bare 8-9 digit number could equal an unrelated passport or tax number, and an
+ * identifier hit scores 1.0. Those companies are screened by name.
+ */
 export const SCREENED_SCHEMES: ReadonlySet<string> = new Set(["LEI", "GB_CRN", "VAT"]);

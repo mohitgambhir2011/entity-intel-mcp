@@ -11,7 +11,12 @@ import type {
 import type { AdapterContext } from "../adapters/types.js";
 import type { Identifier, Provenance, SourceId } from "../core/types.js";
 import type { Runtime } from "../runtime.js";
-import { resolveCompany, whyUnavailable, type CompanyContext } from "./company.js";
+import {
+  findControllersRegistry,
+  resolveCompany,
+  unavailableBecause,
+  type CompanyContext,
+} from "./company.js";
 import { adapterContext, describeFailure } from "./gather.js";
 import { fallbackEntityId, makeEntityId } from "../core/ids.js";
 
@@ -177,20 +182,25 @@ export async function getOwnership(rt: Runtime, input: OwnershipInput): Promise<
     fromCache,
   });
 
-  const adapter = company.ukNumber
-    ? rt.adapters.find((a) => a.controllers && a.supports(company.ukNumber!))
-    : undefined;
-  if (!company.ukNumber || !adapter)
-    return finish(whyUnavailable(rt, company, adapter, "Ownership"));
+  // Only registries the chain walker can follow; anything else is reported, not mis-followed.
+  const registry = findControllersRegistry(rt, company.profile);
+  if (!registry) return finish(unavailableBecause(rt, company.profile, "controllers"));
+  const { adapter } = registry;
 
-  const built = await walk(rt, adapter.controllers!.bind(adapter), company, company.ukNumber, {
+  const built = await walk(rt, adapter.controllers!.bind(adapter), company, registry.identifier, {
     depth,
     includeCeased: input.includeCeased ?? false,
     includePersons: input.includePersons ?? true,
     fresh: input.fresh,
     warn: (w) => warnings.push(w),
   });
-  if (!built) return finish(whyUnavailable(rt, company, adapter, "Ownership"));
+  if (!built) {
+    return finish({
+      state: "unavailable",
+      reason: "no_such_record",
+      detail: "The registry has no such company",
+    });
+  }
   // If the company itself could not be read there is no ownership information at all: that is an
   // error, not an (empty) result.
   if (built.rootFailure) return finish({ state: "error", detail: built.rootFailure });

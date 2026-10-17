@@ -1,0 +1,421 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/923609016/roller"
+    },
+    "enhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/923609016"
+    }
+  },
+  "rollegrupper": [
+    {
+      "roller": [
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1960-01-10",
+            "navn": {
+              "fornavn": "Jane",
+              "mellomnavn": "Alice",
+              "etternavn": "Example"
+            }
+          },
+          "rekkefolge": 0,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/DAGL"
+              }
+            },
+            "beskrivelse": "Daglig leder",
+            "kode": "DAGL"
+          }
+        }
+      ],
+      "sistEndret": "2020-11-02",
+      "type": {
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/roller/rollegruppetyper/DAGL"
+          }
+        },
+        "beskrivelse": "Daglig leder",
+        "kode": "DAGL"
+      }
+    },
+    {
+      "roller": [
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1961-02-11",
+            "navn": {
+              "fornavn": "John",
+              "etternavn": "Sample"
+            }
+          },
+          "rekkefolge": 0,
+          "type": {
+            "kode": "LEDE",
+            "beskrivelse": "Styrets leder"
+          }
+        },
+        {
+          "avregistrert": true,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1962-03-12",
+            "navn": {
+              "fornavn": "Maria",
+              "etternavn": "Tester"
+            }
+          },
+          "rekkefolge": 1,
+          "type": {
+            "kode": "NEST",
+            "beskrivelse": "Nestleder"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1963-04-13",
+            "navn": {
+              "fornavn": "Robert",
+              "mellomnavn": "James",
+              "etternavn": "Demo"
+            }
+          },
+          "rekkefolge": 2,
+          "type": {
+            "kode": "MEDL",
+            "beskrivelse": "Styremedlem"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1964-05-14",
+            "navn": {
+              "fornavn": "Anna",
+              "etternavn": "Placeholder"
+            }
+          },
+          "rekkefolge": 3,
+          "type": {
+            "kode": "VARA",
+            "beskrivelse": "Varamedlem"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1965-06-15",
+            "navn": {
+              "fornavn": "Thomas",
+              "etternavn": "Fixture"
+            }
+          },
+          "rekkefolge": 4,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/MEDL"
+              }
+            },
+            "beskrivelse": "Styremedlem",
+            "kode": "MEDL"
+          },
+          "valgtAv": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/representanter/AREP"
+              }
+            },
+            "beskrivelse": "Representant for de ansatte",
+            "kode": "AREP"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1966-07-16",
+            "navn": {
+              "fornavn": "Sarah",
+              "mellomnavn": "Jane",
+              "etternavn": "Mock"
+            }
+          },
+          "rekkefolge": 5,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/MEDL"
+              }
+            },
+            "beskrivelse": "Styremedlem",
+            "kode": "MEDL"
+          },
+          "valgtAv": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/representanter/AREP"
+              }
+            },
+            "beskrivelse": "Representant for de ansatte",
+            "kode": "AREP"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1967-08-17",
+            "navn": {
+              "fornavn": "Peter",
+              "etternavn": "Dummy"
+            }
+          },
+          "rekkefolge": 6,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/MEDL"
+              }
+            },
+            "beskrivelse": "Styremedlem",
+            "kode": "MEDL"
+          },
+          "valgtAv": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/representanter/AREP"
+              }
+            },
+            "beskrivelse": "Representant for de ansatte",
+            "kode": "AREP"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1968-09-18",
+            "navn": {
+              "fornavn": "Eva",
+              "etternavn": "Stub"
+            }
+          },
+          "rekkefolge": 7,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/MEDL"
+              }
+            },
+            "beskrivelse": "Styremedlem",
+            "kode": "MEDL"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1969-01-10",
+            "navn": {
+              "fornavn": "Oskar",
+              "etternavn": "Fake"
+            }
+          },
+          "rekkefolge": 8,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/MEDL"
+              }
+            },
+            "beskrivelse": "Styremedlem",
+            "kode": "MEDL"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1970-02-11",
+            "navn": {
+              "fornavn": "Lena",
+              "etternavn": "Specimen"
+            }
+          },
+          "rekkefolge": 9,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/MEDL"
+              }
+            },
+            "beskrivelse": "Styremedlem",
+            "kode": "MEDL"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1971-03-12",
+            "navn": {
+              "fornavn": "Karl",
+              "etternavn": "Sketch"
+            }
+          },
+          "rekkefolge": 10,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/VARA"
+              }
+            },
+            "beskrivelse": "Varamedlem",
+            "kode": "VARA"
+          },
+          "valgtAv": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/representanter/AREP"
+              }
+            },
+            "beskrivelse": "Representant for de ansatte",
+            "kode": "AREP"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": true,
+            "fodselsdato": "1972-04-13",
+            "navn": {
+              "fornavn": "Nina",
+              "etternavn": "Model"
+            }
+          },
+          "rekkefolge": 11,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/VARA"
+              }
+            },
+            "beskrivelse": "Varamedlem",
+            "kode": "VARA"
+          },
+          "valgtAv": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/representanter/AREP"
+              }
+            },
+            "beskrivelse": "Representant for de ansatte",
+            "kode": "AREP"
+          }
+        },
+        {
+          "avregistrert": false,
+          "person": {
+            "erDoed": false,
+            "fodselsdato": "1973-05-14",
+            "navn": {
+              "fornavn": "Olav",
+              "etternavn": "Pattern"
+            }
+          },
+          "rekkefolge": 12,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/VARA"
+              }
+            },
+            "beskrivelse": "Varamedlem",
+            "kode": "VARA"
+          },
+          "valgtAv": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/representanter/AREP"
+              }
+            },
+            "beskrivelse": "Representant for de ansatte",
+            "kode": "AREP"
+          },
+          "fratraadt": true
+        }
+      ],
+      "sistEndret": "2026-09-04",
+      "type": {
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/roller/rollegruppetyper/STYR"
+          }
+        },
+        "beskrivelse": "Styre",
+        "kode": "STYR"
+      }
+    },
+    {
+      "roller": [
+        {
+          "avregistrert": false,
+          "enhet": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/enheter/976389387"
+              }
+            },
+            "erSlettet": false,
+            "godkjenningsstatus": "Godkjent revisjonsforetak",
+            "navn": [
+              "ERNST & YOUNG AS"
+            ],
+            "organisasjonsform": {
+              "_links": {
+                "self": {
+                  "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/AS"
+                }
+              },
+              "beskrivelse": "Aksjeselskap",
+              "kode": "AS"
+            },
+            "organisasjonsnummer": "976389387"
+          },
+          "rekkefolge": 0,
+          "type": {
+            "_links": {
+              "self": {
+                "href": "https://data.brreg.no/enhetsregisteret/api/roller/rolletyper/REVI"
+              }
+            },
+            "beskrivelse": "Revisor",
+            "kode": "REVI"
+          }
+        }
+      ],
+      "sistEndret": "2019-07-12",
+      "type": {
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/roller/rollegruppetyper/REVI"
+          }
+        },
+        "beskrivelse": "Revisor",
+        "kode": "REVI"
+      }
+    }
+  ]
+}

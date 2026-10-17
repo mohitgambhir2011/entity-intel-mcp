@@ -76,6 +76,15 @@ review of this codebase (2026-10-17) found 15 defects, all fixed with regression
 | An outage shown as an empty result | Root company unreadable -> one-node 'available' graph | Error state; tests per failure position (root vs higher up) |
 | Shell-escaped regexes | A lost backslash silently broke matching | Read generated files back; tests with real inputs |
 | Privacy drift | Audit log stored names despite "metadata only" | Hash free text; test the audit rows |
+| Registry text used as a table key | `ROLES[code]` / `known[type]` with a code of `constructor` returns a member of `Object.prototype` (a TypeError or a function where a string belongs) | `ownEntry()` for every table keyed by registry text; a test with `constructor`, `toString`, `__proto__` |
+| A record that drops out silently | A Norwegian role without a usable name vanished from the list, so the officer list and a screen built on it looked complete | Count what could not be read; `truncated` and a warning; test through the tools |
+| An answer about another record | A register answering for a different number would become the requested company's profile | Compare the returned id with the one asked for; `bad_response` and no caching |
+| The last name is still the name | A ceased company's only official name has an end date, so it had no legal name and could not be searched | Test with a real ceased-company fixture, not only live ones |
+| Claims written by hand | The profile said officers were "available" for every country, `check_coverage` listed countries in a string | Derive the claim from the adapters (country, capabilities, restrictions); test one company per country |
+| Fan-out that ignores the filter | A `country=DE` search still called the Norwegian and Finnish registers | Adapters declare their country; test the sources queried per country |
+| A short numeric id compared across countries | Bare 8-9 digit registry numbers can equal unrelated passport or tax numbers on a list, and an identifier hit scores 1.0 | Only typed, long identifiers (LEI, UK company number, VAT) are compared; the rest are screened by name |
+
+The fourth `xhigh` review (Norway and Finland, the generalised officers / ownership code and the GLEIF crosswalks, 2026-10-17) found 15 more defects, all fixed with tests in `test/unit/nordic.test.ts` and `test/integration/nordic.test.ts` (the "review regressions" groups). A live run before the review had already shown the Nokia date disagreement between PRH and GLEIF, which is the conflict machinery working as intended.
 
 The third `xhigh` review (officers, ownership and related-party screening, 2026-10-17) found 13 more defects, all fixed with tests in `test/integration/people-review.test.ts`.
 

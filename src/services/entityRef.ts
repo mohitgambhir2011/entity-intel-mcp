@@ -3,7 +3,9 @@ import {
   detectIdentifier,
   isValidLei,
   makeIdentifier,
+  normalizeFiBusinessId,
   normalizeGbCompanyNumber,
+  normalizeNoOrgnr,
   parseVat,
   stripSeparators,
 } from "../core/identifiers.js";
@@ -16,7 +18,7 @@ export interface EntityRefInput {
   country?: string;
 }
 
-export const SUPPORTED_SCHEMES = ["LEI", "GB_CRN", "VAT"] as const;
+export const SUPPORTED_SCHEMES = ["LEI", "GB_CRN", "NO_ORGNR", "FI_YTUNNUS", "VAT"] as const;
 
 /** Turns tool arguments into one Identifier to start a lookup from. Throws InvalidInputError. */
 export function resolveRef(input: EntityRefInput): Identifier {
@@ -33,6 +35,14 @@ function fromEntityId(id: string): Identifier {
   if (parts[0] === "GB" && parts[1] === "CH" && parts[2]) {
     const n = normalizeGbCompanyNumber(parts[2]);
     if (n) return makeIdentifier("GB_CRN", n, { country: "GB" });
+  }
+  if (parts[0] === "NO" && parts[1] === "BR" && parts[2]) {
+    const n = normalizeNoOrgnr(parts[2]);
+    if (n) return makeIdentifier("NO_ORGNR", n, { country: "NO" });
+  }
+  if (parts[0] === "FI" && parts[1] === "PRH" && parts[2]) {
+    const n = normalizeFiBusinessId(parts[2]);
+    if (n) return makeIdentifier("FI_YTUNNUS", n, { country: "FI" });
   }
   if (parts[0] === "ID" && parts[1] === "LEI" && parts[2] && isValidLei(parts[2])) {
     return makeIdentifier("LEI", parts[2].toUpperCase());
@@ -68,11 +78,29 @@ function fromIdentifier(raw: string, scheme?: string, country?: string): Identif
       if (!n) throw new InvalidInputError("Not a valid UK company number");
       return makeIdentifier("GB_CRN", n, { country: "GB" });
     }
+    if (upper === "NO_ORGNR") {
+      const n = normalizeNoOrgnr(value);
+      if (!n)
+        throw new InvalidInputError(
+          "Not a valid Norwegian organisation number (9 digits with a valid check digit)",
+        );
+      return makeIdentifier("NO_ORGNR", n, { country: "NO", validated: true });
+    }
+    if (upper === "FI_YTUNNUS") {
+      const n = normalizeFiBusinessId(value);
+      if (!n)
+        throw new InvalidInputError("Not a valid Finnish business ID (for example 0112038-9)");
+      return makeIdentifier("FI_YTUNNUS", n, { country: "FI", validated: true });
+    }
+    // A Norwegian VAT number is the organisation number plus "MVA": same company, same register.
+    const noVat = /^NO[0-9]{9}MVA$/.test(value) ? normalizeNoOrgnr(value) : undefined;
+    if (noVat) return makeIdentifier("NO_ORGNR", noVat, { country: "NO", validated: true });
     const vat = parseVat(value);
     if (!vat) {
       throw new InvalidInputError(
         "Not a recognised EU VAT number: it must start with a VIES country code (e.g. IE, DE, FR). " +
-          "UK (GB) VAT numbers are not covered by VIES.",
+          "UK (GB) VAT numbers are not covered by VIES; Norwegian ones are organisation numbers " +
+          "(use scheme NO_ORGNR).",
       );
     }
     return makeIdentifier("VAT", `${vat.country}${vat.number}`, { country: vat.country });
@@ -81,8 +109,8 @@ function fromIdentifier(raw: string, scheme?: string, country?: string): Identif
   const detected = detectIdentifier(raw, country);
   if (!detected) {
     throw new InvalidInputError(
-      "Could not tell what kind of identifier this is. Pass scheme (LEI, GB_CRN or VAT), " +
-        "or country=GB for a UK company number.",
+      `Could not tell what kind of identifier this is. Pass scheme (${SUPPORTED_SCHEMES.join(", ")}), ` +
+        "or country (GB, NO or FI) for a bare company number.",
     );
   }
   return makeIdentifier(detected.scheme, detected.value, { country: detected.country });

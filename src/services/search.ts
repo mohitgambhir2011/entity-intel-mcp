@@ -45,16 +45,17 @@ export async function searchEntities(rt: Runtime, input: SearchInput): Promise<S
   if (detected) return searchByIdentifier(rt, detected, input.fresh);
 
   const warnings: string[] = [];
-  if (/^\d{6,8}$/.test(query.replace(/\s/g, "")) && !country) {
+  if (/^\d{6,9}$/.test(query.replace(/\s/g, "")) && !country) {
     warnings.push(
-      "This looks like a company number; add country=GB to look it up as a UK company number",
+      "This looks like a company number; add country=GB, country=NO or country=FI to look it up in that register",
     );
   }
 
-  const searchers: SourceAdapter[] = rt.adapters.filter((a) => a.search);
-  const skipCh = country !== undefined && country !== "GB";
-  const active = searchers.filter((a) => !(a.id === "companies_house" && skipCh));
-  if (!skipCh && !rt.adapters.some((a) => a.id === "companies_house")) {
+  // With a country filter, only that country's register is searched (plus the multi-country
+  // sources, whose hits are filtered by jurisdiction below).
+  const inScope = (a: SourceAdapter): boolean => !country || !a.country || a.country === country;
+  const active = rt.adapters.filter((a) => a.search && inScope(a));
+  if ((!country || country === "GB") && !rt.adapters.some((a) => a.id === "companies_house")) {
     const s = rt.statuses.find((x) => x.id === "gb");
     warnings.push(`Companies House not searched: ${s?.reason ?? "not enabled"}`);
   }

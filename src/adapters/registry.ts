@@ -1,7 +1,9 @@
 import type { Config } from "../core/config.js";
 import type { IdentifierScheme } from "../core/types.js";
 import { createCompaniesHouseAdapter } from "./companies-house/index.js";
+import { finlandAdapter } from "./fi-prh/index.js";
 import { gleifAdapter } from "./gleif/index.js";
+import { norwayAdapter } from "./no-brreg/index.js";
 import type { SourceAdapter } from "./types.js";
 import { viesAdapter } from "./vies/index.js";
 
@@ -68,18 +70,20 @@ export const ADAPTERS: AdapterInfo[] = [
   {
     id: "no",
     country: "NO",
-    label: "Bronnoysund Register Centre",
+    label: "Bronnoysund Register Centre (Enhetsregisteret)",
     requiredEnv: [],
     schemes: ["NO_ORGNR"],
-    implemented: false,
+    implemented: true,
+    create: () => norwayAdapter,
   },
   {
     id: "fi",
     country: "FI",
-    label: "Finnish Patent and Registration Office",
+    label: "Finnish Patent and Registration Office (PRH open data)",
     requiredEnv: [],
     schemes: ["FI_YTUNNUS"],
-    implemented: false,
+    implemented: true,
+    create: () => finlandAdapter,
   },
   {
     id: "ie",

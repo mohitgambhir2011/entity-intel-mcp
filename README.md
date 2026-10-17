@@ -11,9 +11,10 @@ does not publish a data family, or a source is down or stale, the result says so
 returning silence or a false all-clear.
 
 > **Status: early development (v0.0.1).** Seven tools work (below). Filings, regulatory status and
-> insolvency are **not implemented yet**, and only the UK has a national registry adapter, so
-> officers and ownership are available for UK companies only. See [Coverage](#coverage) and the
-> [roadmap](docs/01-DECISIONS.md) (D12).
+> insolvency are **not implemented yet**. National registry adapters exist for the **UK**, **Norway**
+> and **Finland**: officers are available for UK and Norwegian companies, ownership for UK companies
+> only (Norway and Finland do not publish beneficial owners, and the result says so). See
+> [Coverage](#coverage) and the [roadmap](docs/01-DECISIONS.md) (D12).
 
 ## Contents
 
@@ -23,15 +24,16 @@ returning silence or a false all-clear.
 
 ## What you get
 
-| Question an assistant can answer                                                     | Tool                              |
-| ------------------------------------------------------------------------------------ | --------------------------------- |
-| "Which companies are called Tesco PLC in the UK, and which one is the listed group?" | `search_entities`                 |
-| "Give me the profile of UK company 00445790 / LEI 2138002P5RNKC5W2JZ46"              | `get_entity`                      |
-| "Is this LEI or VAT number valid, and what are the entity's other identifiers?"      | `resolve_identifier`              |
-| "Is this company, or this name, on the UK, EU or US sanctions lists?"                | `screen_sanctions`                |
-| "Who are its directors, and who ultimately owns and controls it?" (UK)               | `get_officers`, `get_ownership`   |
-| "Are any of its directors or owners sanctioned?" (UK)                                | `screen_sanctions` with `include` |
-| "What can this server actually tell me about Norway today?"                          | `check_coverage`                  |
+| Question an assistant can answer                                                       | Tool                              |
+| -------------------------------------------------------------------------------------- | --------------------------------- |
+| "Which companies are called Tesco PLC in the UK, and which one is the listed group?"   | `search_entities`                 |
+| "Give me the profile of UK company 00445790 / LEI 2138002P5RNKC5W2JZ46"                | `get_entity`                      |
+| "Is this LEI or VAT number valid, and what are the entity's other identifiers?"        | `resolve_identifier`              |
+| "Is this company, or this name, on the UK, EU or US sanctions lists?"                  | `screen_sanctions`                |
+| "Give me the profile of Norwegian company 923 609 016 / Finnish business ID 0112038-9" | `get_entity`                      |
+| "Who are its directors, and who ultimately owns and controls it?" (UK; Norway: board)  | `get_officers`, `get_ownership`   |
+| "Are any of its directors or owners sanctioned?" (UK; Norway: officers)                | `screen_sanctions` with `include` |
+| "What can this server actually tell me about Norway today?"                            | `check_coverage`                  |
 
 Design rules that shape every answer:
 
@@ -73,9 +75,9 @@ Add to your MCP client (Claude Desktop shown; the path must be absolute):
 ```
 
 Keys: a free Companies House **REST** key from <https://developer.company-information.service.gov.uk>
-(create an application, then a REST key). GLEIF, VIES and the sanctions lists need no key. Without a
-Companies House key the server still works for LEIs, VAT numbers and sanctions screening, and says
-which source was skipped.
+(create an application, then a REST key). GLEIF, VIES, the Norwegian and Finnish registers and the
+sanctions lists need no key. Without a Companies House key the server still works for LEIs, VAT
+numbers, Norwegian and Finnish companies and sanctions screening, and says which source was skipped.
 
 The first sanctions screening downloads about 100 MB of lists (a few seconds to half a minute); they
 are then cached locally for 24 hours.
@@ -91,13 +93,13 @@ All tools are read-only. Arguments are flat; names are never accepted where an i
 
 Find entities by **name**, or resolve an **identifier** to one entity.
 
-| Argument           | Meaning                                                                                     |
-| ------------------ | ------------------------------------------------------------------------------------------- |
-| `query` (required) | A name, or an LEI / UK company number / EU VAT number                                       |
-| `country`          | ISO code to restrict results (`GB`). Also lets a bare number be read as a UK company number |
-| `status`           | `operating`, `distressed`, `ended`, `any` (default)                                         |
-| `limit`            | 1-25, default 10                                                                            |
-| `fresh`            | Bypass the cache                                                                            |
+| Argument           | Meaning                                                                                                                                      |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `query` (required) | A name, or an LEI / company number / VAT number (`NO923609016MVA`, `0112038-9` are read as is)                                               |
+| `country`          | ISO code to restrict results to that country's register (`GB`, `NO`, `FI`). Also lets a bare number be read as that country's company number |
+| `status`           | `operating`, `distressed`, `ended`, `any` (default)                                                                                          |
+| `limit`            | 1-25, default 10                                                                                                                             |
+| `fresh`            | Bypass the cache                                                                                                                             |
 
 Returns `candidates[]` with `entityId`, `name`, `jurisdiction`, `status`, `identifiers`, `sources` and
 `match { confidence, band, reasons, warnings }`. Bands: `certain` (exact identifier only), `high`,
@@ -118,20 +120,22 @@ company number and back; VAT validity through VIES, including that Germany withh
 
 ### `get_officers`
 
-Current directors, secretaries and other officers of a **UK** company from Companies House: role, appointment / resignation dates, nationality, occupation, partial date of birth as published, address. Corporate officers carry their UK company number. Arguments: entity reference, `active_only` (default true), `role`, `limit` (default 25, max 100), `offset`. Other countries report `not_yet_supported`. **Contains personal data.**
+Current directors, secretaries and other officers of a **UK** company from Companies House (role, appointment / resignation dates, nationality, occupation, partial date of birth as published, address; corporate officers carry their UK company number), or the roles of a **Norwegian** company from Enhetsregisteret: CEO, chair, board members, deputies, auditor, accountant, signatories, each with the register's own wording, whether it is still in force, the full birth date as Norway publishes it and a deceased flag. Norway publishes no appointment dates. Finland does not publish officers in its open data (`unavailable: not_published_by_source`); other countries report `not_yet_supported`. Arguments: entity reference, `active_only` (default true), `role`, `limit` (default 25, max 100), `offset`. **Contains personal data.**
 
 ### `get_ownership`
 
-Traces who controls a **UK** company: its persons with significant control (PSC) and, for each corporate controller registered at Companies House, theirs in turn, up to `depth` levels (default 3, max 10). Returns a graph (owner-to-owned edges with the published share / voting bands and board-control flags) and the ends of the chains, each with the reason the chain stops: a natural person, a company **exempt** from PSC reporting (for example listed on a regulated market), a company's statement, all controllers ceased, a foreign or unidentified entity, a protected identity, or the depth / request limit. Bands are not multiplied along the chain. **Contains personal data.**
+Traces who controls a **UK** company: its persons with significant control (PSC) and, for each corporate controller registered at Companies House, theirs in turn, up to `depth` levels (default 3, max 10). Returns a graph (owner-to-owned edges with the published share / voting bands and board-control flags) and the ends of the chains, each with the reason the chain stops: a natural person, a company **exempt** from PSC reporting (for example listed on a regulated market), a company's statement, all controllers ceased, a foreign or unidentified entity, a protected identity, or the depth / request limit. Bands are not multiplied along the chain. Norway and Finland do not publish beneficial owners openly, so their companies answer `unavailable: restricted_access` with that explanation. **Contains personal data.**
 
 ### `screen_sanctions`
 
 Screens a **name** (`name`, optional `type`: `person|entity|any`) **or** a resolved entity
 (`entity_id` / `identifier`) against the **UK Sanctions List**, the **EU consolidated list** and the
 **US OFAC SDN list** (`lists` to choose). An entity is screened under its legal and former names and
-its LEI / company number / VAT number. With `include: ["officers", "owners"]` (UK companies) its
-current officers and its owners (`owners_depth`, default 3) are screened too, and `overall` is the
-worst result across all of them. Matching is local, so the name you screen is not sent to the list
+its LEI / UK company number / VAT number (Norwegian and Finnish registry numbers are not compared with
+list identifiers: bare 8-9 digit numbers could equal unrelated list entries, so those companies are
+screened by name, LEI and VAT). With `include: ["officers", "owners"]` its current officers (UK,
+Norway) and its owners (UK, `owners_depth`, default 3) are screened too, and `overall` is the worst
+result across all of them; a group the country does not provide makes the result `incomplete`. Matching is local, so the name you screen is not sent to the list
 publishers.
 
 Result: `match` (score >= 0.95, or an exact registration number), `possible_match` (>= 0.80),
@@ -157,7 +161,7 @@ See [`.env.example`](.env.example).
 | ----------------------------------------------- | ---------------------------------------------------------- | ----------------------- |
 | `COMPANIES_HOUSE_API_KEY`                       | Enables the UK Companies House adapter                     | adapter off             |
 | `FCA_AUTH_EMAIL`, `FCA_AUTH_KEY`                | FCA Register (adapter not implemented yet)                 | off                     |
-| `EIM_ADAPTERS`                                  | Allow-list of adapter ids, e.g. `gleif,vies,gb`            | all with credentials    |
+| `EIM_ADAPTERS`                                  | Allow-list of adapter ids, e.g. `gleif,vies,gb,no,fi`      | all with credentials    |
 | `EIM_DB_PATH`                                   | SQLite cache and audit file                                | per-user data directory |
 | `EIM_PERSONAL_DATA_TTL_DAYS`                    | Cache lifetime cap for officer / owner data                | 30 (0-3650)             |
 | `EIM_AUDIT_RETENTION_DAYS`                      | Audit log retention                                        | 365 (1-3650)            |
@@ -171,14 +175,16 @@ Out-of-range values are replaced by the default and reported on stderr at startu
 What the server can return **today** (v0.0.1). "Identity" = names, identifiers, status, legal form,
 dates, address.
 
-| Source                | Countries             | Identity                                                 | Officers | Owners            | Filings | Regulatory | Insolvency | Sanctions |
-| --------------------- | --------------------- | -------------------------------------------------------- | :------: | ----------------- | :-----: | :--------: | :--------: | --------- |
-| Companies House (key) | GB                    | yes                                                      |   yes    | yes (PSC chain)   |    -    |     -      |     -      | -         |
-| GLEIF                 | LEI holders worldwide | yes                                                      |    -     | parents (planned) |    -    |     -      |     -      | -         |
-| VIES                  | EU member states + XI | VAT validity; name/address where the state releases them |    -     | -                 |    -    |     -      |     -      | -         |
-| UK Sanctions List     | UK designations       | -                                                        |    -     | -                 |    -    |     -      |     -      | yes       |
-| EU consolidated list  | EU designations       | -                                                        |    -     | -                 |    -    |     -      |     -      | yes       |
-| OFAC SDN              | US designations       | -                                                        |    -     | -                 |    -    |     -      |     -      | yes       |
+| Source                | Countries             | Identity                                                 |   Officers    | Owners            | Filings | Regulatory | Insolvency | Sanctions |
+| --------------------- | --------------------- | -------------------------------------------------------- | :-----------: | ----------------- | :-----: | :--------: | :--------: | --------- |
+| Companies House (key) | GB                    | yes                                                      |      yes      | yes (PSC chain)   |    -    |     -      |     -      | -         |
+| Enhetsregisteret      | NO                    | yes (incl. LEI and VAT crosswalk)                        |  yes (roles)  | not public        |    -    |     -      |     -      | -         |
+| PRH open data         | FI                    | yes (incl. LEI and VAT crosswalk; status inferred)       | not published | not public        |    -    |     -      |     -      | -         |
+| GLEIF                 | LEI holders worldwide | yes                                                      |       -       | parents (planned) |    -    |     -      |     -      | -         |
+| VIES                  | EU member states + XI | VAT validity; name/address where the state releases them |       -       | -                 |    -    |     -      |     -      | -         |
+| UK Sanctions List     | UK designations       | -                                                        |       -       | -                 |    -    |     -      |     -      | yes       |
+| EU consolidated list  | EU designations       | -                                                        |       -       | -                 |    -    |     -      |     -      | yes       |
+| OFAC SDN              | US designations       | -                                                        |       -       | -                 |    -    |     -      |     -      | yes       |
 
 `-` = not implemented yet. Planned order and per-country detail, including data that will stay
 unavailable for legal reasons (for example most EU beneficial-owner registers since 2022):
@@ -187,9 +193,14 @@ unavailable for legal reasons (for example most EU beneficial-owner registers si
 ## Limitations
 
 - **Coverage is partial by design.** Only a minority of European companies hold an LEI, and only the
-  UK has a registry adapter, so most EU companies can currently be reached by VAT number only, and
-  officers and ownership exist for UK companies only. Most EU beneficial-owner registers are closed
-  to the public (2022 court ruling), so that data may never be available there.
+  UK, Norway and Finland have registry adapters, so most other EU companies can currently be reached
+  by VAT number only. Officers exist for UK and Norwegian companies, ownership for UK companies.
+  Most EU beneficial-owner registers are closed to the public (2022 court ruling), so that data may
+  never be available there.
+- **Nordic detail.** Finland's open data has no status field, so status is inferred from the trade
+  register entry and company situations (anything unrecognised is `unknown`, never "active"). Norwegian
+  sub-units (underenheter) are not looked up. The registers' rate limits are unverified; the server
+  uses conservative limits. A Norwegian role carries no appointment date.
 - **Ownership is what the register says.** Percentages are the published bands, not exact holdings;
   chains end at foreign entities, protected identities and the depth / request limit, and say so.
 - **Sanctions screening is name- and number-based.** It does not read dates of birth, passports or
@@ -225,9 +236,10 @@ unavailable for legal reasons (for example most EU beneficial-owner registers si
 ```bash
 npm install
 npm run verify          # typecheck + lint + format check + tests + build  (run before every commit)
-npm test                # 185+ tests: unit, MCP-client integration, architecture guards
+npm test                # 300+ tests: unit, MCP-client integration, architecture guards
 npm run dev             # run the server from source over stdio
 npx tsx scripts/live-smoke.ts       # real calls to GLEIF, VIES, Companies House (needs your key)
+npx tsx scripts/live-nordic.ts      # real calls to the Norwegian and Finnish registers (no key)
 npx tsx scripts/live-sanctions.ts   # downloads the real sanctions lists and screens sample names
 npx tsx scripts/live-mcp-smoke.ts   # end-to-end over stdio against real services (after build)
 ```

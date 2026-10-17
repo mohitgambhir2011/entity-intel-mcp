@@ -1,8 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Runtime } from "../../runtime.js";
+import { buildProfile } from "../../services/company.js";
 import { resolveRef } from "../../services/entityRef.js";
 import { gather } from "../../services/gather.js";
-import { mergePartials } from "../../services/merge.js";
 import { fail, guard, ok } from "../envelope.js";
 import { entityRefShape, READ_ONLY } from "./shared.js";
 
@@ -34,7 +34,7 @@ export function registerGetEntity(server: McpServer, rt: Runtime): void {
           const why = g.warnings.length > 0 ? ` ${g.warnings.join("; ")}` : "";
           return fail(`No entity found for ${seed.scheme} ${seed.value}.${why}`);
         }
-        const profile = mergePartials(g.partials, g.sourcesQueried);
+        const profile = buildProfile(rt, g.partials, g.sourcesQueried);
         const warnings = [...g.warnings];
         if (profile.conflicts.length > 0) {
           warnings.push(

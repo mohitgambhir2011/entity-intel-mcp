@@ -64,6 +64,7 @@ Per source record: access, auth, limits, licence/caching/redistribution terms, f
 - **VIES (REST)**: responses carry `isValid`, `userError` (`VALID`/`INVALID`), `name`/`address` (`---` when withheld; Germany withholds). Error shapes for outages are not all observed; the adapter treats any body without a boolean `isValid` as an error and never caches it.
 - **Companies House**: HTTP Basic with the key as username; `X-Ratelimit-*` response headers confirmed (limit 600, window 5m). Search relevance is loose (unrelated names appear in the top results), so ranking is done by this server.
 - **FCA**: base URL, headers and a successful search verified; rate limit still unverified (no rate-limit headers returned).
+- **Norway / Finland**: verified and built; see the section "Norway and Finland" below.
 - **Denmark / Ireland / France / Netherlands / Belgium**: still UNVERIFIED beyond the notes above.
 
 ## Sanctions lists (verified live 2026-10-17)
@@ -85,3 +86,31 @@ Licence/terms: all three are official publications intended for public use. Redi
 - `GET /company/{n}/persons-with-significant-control?items_per_page=100` -> `items[]` with `kind` (`individual-/corporate-entity-/legal-person-/super-secure-person-with-significant-control`, and `-beneficial-owner` variants), `name`, `name_elements`, `natures_of_control[]` (e.g. `ownership-of-shares-75-to-100-percent`, `right-to-appoint-and-remove-directors`), `identification{}` for corporate controllers, `ceased`. An empty list with `links.exemptions` means look at `GET /company/{n}/exemptions` (Tesco PLC: `psc_exempt_as_trading_on_uk_regulated_market`); otherwise `GET .../persons-with-significant-control-statements` (404 when none).
 - Chain verified end to end: Tesco Stores Limited (00519500) <- Tesco Holdings Limited (00243011) <- Tesco Plc (00445790, exempt). Havin Bank (01074897) <- Banco Central De Cuba (foreign, not followable).
 - Each company costs 1 request (PSC), plus 1 more when it has no controllers (exemptions or statements). The rate limit (600 / 5 min) is protected by the 30-company budget per call.
+
+## Norway and Finland (verified live 2026-10-17, `scripts/live-nordic.ts`)
+
+### Norway: Enhetsregisteret (Bronnoysund Register Centre)
+
+- Base `https://data.brreg.no/enhetsregisteret/api`, no key, licence **NLOD 2.0** (attribution is carried in each provenance entry).
+- `GET /enheter/{orgnr}` -> the unit (`navn`, `organisasjonsform{kode,beskrivelse}`, `stiftelsesdato`, `forretningsadresse` / `postadresse`, flags `konkurs`, `underAvvikling`, `underTvangsavviklingEllerTvangsopplosning` with dates, `slettedato`, `historiskeNavn`). 404 = no such unit. **410 Gone** is the documented answer for a deleted unit; its body shape has **not** been observed, so the adapter does not trust it (a nameless deleted unit stays nameless).
+- `GET /enheter?navn={q}&size={n}` -> `_embedded.enheter[]` plus `page`. A query with no hits has no `_embedded`; a body with neither `_embedded` nor `page` is treated as an error and never cached.
+- `GET /enheter/{orgnr}/roller` -> `rollegrupper[].roller[]` with `type{kode,beskrivelse}`, `person{navn{fornavn,mellomnavn,etternavn}, fodselsdato, erDoed}` or `enhet{organisasjonsnummer, navn[]}`, `fratraadt`, `avregistrert`. Equinor ASA: 15 roles (DAGL 1, LEDE 1, NEST/MEDL 8, VARA 3, REVI 1, ...; 13 current). **No appointment dates are published.** Individuals in the test fixture are synthetic; the company data is real.
+- Role codes mapped: DAGL ceo, LEDE chair, NEST and MEDL board member, VARA deputy, REVI auditor, REGN accountant, SIGN and PROK authorised signatory, INNH and FFØR manager; anything else is `other` with the register's wording kept.
+- Organisation number: 9 digits, mod-11 check digit (weights 3,2,7,6,5,4,3,2; a computed check of 10 is invalid). The VAT form is `NO` + number + `MVA`.
+- **GLEIF crosswalk**: registration authority `RA000472` (Enhetsregisteret); GLEIF stores the number with spaces (`923 609 016`). The unspaced spelling is also asked, both at the same time, and the authority is checked client side (as for the UK).
+- Beneficial owners are not in this API and are not public: reported as `restricted_access`.
+- Not verified: the rate limit (the client allows 10 requests/s per host as a conservative guess); sub-units (`/underenheter`) are not used.
+
+### Finland: PRH open data (YTJ v3)
+
+- Base `https://avoindata.prh.fi/opendata-ytj-api/v3`, no key, licence **CC BY 4.0**.
+- `GET /companies?businessId={id}` and `GET /companies?name={q}&maxResults={n}` -> `{ totalResults, companies[] }`. **An unknown business ID answers 200 with `companies: []`**, so shape is the only check; a list that does not contain the company asked for is an error, not "not found".
+- Language codes in descriptions: 1 Finnish, 2 Swedish, 3 English (English preferred).
+- Names: `type` 1 = official name, 2 = parallel name, 3 = auxiliary (trading) name; `endDate` marks a name that ended. A ceased company's official name usually has an `endDate`, so the newest official name is still taken as its legal name.
+- **Status**: the `status` field was "2" for every company in a sample of **1,466 companies** and means nothing. The signals are `companySituations` (current ones only: KONK bankruptcy, SELTILA liquidation; others unrecognised) and the trade-register entry (`registeredEntries` with `register` = "1": "Registered" / "Ceased"). Companies without a trade-register entry (housing companies, associations) are `unknown`. Verified on a ceased company, a bankrupt one, one in liquidation and a housing company (fixtures `test/fixtures/prh_fi/`).
+- Business ID: 7 digits + hyphen + mod-11 check digit (weights 7,9,10,5,8,4,2; remainder 1 invalid); the short spelling without the leading zero is accepted. The VAT number is `FI` + the ID without the hyphen, validated through VIES (`FI01120389` valid for Nokia).
+- **GLEIF crosswalk**: registration authority `RA000188`; GLEIF stores the hyphenated ID.
+- Officers and beneficial owners: not in the open API (officers sit in the trade-register extract, which is not open data): `not_published_by_source` and `restricted_access`.
+- Not verified: the rate limit (the client allows 5 requests/s per host as a conservative guess); the meaning of situation codes other than KONK and SELTILA.
+- **Observed disagreement**: Nokia's PRH registration date is 1896-12-19 while GLEIF's creation date is 1896-12-18. Both are shown as a `conflicts` entry and a warning, which is the intended behaviour for differing sources.
+- **Fixture hygiene**: `test/fixtures/prh_fi/0104057-3.json` is a real bankruptcy record whose partnership is named after a person, so its name and street were replaced with synthetic values; the Norwegian roles are synthetic individuals. Company records otherwise keep their real data.

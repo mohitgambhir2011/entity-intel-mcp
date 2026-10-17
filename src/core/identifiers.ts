@@ -56,6 +56,45 @@ export function normalizeGbCompanyNumber(input: string): string | undefined {
   return undefined;
 }
 
+/**
+ * Norwegian organisation number: 9 digits, the last a mod-11 check digit (weights 3,2,7,6,5,4,3,2).
+ * Accepts "923 609 016", "923609016" and the VAT form "NO923609016MVA". Returns the 9 digits.
+ */
+export function normalizeNoOrgnr(input: string): string | undefined {
+  const raw = stripSeparators(input).replace(/^NO/, "").replace(/MVA$/, "");
+  if (!/^[0-9]{9}$/.test(raw)) return undefined;
+  const w = [3, 2, 7, 6, 5, 4, 3, 2];
+  const sum = w.reduce((acc, weight, k) => acc + weight * Number(raw[k]), 0);
+  const r = sum % 11;
+  const check = r === 0 ? 0 : 11 - r;
+  return check < 10 && check === Number(raw[8]) ? raw : undefined;
+}
+
+/** "923609016" -> "923 609 016": the form GLEIF stores Norwegian numbers in. */
+export const formatNoOrgnr = (n: string): string =>
+  `${n.slice(0, 3)} ${n.slice(3, 6)} ${n.slice(6)}`;
+
+/**
+ * Finnish business ID (Y-tunnus): 7 digits, a hyphen and a mod-11 check digit (weights
+ * 7,9,10,5,8,4,2). Accepts "0112038-9", "01120389" and the short spelling without the leading
+ * zero ("112038-9"). Returns the canonical hyphenated form.
+ */
+export function normalizeFiBusinessId(input: string): string | undefined {
+  const raw = stripSeparators(input).replace(/^FI/, "");
+  const m = /^([0-9]{6,7})([0-9])$/.exec(raw);
+  if (!m) return undefined;
+  const body = m[1]!.padStart(7, "0");
+  const w = [7, 9, 10, 5, 8, 4, 2];
+  const sum = w.reduce((acc, weight, k) => acc + weight * Number(body[k]), 0);
+  const r = sum % 11;
+  if (r === 1) return undefined;
+  const check = r === 0 ? 0 : 11 - r;
+  return check === Number(m[2]) ? `${body}-${m[2]}` : undefined;
+}
+
+/** A Finnish VAT number is "FI" plus the business ID without its hyphen. */
+export const finnishVatFromBusinessId = (id: string): string => `FI${id.replace("-", "")}`;
+
 export interface ParsedVat {
   country: CountryCode;
   number: string;
@@ -128,6 +167,25 @@ export function detectIdentifier(
 ): DetectedIdentifier | undefined {
   const raw = stripSeparators(input);
   if (raw.length === 20 && isValidLei(raw)) return { scheme: "LEI", value: raw };
+  // Norwegian VAT numbers ("NO923609016MVA") are the organisation number; VIES does not cover them.
+  if (/^NO[0-9]{9}MVA$/.test(raw)) {
+    const no = normalizeNoOrgnr(raw);
+    if (no) return { scheme: "NO_ORGNR", value: no, country: "NO" };
+  }
+  // "0112038-9" is unambiguous; bare digits need the country.
+  const fiHyphen = /^[0-9]{6,7}-[0-9]$/.test(input.trim())
+    ? normalizeFiBusinessId(input)
+    : undefined;
+  if (fiHyphen) return { scheme: "FI_YTUNNUS", value: fiHyphen, country: "FI" };
+  const cc = country?.toUpperCase();
+  if (cc === "NO") {
+    const no = normalizeNoOrgnr(raw);
+    if (no) return { scheme: "NO_ORGNR", value: no, country: "NO" };
+  }
+  if (cc === "FI") {
+    const fi = normalizeFiBusinessId(raw);
+    if (fi) return { scheme: "FI_YTUNNUS", value: fi, country: "FI" };
+  }
   const vat = parseVat(raw);
   if (vat && hasVatShape(vat)) return { scheme: "VAT", value: raw, country: vat.country };
   const gb = normalizeGbCompanyNumber(raw);

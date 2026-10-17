@@ -1,8 +1,15 @@
 import { SourceError } from "../../core/errors.js";
-import { isValidLei } from "../../core/identifiers.js";
+import {
+  formatNoOrgnr,
+  isValidLei,
+  normalizeFiBusinessId,
+  normalizeGbCompanyNumber,
+  normalizeNoOrgnr,
+} from "../../core/identifiers.js";
 import { makeStatus } from "../../core/types.js";
 import type {
   Address,
+  IdentifierScheme,
   EntityStatus,
   Identifier,
   PartialEntity,
@@ -15,8 +22,47 @@ import { iso, type AdapterContext, type SourceAdapter } from "../types.js";
 const BASE = "https://api.gleif.org/api/v1";
 const HEADERS = { accept: "application/vnd.api+json" };
 
-/** Registration authority codes whose `registeredAs` value we can turn into a local identifier. */
-const RA_GB_COMPANIES_HOUSE = "RA000585";
+/**
+ * Registration authorities whose `registeredAs` value we can turn into a local identifier, and the
+ * other way round (to find the LEI of a local number). The formats are what GLEIF actually stores:
+ * Norwegian numbers with spaces ("923 609 016"), Finnish ones with the hyphen ("0112038-9").
+ */
+interface RegistryRule {
+  ra: string;
+  scheme: IdentifierScheme;
+  country: string;
+  /** Local number from GLEIF's registeredAs, or undefined if it is not a valid one. */
+  parse(registeredAs: string): string | undefined;
+  /** The spellings GLEIF may use for a local number, most likely first. */
+  spellings(value: string): string[];
+}
+
+const REGISTRIES: RegistryRule[] = [
+  {
+    ra: "RA000585", // Companies House
+    scheme: "GB_CRN",
+    country: "GB",
+    parse: normalizeGbCompanyNumber,
+    spellings: (v) => [v],
+  },
+  {
+    ra: "RA000472", // Enhetsregisteret
+    scheme: "NO_ORGNR",
+    country: "NO",
+    parse: normalizeNoOrgnr,
+    spellings: (v) => [formatNoOrgnr(v), v],
+  },
+  {
+    ra: "RA000188", // Finnish trade register (PRH)
+    scheme: "FI_YTUNNUS",
+    country: "FI",
+    parse: normalizeFiBusinessId,
+    spellings: (v) => [v],
+  },
+];
+
+const ruleFor = (ra: string | null | undefined): RegistryRule | undefined =>
+  REGISTRIES.find((r) => r.ra === ra);
 
 interface GleifAddress {
   addressLines?: string[] | null;
@@ -106,11 +152,13 @@ function mapRecord(rec: GleifRecord, prov: Provenance): PartialEntity {
       provenance: [prov],
     },
   ];
-  if (e.registeredAt?.id === RA_GB_COMPANIES_HOUSE && e.registeredAs) {
+  const rule = ruleFor(e.registeredAt?.id);
+  const local = rule && e.registeredAs ? rule.parse(e.registeredAs) : undefined;
+  if (rule && local) {
     identifiers.push({
-      scheme: "GB_CRN",
-      value: e.registeredAs,
-      country: "GB",
+      scheme: rule.scheme,
+      value: local,
+      country: rule.country,
       validated: false,
       provenance: [prov],
     });
@@ -166,28 +214,44 @@ function mapLeiStatus(s: string | undefined): Identifier["status"] {
 }
 
 /**
- * Reverse crosswalk: find the LEI for a UK company number. GLEIF cannot filter on registration
- * authority and number together, so we filter on the number and check the authority ourselves.
+ * Reverse crosswalk: find the LEI for a local registration number. GLEIF cannot filter on the
+ * registration authority and the number together, so we filter on the number (in each spelling
+ * GLEIF may use) and check the authority ourselves.
  */
-async function findLeiByCompaniesHouseNumber(
-  crn: string,
+async function findLeiByRegistration(
+  rule: RegistryRule,
+  value: string,
   ctx: AdapterContext,
 ): Promise<string | undefined> {
-  const url = `${BASE}/lei-records?filter[entity.registeredAs]=${encodeURIComponent(crn)}&page[size]=5`;
-  const res = await ctx.cache.getOrFetch(
-    `gleif:byreg:${crn}`,
-    { ttlSeconds: TTL.gleif, source: "gleif", fresh: ctx.fresh },
-    async () =>
-      checkedBody(
-        (await ctx.http.getJson<GleifResponse>(url, { source: "gleif", headers: HEADERS })).body,
-      ),
+  // The spellings are asked at the same time: most companies have no LEI, and a miss would
+  // otherwise cost one round trip per spelling.
+  const attempts = await Promise.allSettled(
+    rule.spellings(value).map(async (spelling) => {
+      const url = `${BASE}/lei-records?filter[entity.registeredAs]=${encodeURIComponent(spelling)}&page[size]=5`;
+      const res = await ctx.cache.getOrFetch(
+        `gleif:byreg:${rule.scheme}:${spelling}`,
+        { ttlSeconds: TTL.gleif, source: "gleif", fresh: ctx.fresh },
+        async () =>
+          checkedBody(
+            (await ctx.http.getJson<GleifResponse>(url, { source: "gleif", headers: HEADERS }))
+              .body,
+          ),
+      );
+      return recordsOf(res.value).find((r) => {
+        const e = r.attributes.entity;
+        return (
+          e.registeredAt?.id === rule.ra && e.registeredAs && rule.parse(e.registeredAs) === value
+        );
+      });
+    }),
   );
-  const match = recordsOf(res.value).find(
-    (r) =>
-      r.attributes.entity.registeredAt?.id === RA_GB_COMPANIES_HOUSE &&
-      r.attributes.entity.registeredAs === crn,
-  );
-  return match?.attributes.lei;
+  for (const a of attempts) {
+    if (a.status === "fulfilled" && a.value) return a.value.attributes.lei;
+  }
+  // No spelling matched. If one of them failed, "no LEI" is not a safe conclusion: surface it.
+  const failed = attempts.find((a) => a.status === "rejected");
+  if (failed?.status === "rejected") throw failed.reason;
+  return undefined;
 }
 
 export const gleifAdapter: SourceAdapter = {
@@ -195,16 +259,16 @@ export const gleifAdapter: SourceAdapter = {
 
   supports: (id) => id.scheme === "LEI",
 
-  crosswalks: [
-    {
-      from: "GB_CRN",
-      to: "LEI",
-      async find(identifier, ctx) {
-        const lei = await findLeiByCompaniesHouseNumber(identifier.value, ctx);
-        return lei ? { scheme: "LEI", value: lei, validated: true, provenance: [] } : undefined;
-      },
+  crosswalks: REGISTRIES.map((rule) => ({
+    from: rule.scheme,
+    to: "LEI" as const,
+    async find(identifier: Identifier, ctx: AdapterContext) {
+      const lei = await findLeiByRegistration(rule, identifier.value, ctx);
+      return lei
+        ? { scheme: "LEI" as const, value: lei, validated: true, provenance: [] }
+        : undefined;
     },
-  ],
+  })),
 
   async lookup(identifier, ctx) {
     const lei = identifier.value.toUpperCase();

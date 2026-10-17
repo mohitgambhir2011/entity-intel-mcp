@@ -1,0 +1,155 @@
+{
+  "totalResults": 1,
+  "companies": [
+    {
+      "businessId": {
+        "value": "0100002-9",
+        "registrationDate": "1978-03-15",
+        "source": "3"
+      },
+      "names": [
+        {
+          "name": "Artjärven Metalli Oy",
+          "type": "1",
+          "registrationDate": "1976-04-23",
+          "endDate": "2005-12-19",
+          "version": 1,
+          "source": "1"
+        }
+      ],
+      "mainBusinessLine": {
+        "type": "29120",
+        "descriptions": [
+          {
+            "languageCode": "3",
+            "description": "Manufacture of pumps and compressors"
+          },
+          {
+            "languageCode": "1",
+            "description": "Pumppujen ja kompressorien valmistus"
+          },
+          {
+            "languageCode": "2",
+            "description": "Tillv av pumpar och kompressorer"
+          }
+        ],
+        "typeCodeSet": "TOIMI2",
+        "registrationDate": "2001-12-31",
+        "source": "2"
+      },
+      "companyForms": [
+        {
+          "type": "16",
+          "descriptions": [
+            {
+              "languageCode": "2",
+              "description": "Aktiebolag"
+            },
+            {
+              "languageCode": "3",
+              "description": "Limited company"
+            },
+            {
+              "languageCode": "1",
+              "description": "Osakeyhtiö"
+            }
+          ],
+          "endDate": "2005-12-19",
+          "version": 1,
+          "source": "1"
+        }
+      ],
+      "companySituations": [],
+      "registeredEntries": [
+        {
+          "type": "1",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Registered"
+            },
+            {
+              "languageCode": "2",
+              "description": "Registrerad"
+            },
+            {
+              "languageCode": "1",
+              "description": "Rekisterissä"
+            }
+          ],
+          "registrationDate": "1976-04-23",
+          "endDate": "2005-12-18",
+          "register": "1",
+          "authority": "2"
+        },
+        {
+          "type": "4",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Ceased"
+            },
+            {
+              "languageCode": "1",
+              "description": "Lakannut"
+            },
+            {
+              "languageCode": "2",
+              "description": "Upphört"
+            }
+          ],
+          "registrationDate": "2005-12-19",
+          "register": "1",
+          "authority": "2"
+        },
+        {
+          "type": "1",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Registered"
+            },
+            {
+              "languageCode": "2",
+              "description": "Registrerad"
+            },
+            {
+              "languageCode": "1",
+              "description": "Rekisterissä"
+            }
+          ],
+          "registrationDate": "1978-03-15",
+          "endDate": "2005-12-19",
+          "register": "4",
+          "authority": "1"
+        },
+        {
+          "type": "41",
+          "descriptions": [
+            {
+              "languageCode": "3",
+              "description": "Registered"
+            },
+            {
+              "languageCode": "2",
+              "description": "Registrerad"
+            },
+            {
+              "languageCode": "1",
+              "description": "Rekisterissä"
+            }
+          ],
+          "registrationDate": "1983-01-01",
+          "endDate": "1991-12-23",
+          "register": "7",
+          "authority": "1"
+        }
+      ],
+      "addresses": [],
+      "tradeRegisterStatus": "4",
+      "status": "2",
+      "registrationDate": "1976-04-23",
+      "endDate": "2005-12-19"
+    }
+  ]
+}

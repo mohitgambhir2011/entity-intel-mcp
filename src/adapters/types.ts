@@ -1,4 +1,4 @@
-import type { ControllersResult, OfficersResult } from "../core/people.js";
+import type { ControllersResult, OfficersResult, UnavailableReason } from "../core/people.js";
 import type { Cache } from "../infra/cache.js";
 import type { HttpClient } from "../infra/http.js";
 import type {
@@ -28,10 +28,22 @@ export interface Crosswalk {
 
 export interface SourceAdapter {
   readonly id: SourceId;
+  /**
+   * ISO country whose register this adapter reads. Absent for adapters that span countries (GLEIF,
+   * VIES). Lets a country-filtered search skip the registers of other countries.
+   */
+  readonly country?: string;
   /** Can this adapter look up this identifier? */
   supports(identifier: Identifier): boolean;
   /** Returns undefined when the source has no such record. Throws SourceError on source failures. */
   lookup(identifier: Identifier, ctx: AdapterContext): Promise<PartialEntity | undefined>;
+  /**
+   * Families this source's country will not provide, and why (for example Norway does not publish
+   * beneficial owners). Lets the tools say "restricted" instead of "not yet supported".
+   */
+  readonly restrictions?: Partial<
+    Record<"officers" | "controllers", { reason: UnavailableReason; detail: string }>
+  >;
   /** Optional identifier translations this source can provide. */
   readonly crosswalks?: Crosswalk[];
   /** Optional: officers of the company this identifier names. undefined = no such company. */

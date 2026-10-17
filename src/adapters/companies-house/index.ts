@@ -1,5 +1,6 @@
 import { SourceError } from "../../core/errors.js";
 import { normalizeGbCompanyNumber } from "../../core/identifiers.js";
+import { ownEntry } from "../../core/tables.js";
 import { makeStatus } from "../../core/types.js";
 import type {
   EntityStatus,
@@ -56,7 +57,7 @@ export function mapChStatus(status: string | undefined, detail?: string): Entity
   const text = [status, detail].filter(Boolean).join(" / ");
   // Companies House reports dormancy through the accounts type, not the status; we only claim
   // what the status field says.
-  return makeStatus(STATUS_MAP[status ?? ""] ?? "unknown", text);
+  return makeStatus(ownEntry(STATUS_MAP, status) ?? "unknown", text);
 }
 
 const LEGAL_FORMS: Record<string, LegalForm["normalized"]> = {
@@ -89,6 +90,7 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
 
   return {
     id: "companies_house",
+    country: "GB",
 
     supports: (id) => id.scheme === "GB_CRN",
 
@@ -173,7 +175,7 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
         jurisdiction: "GB",
         legalForm: c.type
           ? {
-              value: { localName: c.type, normalized: LEGAL_FORMS[c.type] ?? "other" },
+              value: { localName: c.type, normalized: ownEntry(LEGAL_FORMS, c.type) ?? "other" },
               provenance: [prov],
             }
           : undefined,

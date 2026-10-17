@@ -131,7 +131,9 @@ export async function collectRelated(
           name: officer.displayName,
           subject: {
             names: [...new Set([officer.displayName, officer.name])].filter(Boolean),
-            identifiers: officer.corporateIdentifier ? [officer.corporateIdentifier.value] : [],
+            identifiers: registrationIds(
+              officer.corporateIdentifier ? [officer.corporateIdentifier] : [],
+            ),
             kind: officer.kind === "person" ? "person" : "entity",
           },
         });

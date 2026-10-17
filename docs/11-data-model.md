@@ -131,7 +131,7 @@ interface Identifier {
 
 type IdentifierScheme =
   | "LEI"                       // ISO 17442, 20 chars
-  | "GB_CRN"                    // Companies House number
+  | "GB_CRN"                    // Companies House number (NO_ORGNR and FI_YTUNNUS are implemented, D40)
   | "IE_CRO" | "NO_ORGNR" | "FI_YTUNNUS" | "DK_CVR" | "FR_SIREN" | "FR_SIRET"
   | "NL_KVK" | "BE_KBO" | "DE_HRB"      // grows with each country wave
   | "VAT"                       // value includes country prefix, e.g. "IE6388047V"

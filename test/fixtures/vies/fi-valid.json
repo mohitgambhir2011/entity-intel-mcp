@@ -1,0 +1,22 @@
+{
+  "isValid": true,
+  "requestDate": "2026-10-17T13:48:43.748Z",
+  "userError": "VALID",
+  "name": "Nokia Oyj",
+  "address": "c/oVero-osasto PL 226\n00045 NOKIA GROUP",
+  "requestIdentifier": "",
+  "originalVatNumber": "01120389",
+  "vatNumber": "01120389",
+  "viesApproximate": {
+    "name": "---",
+    "street": "---",
+    "postalCode": "---",
+    "city": "---",
+    "companyType": "---",
+    "matchName": 3,
+    "matchStreet": 3,
+    "matchPostalCode": 3,
+    "matchCity": 3,
+    "matchCompanyType": 3
+  }
+}

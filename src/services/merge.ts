@@ -97,13 +97,23 @@ function mergeNames(partials: PartialEntity[]): EntityName[] {
   return [...map.values()].sort((a, b) => order[a.kind] - order[b.kind]);
 }
 
+/** Identifier schemes that are a home-registry number, with the country and registry of their entity id. */
+export const REGISTRY_IDS: [string, string, string][] = [
+  ["GB_CRN", "GB", "CH"],
+  ["NO_ORGNR", "NO", "BR"],
+  ["FI_YTUNNUS", "FI", "PRH"],
+];
+
 export function chooseEntityId(
   identifiers: Identifier[],
   legalName: string | undefined,
   jurisdiction: string | undefined,
 ): string {
-  const crn = identifiers.find((i) => i.scheme === "GB_CRN");
-  if (crn) return makeEntityId("GB", "CH", crn.value);
+  // Home-registry numbers first (D20): <country>:<registry>:<number>.
+  for (const [scheme, country, registry] of REGISTRY_IDS) {
+    const found = identifiers.find((i) => i.scheme === scheme);
+    if (found) return makeEntityId(country, registry, found.value);
+  }
   const lei = identifiers.find((i) => i.scheme === "LEI");
   if (lei) return makeIdentifierEntityId("LEI", lei.value);
   const vat = identifiers.find((i) => i.scheme === "VAT");
@@ -189,16 +199,7 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
     jurisdiction,
     families: {
       identity: { state: partials.length > 0 ? "available" : "unavailable", sourcesTried },
-      officers: {
-        state: "available",
-        sourcesTried: [],
-        note: "UK companies only: call get_officers",
-      },
-      ownership: {
-        state: "available",
-        sourcesTried: [],
-        note: "UK companies only: call get_ownership",
-      },
+      // officers and ownership depend on which sources are enabled: buildProfile fills them in.
       filings: { state: "not_yet_supported", sourcesTried: [] },
       regulatory: { state: "not_yet_supported", sourcesTried: [] },
       insolvency: { state: "not_yet_supported", sourcesTried: [] },
