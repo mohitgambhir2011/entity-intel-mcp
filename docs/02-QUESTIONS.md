@@ -96,3 +96,8 @@ Round 6 complete (Q21-Q24 answered). Next: Phase 3, MCP tool design.
 - Round 3 — Tech: language, local vs. hosted, caching/storage, auth.
 - Round 4 — Compliance: GDPR stance, licence constraints, audit/logging needs.
 - Round 5 — Quality & rollout: eval set, success metrics, timeline.
+
+## Round 10 - Quality, documentation and publishing (2026-10-17)
+
+- Request: push to GitHub, review the code, keep it modular, document in detail, add skills for extremely thorough code review. Outcome: D34; first xhigh review found 15 defects, all fixed with regression tests; docs/20-25 and `.claude/skills/` added.
+- Repository visibility for the first push: see 01-DECISIONS.md D35.

@@ -57,3 +57,11 @@ Started 2026-10-17. Status per source: sign-up facts below come from web search;
 Wave 2 SIRENE/INPI; wave 3 KvK/CBE; Sweden (Bolagsverket) for later; official-doc verification of Ireland CRO and Denmark CVR terms; FCA rate limit.
 
 Per source record: access, auth, limits, licence/caching/redistribution terms, fields available, 5 test entities.
+
+## Verification log (2026-10-17, after implementation)
+
+- **GLEIF**: `entity.registeredAt.id = RA000585` with `registeredAs = 00445790` confirmed as Companies House for Tesco PLC; used for the LEI <-> UK number crosswalk. `filter[entity.registeredAs]` works on its own; combining it with `filter[entity.registeredAt.id]` returns HTTP 400, so the authority is checked client side. `Accept: application/vnd.api+json` required. Entity `status` values seen: ACTIVE, INACTIVE.
+- **VIES (REST)**: responses carry `isValid`, `userError` (`VALID`/`INVALID`), `name`/`address` (`---` when withheld; Germany withholds). Error shapes for outages are not all observed; the adapter treats any body without a boolean `isValid` as an error and never caches it.
+- **Companies House**: HTTP Basic with the key as username; `X-Ratelimit-*` response headers confirmed (limit 600, window 5m). Search relevance is loose (unrelated names appear in the top results), so ranking is done by this server.
+- **FCA**: base URL, headers and a successful search verified; rate limit still unverified (no rate-limit headers returned).
+- **Denmark / Ireland / France / Netherlands / Belgium**: still UNVERIFIED beyond the notes above.

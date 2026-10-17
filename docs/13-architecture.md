@@ -1,5 +1,7 @@
 # Phase 4 — Architecture (DRAFT v0.1)
 
+> **Implementation status (2026-10-17):** the layers `core`, `resolution`, `infra`, `adapters`, `services`, `server` exist and the layering below is enforced by `test/architecture.test.ts`. Differences from this plan: crosswalks are an adapter capability (`SourceAdapter.crosswalks`), the adapter catalogue in `src/adapters/registry.ts` owns construction, text folding lives in `core/text.ts`, source priority in `core/sources.ts`, tools are one file each. Not built yet: `sanctions/`, `--clear-cache`, ownership traversal. Authoritative module descriptions: [20-modules.md](20-modules.md).
+
 Implements D9 (TypeScript), D10 (stdio), D11 (SQLite), D29–D32. Data model: `11-data-model.md`. Tools: `12-tool-spec.md`.
 
 ## 1. Layers

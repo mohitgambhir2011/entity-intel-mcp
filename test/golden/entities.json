@@ -1,0 +1,45 @@
+{
+  "_comment": "Golden set (D16-A). Each entry is a real entity with the answers we expect, replayed from recorded fixtures. Grow it with every country; change expectations deliberately and explain in the commit.",
+  "entities": [
+    {
+      "name": "Tesco PLC (UK listed group)",
+      "tool": "get_entity",
+      "args": { "identifier": "00445790", "country": "GB" },
+      "expect": {
+        "entityId": "GB:CH:00445790",
+        "status": "active",
+        "statusGroup": "operating",
+        "identifiers": ["GB_CRN=00445790", "LEI=2138002P5RNKC5W2JZ46"],
+        "legalName": "TESCO PLC",
+        "jurisdiction": "GB",
+        "conflicts": 0
+      }
+    },
+    {
+      "name": "Tesco PLC reached from its LEI",
+      "tool": "get_entity",
+      "args": { "identifier": "2138002P5RNKC5W2JZ46" },
+      "expect": {
+        "entityId": "GB:CH:00445790",
+        "status": "active",
+        "statusGroup": "operating",
+        "identifiers": ["GB_CRN=00445790", "LEI=2138002P5RNKC5W2JZ46"],
+        "legalName": "TESCO PLC",
+        "jurisdiction": "GB",
+        "conflicts": 0
+      }
+    },
+    {
+      "name": "Google Ireland Limited (VAT, name released by Ireland)",
+      "tool": "get_entity",
+      "args": { "identifier": "IE6388047V" },
+      "expect": {
+        "entityId": "ID:VAT:IE6388047V",
+        "identifiers": ["VAT=IE6388047V"],
+        "legalName": "GOOGLE IRELAND LIMITED",
+        "jurisdiction": "IE",
+        "conflicts": 0
+      }
+    }
+  ]
+}
