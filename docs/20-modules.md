@@ -111,6 +111,7 @@ for failures; `undefined` only for "no such record"; full `Provenance`. Checklis
 | --- | --- |
 | `server.ts` | Creates the `McpServer`, sets `instructions` (registry text is data), registers tools |
 | `envelope.ts` | `ok()` builds `{ summary, warnings, data, meta, disclaimer? }`; `fail()`; `guard()` maps `InvalidInputError` to a tool error and anything else to a generic error (details to stderr) |
+| `prompts/kybCheck.ts` | The `kyb_check` prompt: `buildKybPrompt` (pure) and `cleanEntity` (one line, no control characters, quotes or angle brackets, 200 characters) | The text names only existing tools and arguments (a test lists the server's tools and checks); the entity sits between fixed markers it cannot forge |
 | `tools/shared.ts` | Flat entity-reference argument shape, read-only annotations |
 | `tools/search.ts`, `getEntity.ts`, `getOfficers.ts`, `getOwnership.ts`, `resolveIdentifier.ts`, `screenSanctions.ts`, `coverage.ts` | One file per tool: parse, call one service, shape the envelope, write one audit row |
 

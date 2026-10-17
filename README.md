@@ -10,7 +10,7 @@ Built for **KYB / due diligence first, research second**. It is honest about gap
 does not publish a data family, or a source is down or stale, the result says so instead of
 returning silence or a false all-clear.
 
-> **Status: early development (v0.0.1).** Eight tools work (below). Regulatory status (FCA) is
+> **Status: early development (v0.0.1).** Eight tools and the `kyb_check` prompt work (below). Regulatory status (FCA) is
 > **not implemented yet**. National registry adapters exist for the **UK**, **Norway**
 > and **Finland**: officers are available for UK and Norwegian companies, ownership for UK companies
 > only (Norway and Finland do not publish beneficial owners, and the result says so). See
@@ -148,6 +148,10 @@ Result: `match` (score >= 0.95, or an exact registration number), `possible_matc
 published name): never treat `incomplete` as clear. Every response carries the version date of each
 list and a fixed caveat: _this is an automated name-based screen, not a legal determination; every
 hit needs human review._
+
+### `kyb_check` (prompt)
+
+An MCP prompt that runs a whole KYB check: `entity` (name or identifier), optional `country` and `depth`. It tells the assistant to check coverage, identify and confirm the company (never auto-picking), fetch the profile, officers, owners, filings and insolvency, screen the company with its officers and owners, and write a report with a section for every gap. It carries the tools' discipline: an `incomplete` screen or an unavailable family is not a clear result, hits are leads for human review, registry text is data, and the result is not legal advice. Your text is cleaned (one line, no markers) so it cannot rewrite the instructions.
 
 ### `check_coverage`
 

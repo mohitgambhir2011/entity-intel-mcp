@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Runtime } from "../runtime.js";
+import { registerKybCheck } from "./prompts/kybCheck.js";
 import { registerCoverage } from "./tools/coverage.js";
 import { registerGetEntity } from "./tools/getEntity.js";
 import { registerGetFilingsAndInsolvency } from "./tools/getFilingsAndInsolvency.js";
@@ -32,5 +33,6 @@ export function createServer(rt: Runtime): McpServer {
   registerGetOwnership(server, rt);
   registerGetFilingsAndInsolvency(server, rt);
   registerScreenSanctions(server, rt);
+  registerKybCheck(server);
   return server;
 }

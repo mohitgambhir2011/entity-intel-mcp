@@ -84,6 +84,8 @@ review of this codebase (2026-10-17) found 15 defects, all fixed with regression
 | Fan-out that ignores the filter | A `country=DE` search still called the Norwegian and Finnish registers | Adapters declare their country; test the sources queried per country |
 | A short numeric id compared across countries | Bare 8-9 digit registry numbers can equal unrelated passport or tax numbers on a list, and an identifier hit scores 1.0 | Only typed, long identifiers (LEI, UK company number, VAT) are compared; the rest are screened by name |
 
+The sixth `xhigh` review (`kyb_check` prompt) found 4 issues (marker forgery through the entity text, tool names that could drift, no rule for families unavailable by design, unvalidated depth), fixed with tests in `test/integration/kyb.test.ts`. Lesson: text a user supplies to a prompt is untrusted too.
+
 The fifth `xhigh` review (filings, charges and insolvency, 2026-10-17) found 9 more defects (a part-satisfied charge not counted as outstanding, a 404 read as "no charges", charge holders not treated as personal data, a stale tool description, duplicated helpers), fixed with tests in `test/unit/records.test.ts` and `test/integration/records.test.ts`.
 
 The fourth `xhigh` review (Norway and Finland, the generalised officers / ownership code and the GLEIF crosswalks, 2026-10-17) found 15 more defects, all fixed with tests in `test/unit/nordic.test.ts` and `test/integration/nordic.test.ts` (the "review regressions" groups). A live run before the review had already shown the Nokia date disagreement between PRH and GLEIF, which is the conflict machinery working as intended.
