@@ -1,0 +1,412 @@
+{
+  "Status": "FSR-API-02-03-00",
+  "ResultInfo": {
+    "Next": "https://register.fca.org.uk/services/V0.1/Firm/759676/Permissions?pgnp=2",
+    "page": "1",
+    "per_page": "20",
+    "total_count": "34"
+  },
+  "Message": "Ok. Firm permission found",
+  "Data": {
+    "Debt-collecting": [
+      {
+        "Limitation Not Found": [
+          "Valid limitation not present"
+        ]
+      }
+    ],
+    "Debt Administration": [
+      {
+        "Limitation Not Found": [
+          "Valid limitation not present"
+        ]
+      }
+    ],
+    "Debt Adjusting": [
+      {
+        "Limitation": [
+          "This permission is limited to debt adjusting with no debt management activity."
+        ]
+      }
+    ],
+    "Credit Broking": [
+      {
+        "Limitation Not Found": [
+          "Valid limitation not present"
+        ]
+      }
+    ],
+    "Advising on a regulated credit agreement the purpose of which is to acquire land": [
+      {
+        "Limitation Not Found": [
+          "Valid limitation not present"
+        ]
+      }
+    ],
+    "Making arrangements with a view to regulated mortgage contracts": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Regulated mortgage contract"
+        ]
+      }
+    ],
+    "Making arrangements with a view to a home reversion plan": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Home reversion plans"
+        ]
+      }
+    ],
+    "Entering into a regulated mortgage contract as lender": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Regulated mortgage contract"
+        ]
+      }
+    ],
+    "Arranging (bringing about) regulated mortgage contracts": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Regulated mortgage contract"
+        ]
+      }
+    ],
+    "Arranging (bringing about) a home reversion plan": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Home reversion plans"
+        ]
+      }
+    ],
+    "Advising on regulated mortgage contracts": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Regulated mortgage contract"
+        ]
+      }
+    ],
+    "Advising on a home reversion plan": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Home reversion plans"
+        ]
+      }
+    ],
+    "Administering a regulated mortgage contract": [
+      {
+        "Customer Type": [
+          "Customer"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Regulated mortgage contract"
+        ]
+      }
+    ],
+    "Making arrangements with a view to transactions in investments": [
+      {
+        "Customer Type": [
+          "Commercial",
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Non-investment insurance contracts"
+        ]
+      },
+      {
+        "Customer Type": [
+          "Retail (Investment)",
+          "Professional",
+          "Commercial",
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Structured Deposits",
+          "Share",
+          "Debenture",
+          "Government and public security",
+          "Warrant",
+          "Certificates representing certain security",
+          "Unit",
+          "Rights to or interests in investments (Security)",
+          "Alternative Debenture",
+          "Option (excluding a commodity option and an option on a commodity future)",
+          "Commodity option and option on commodity future",
+          "Future (excluding a commodity future and a rolling spot forex contract)",
+          "Commodity Future",
+          "Contract for Differences (excluding a spread bet and, a rolling spot forex contract and a binary bet)",
+          "Spread Bet",
+          "Rolling spot forex contract",
+          "Rights to or interests in investments (Contractually Based Investments)",
+          "Personal pension scheme",
+          "Stakeholder pension scheme",
+          "Funeral plan contract",
+          "Life Policy",
+          "Non-investment insurance contracts"
+        ]
+      },
+      {
+        "Limitation": [
+          "Investment activity in \"rights to or interests in investments (security)\" and \"rights to or interests in investments (contractually based investment)\" is limited to the investment types granted for this activity."
+        ]
+      }
+    ],
+    "Dealing in investments as agent": [
+      {
+        "Customer Type": [
+          "Retail (Investment)",
+          "Professional",
+          "Commercial",
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Structured Deposits",
+          "Share",
+          "Debenture",
+          "Government and public security",
+          "Warrant",
+          "Certificates representing certain security",
+          "Unit",
+          "Rights to or interests in investments (Security)",
+          "Alternative Debenture",
+          "Option (excluding a commodity option and an option on a commodity future)",
+          "Commodity option and option on commodity future",
+          "Future (excluding a commodity future and a rolling spot forex contract)",
+          "Commodity Future",
+          "Contract for Differences (excluding a spread bet and, a rolling spot forex contract and a binary bet)",
+          "Spread Bet",
+          "Rolling spot forex contract",
+          "Personal pension scheme",
+          "Stakeholder pension scheme",
+          "Funeral plan contract",
+          "Life Policy",
+          "Non-investment insurance contracts",
+          "Rights to or interests in investments (Contractually Based Investments)"
+        ]
+      },
+      {
+        "Limitation": [
+          "Investment activity in \"rights to or interests in investments (security)\" and \"rights to or interests in investments (contractually based investment)\" is limited to the investment types granted for this activity."
+        ]
+      },
+      {
+        "Customer Type": [
+          "Commercial",
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Non-investment insurance contracts"
+        ]
+      }
+    ],
+    "Assisting in the administration and performance of a contract of insurance": [
+      {
+        "Customer Type": [
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Non-investment insurance contracts"
+        ]
+      }
+    ],
+    "Arranging safeguarding and administration of assets": [
+      {
+        "Customer Type": [
+          "Retail (Investment)",
+          "Professional"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Share",
+          "Debenture",
+          "Government and public security",
+          "Warrant",
+          "Certificates representing certain security",
+          "Unit",
+          "Rights to or interests in investments (Security)",
+          "Alternative Debenture",
+          "Option (excluding a commodity option and an option on a commodity future)",
+          "Commodity option and option on commodity future",
+          "Future (excluding a commodity future and a rolling spot forex contract)",
+          "Commodity Future",
+          "Contract for Differences (excluding a spread bet and, a rolling spot forex contract and a binary bet)",
+          "Spread Bet",
+          "Rolling spot forex contract",
+          "Rights to or interests in investments (Contractually Based Investments)",
+          "Personal pension scheme",
+          "Stakeholder pension scheme",
+          "Funeral plan contract",
+          "Life Policy"
+        ]
+      },
+      {
+        "Limitation": [
+          "Investment activity in \"rights to or interests in investments (security)\" and \"rights to or interests in investments (contractually based investment)\" is limited to the investment types granted for this activity."
+        ]
+      }
+    ],
+    "Arranging (bringing about) deals in investments": [
+      {
+        "Customer Type": [
+          "Commercial",
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Non-investment insurance contracts"
+        ]
+      },
+      {
+        "Customer Type": [
+          "Retail (Investment)",
+          "Professional",
+          "Commercial",
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Structured Deposits",
+          "Alternative Debenture",
+          "Certificates representing certain security",
+          "Commodity Future",
+          "Commodity option and option on commodity future",
+          "Contract for Differences (excluding a spread bet and, a rolling spot forex contract and a binary bet)",
+          "Debenture",
+          "Funeral plan contract",
+          "Future (excluding a commodity future and a rolling spot forex contract)",
+          "Government and public security",
+          "Life Policy",
+          "Non-investment insurance contracts",
+          "Option (excluding a commodity option and an option on a commodity future)",
+          "Personal pension scheme",
+          "Rights to or interests in investments (Contractually Based Investments)",
+          "Rights to or interests in investments (Security)",
+          "Rolling spot forex contract",
+          "Share",
+          "Spread Bet",
+          "Stakeholder pension scheme",
+          "Unit",
+          "Warrant"
+        ]
+      },
+      {
+        "Limitation": [
+          "Investment activity in \"rights to or interests in investments (security)\" and \"rights to or interests in investments (contractually based investment)\" is limited to the investment types granted for this activity."
+        ]
+      }
+    ],
+    "Advising on investments (except on Pension Transfers and Pension Opt Outs)": [
+      {
+        "Customer Type": [
+          "Retail (Non-Investment Insurance)",
+          "Commercial"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Non-investment insurance contracts"
+        ]
+      },
+      {
+        "Customer Type": [
+          "Retail (Investment)",
+          "Professional",
+          "Commercial",
+          "Retail (Non-Investment Insurance)"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Structured Deposits",
+          "Share",
+          "Debenture",
+          "Government and public security",
+          "Warrant",
+          "Certificates representing certain security",
+          "Unit",
+          "Rights to or interests in investments (Security)",
+          "Alternative Debenture",
+          "Option (excluding a commodity option and an option on a commodity future)",
+          "Commodity option and option on commodity future",
+          "Future (excluding a commodity future and a rolling spot forex contract)",
+          "Commodity Future",
+          "Contract for Differences (excluding a spread bet and, a rolling spot forex contract and a binary bet)",
+          "Spread Bet",
+          "Rolling spot forex contract",
+          "Rights to or interests in investments (Contractually Based Investments)",
+          "Personal pension scheme",
+          "Stakeholder pension scheme",
+          "Funeral plan contract",
+          "Life Policy",
+          "Non-investment insurance contracts"
+        ]
+      },
+      {
+        "Limitation": [
+          "Investment activity in \"rights to or interests in investments (security)\" and \"rights to or interests in investments (contractually based investment)\" is limited to the investment types granted for this activity."
+        ]
+      }
+    ],
+    "Accepting Deposits": [
+      {
+        "Customer Type": [
+          "All"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Deposit"
+        ]
+      }
+    ]
+  }
+}

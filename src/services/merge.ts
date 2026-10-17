@@ -100,6 +100,7 @@ function mergeNames(partials: PartialEntity[]): EntityName[] {
 /** Identifier schemes that are a home-registry number, with the country and registry of their entity id. */
 export const REGISTRY_IDS: [string, string, string][] = [
   ["GB_CRN", "GB", "CH"],
+  ["FCA_FRN", "GB", "FCA"],
   ["NO_ORGNR", "NO", "BR"],
   ["FI_YTUNNUS", "FI", "PRH"],
 ];
@@ -200,7 +201,6 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
     families: {
       identity: { state: partials.length > 0 ? "available" : "unavailable", sourcesTried },
       // officers, ownership, filings and insolvency depend on which sources are enabled: buildProfile fills them in.
-      regulatory: { state: "not_yet_supported", sourcesTried: [] },
       sanctions: {
         state: "available",
         sourcesTried: [],

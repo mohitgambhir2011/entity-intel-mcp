@@ -1,0 +1,66 @@
+{
+  "accounts": {
+    "accounting_reference_date": {
+      "day": "31",
+      "month": "12"
+    },
+    "last_accounts": {
+      "made_up_to": "2025-12-31",
+      "period_end_on": "2025-12-31",
+      "period_start_on": "2025-01-01",
+      "type": "group"
+    },
+    "next_accounts": {
+      "due_on": "2027-06-30",
+      "overdue": false,
+      "period_end_on": "2026-12-31",
+      "period_start_on": "2026-01-01"
+    },
+    "next_due": "2027-06-30",
+    "next_made_up_to": "2026-12-31",
+    "overdue": false
+  },
+  "can_file": true,
+  "company_name": "BARCLAYS BANK UK PLC",
+  "company_number": "09740322",
+  "company_status": "active",
+  "confirmation_statement": {
+    "last_made_up_to": "2025-11-01",
+    "next_due": "2026-11-15",
+    "next_made_up_to": "2026-11-01",
+    "overdue": false
+  },
+  "date_of_creation": "2015-08-19",
+  "etag": "5fd5728e578343b9924b37581d4ff56aae9aaea9",
+  "has_charges": false,
+  "has_insolvency_history": false,
+  "jurisdiction": "england-wales",
+  "last_full_members_list_date": "2016-06-01",
+  "links": {
+    "persons_with_significant_control": "/company/09740322/persons-with-significant-control",
+    "self": "/company/09740322",
+    "charges": "/company/09740322/charges",
+    "filing_history": "/company/09740322/filing-history",
+    "officers": "/company/09740322/officers"
+  },
+  "previous_company_names": [
+    {
+      "ceased_on": "2017-06-15",
+      "effective_from": "2015-08-19",
+      "name": "BARCLAYS UK AND EUROPE PLC"
+    }
+  ],
+  "registered_office_address": {
+    "address_line_1": "1 Churchill Place",
+    "country": "England",
+    "locality": "London",
+    "postal_code": "E14 5HP"
+  },
+  "registered_office_is_in_dispute": false,
+  "sic_codes": [
+    "64191"
+  ],
+  "type": "plc",
+  "undeliverable_registered_office_address": false,
+  "has_super_secure_pscs": false
+}

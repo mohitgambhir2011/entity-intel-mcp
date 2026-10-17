@@ -1,0 +1,29 @@
+{
+  "Status": "FSR-API-02-06-00",
+  "ResultInfo": {
+    "page": "1",
+    "per_page": "3",
+    "total_count": "3"
+  },
+  "Message": "Ok. Firm Requirements found",
+  "Data": [
+    {
+      "Effective Date": "01/01/2024",
+      "RFB Sub-group": "TO: Barclays Bank UK Plc (FRN 759676) OF: 1 Churchill Place, London, England, E14 5HP TAKE NOTICE: The Prudential Regulation Authority of 20 Moorgate, London, EC2R 6DA has decided to take the following action. 1. ACTION Following an application received from the firm pursuant to section 55M(5)(a) of",
+      "Requirement Reference": "OR-0258031",
+      "Financial Promotions Requirement": "FALSE"
+    },
+    {
+      "Effective Date": "11/05/2018",
+      "Report annually to FCA and PRA on whistleblowing": "Details of the FCA requirement can be found at this link - https://www.fca.org.uk/publication/requirement-notices/vreq-barclays-bank-uk-plc.pdf Details of the PRA requirement can be found at this link - www.bankofengland.co.uk/-/media/BoE/Files/prudential-regulation/regulatory-action/written-notice-",
+      "Requirement Reference": "OR-0157983",
+      "Financial Promotions Requirement": "FALSE"
+    },
+    {
+      "Effective Date": "06/11/2023",
+      "Financial Promotions for own firm, ARs and other members of the group": "This firm can approve its own financial promotions as well as those of members of its wider group and, in certain circumstances, those of its appointed representatives.",
+      "Requirement Reference": "OR-0215096",
+      "Financial Promotions Requirement": "TRUE"
+    }
+  ]
+}

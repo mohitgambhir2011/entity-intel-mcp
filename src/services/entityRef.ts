@@ -4,6 +4,7 @@ import {
   isValidLei,
   makeIdentifier,
   normalizeFiBusinessId,
+  normalizeFrn,
   normalizeGbCompanyNumber,
   normalizeNoOrgnr,
   parseVat,
@@ -18,7 +19,14 @@ export interface EntityRefInput {
   country?: string;
 }
 
-export const SUPPORTED_SCHEMES = ["LEI", "GB_CRN", "NO_ORGNR", "FI_YTUNNUS", "VAT"] as const;
+export const SUPPORTED_SCHEMES = [
+  "LEI",
+  "GB_CRN",
+  "FCA_FRN",
+  "NO_ORGNR",
+  "FI_YTUNNUS",
+  "VAT",
+] as const;
 
 /** Turns tool arguments into one Identifier to start a lookup from. Throws InvalidInputError. */
 export function resolveRef(input: EntityRefInput): Identifier {
@@ -35,6 +43,10 @@ function fromEntityId(id: string): Identifier {
   if (parts[0] === "GB" && parts[1] === "CH" && parts[2]) {
     const n = normalizeGbCompanyNumber(parts[2]);
     if (n) return makeIdentifier("GB_CRN", n, { country: "GB" });
+  }
+  if (parts[0] === "GB" && parts[1] === "FCA" && parts[2]) {
+    const n = normalizeFrn(parts[2]);
+    if (n) return makeIdentifier("FCA_FRN", n, { country: "GB" });
   }
   if (parts[0] === "NO" && parts[1] === "BR" && parts[2]) {
     const n = normalizeNoOrgnr(parts[2]);
@@ -77,6 +89,11 @@ function fromIdentifier(raw: string, scheme?: string, country?: string): Identif
       const n = normalizeGbCompanyNumber(value);
       if (!n) throw new InvalidInputError("Not a valid UK company number");
       return makeIdentifier("GB_CRN", n, { country: "GB" });
+    }
+    if (upper === "FCA_FRN") {
+      const n = normalizeFrn(value);
+      if (!n) throw new InvalidInputError("Not a valid FCA firm reference number (3 to 7 digits)");
+      return makeIdentifier("FCA_FRN", n, { country: "GB", validated: false });
     }
     if (upper === "NO_ORGNR") {
       const n = normalizeNoOrgnr(value);

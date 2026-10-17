@@ -33,6 +33,7 @@ Read-only, idempotent. `openWorldHint` is true except for `check_coverage`.
 | --- | --- | --- |
 | `LEI` | `2138002P5RNKC5W2JZ46` | ISO 17442; checksum validated |
 | `GB_CRN` | `00445790`, `SC123456` | Companies House number; digits are zero-padded to 8; bare digits need `country=GB` |
+| `FCA_FRN` | `759676` | FCA firm reference number, 3-7 digits; only with `scheme` (bare digits are ambiguous). Entity id `GB:FCA:<frn>`; links to the firm's Companies House number |
 | `NO_ORGNR` | `923609016`, `923 609 016`, `NO923609016MVA` | Norwegian organisation number: 9 digits, mod-11 check digit (validated before any request). The `NO...MVA` VAT form is recognised without a scheme; bare digits need `country=NO` |
 | `FI_YTUNNUS` | `0112038-9`, `01120389`, `112038-9` | Finnish business ID: 7 digits and a check digit (validated before any request); the hyphenated form is recognised without a scheme, bare digits need `country=FI`; the leading zero may be omitted |
 | `VAT` | `IE6388047V`, `FI01120389` | EU/VIES prefix (`EL` for Greece, `XI` Northern Ireland). `GB` VAT is not covered. A Finnish VAT number is linked to the business ID; a Norwegian one (`NO...MVA`) is read as `NO_ORGNR`, also with `scheme=VAT` |
@@ -86,7 +87,7 @@ country and address; call `get_entity` with the chosen `entityId`.
 
 ## `get_entity`
 
-Arguments: `entity_id` **or** `identifier`; optional `scheme` (`LEI|GB_CRN|NO_ORGNR|FI_YTUNNUS|VAT`), `country`, `fresh`.
+Arguments: `entity_id` **or** `identifier`; optional `scheme` (`LEI|GB_CRN|FCA_FRN|NO_ORGNR|FI_YTUNNUS|VAT`), `country`, `fresh`.
 
 `data` is the merged profile:
 
@@ -156,6 +157,14 @@ Arguments: entity reference, `include` (any of `filings|charges|insolvency`, at 
 Personal data: practitioners and charge holders can be named individuals, so these two families are cached as personal data (capped lifetime) and the response carries the personal-data disclaimer when either is present.
 
 Real example (Tesco PLC, `00445790`): 8,372 filings (newest `SH03`), 9 charges of which 2 outstanding, no insolvency case. A liquidated Northern Ireland company (`NI017460`): status `in_liquidation`, one `compulsory-liquidation` case.
+
+## `get_regulatory_status`
+
+Arguments: entity reference (a Companies House number, or `scheme: FCA_FRN` with a firm reference number; `entity_id` `GB:FCA:<frn>` also works), `fresh`.
+
+`data.regulatory` is an availability object. `available` holds `frn`, `name`, `status` (the register's wording, e.g. `Authorised`, `No longer authorised`), `statusEffectiveFrom`, `businessType`, `clientMoneyPermission`, `mlrsStatus`, `regulators[]` (`name`, `effectiveFrom`, `terminatedOn`), `permissions[]` (`name`, `limitations[]` cut to 3), `permissionsTotal`, `requirements[]` (`kind`, `text` cut to 300 characters, `effectiveFrom`), `requirementsTotal`, `truncated` (more than read, or entries that could not be read), `matchedBy` (`frn` or `companies_house_number`) and provenance. `unavailable` with `no_such_record` (no firm matched; the detail explains the limits of matching by name), `requires_credentials`, `not_enabled`; `not_yet_supported` outside the UK; or `error` (an outage is never "not regulated"). Authorisation status is not company status and is not part of `get_entity`'s status.
+
+Real example (Barclays Bank UK PLC, `09740322`): FRN 759676, `Authorised` since 2017-04-06, regulators FCA and PRA, 34 permissions, 3 requirements.
 
 ## `screen_sanctions`
 

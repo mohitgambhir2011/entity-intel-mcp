@@ -87,6 +87,14 @@ Licence/terms: all three are official publications intended for public use. Redi
 - Chain verified end to end: Tesco Stores Limited (00519500) <- Tesco Holdings Limited (00243011) <- Tesco Plc (00445790, exempt). Havin Bank (01074897) <- Banco Central De Cuba (foreign, not followable).
 - Each company costs 1 request (PSC), plus 1 more when it has no controllers (exemptions or statements). The rate limit (600 / 5 min) is protected by the 30-company budget per call.
 
+## FCA Financial Services Register (verified live 2026-10-17, `scripts/live-fca.ts`)
+
+- Base `https://register.fca.org.uk/services/V0.1`, headers `X-Auth-Email` and `X-Auth-Key`. **Every reply is HTTP 200**, including not found and invalid input; the outcome is in the body: `Status` (e.g. `FSR-API-02-01-00`) and `Message` (`Ok...`). Codes ending `-11` mean nothing found (`Firm not found`, `No search result found`), `-21` is `Bad Request: Invalid Input` (also returned for endpoints that do not exist, such as `/Disciplinary`). No rate-limit headers are returned: the limit is unverified.
+- `GET /Search?q=&type=firm` -> `Data[]` with `Status` (`Authorised`, `No longer authorised`), `Reference Number`, `Name` (with `(Postcode: ...)`). **It matches names and FRNs but not Companies House numbers.**
+- `GET /Firm/{frn}` -> one object with `FRN`, `Organisation Name`, `Business Type`, `Status Effective Date` (dd/mm/yyyy), `Client Money Permission`, `MLRs Status`, **`Companies House Number`**, and links to sub-resources. Its own `Status` is the placeholder `See full details`: the authorisation status is only in the search result.
+- `/Firm/{frn}/Permissions` (object keyed by activity, each a list of limitation blocks; 20 per page, `ResultInfo.Next` and `?pgnp=n`; Barclays UK: 34), `/Regulators` (FCA and PRA with dates), `/Requirements` (each requirement's text under a different field name, e.g. `RFB Sub-group`), `/Names`, `/Address`, `/Individuals` (2,289 for Barclays UK: personal data, not used), `/Passports`, `/Waivers`, `/Exclusions` are read as noted in [23-coverage.md](23-coverage.md).
+- Design consequence: a company is found by name and confirmed by its company number (D43).
+
 ## Norway and Finland (verified live 2026-10-17, `scripts/live-nordic.ts`)
 
 ### Norway: Enhetsregisteret (Bronnoysund Register Centre)

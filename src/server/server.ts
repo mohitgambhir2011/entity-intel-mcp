@@ -5,6 +5,7 @@ import { registerCoverage } from "./tools/coverage.js";
 import { registerGetEntity } from "./tools/getEntity.js";
 import { registerGetFilingsAndInsolvency } from "./tools/getFilingsAndInsolvency.js";
 import { registerGetOfficers } from "./tools/getOfficers.js";
+import { registerGetRegulatoryStatus } from "./tools/getRegulatoryStatus.js";
 import { registerGetOwnership } from "./tools/getOwnership.js";
 import { registerResolveIdentifier } from "./tools/resolveIdentifier.js";
 import { registerScreenSanctions } from "./tools/screenSanctions.js";
@@ -32,6 +33,7 @@ export function createServer(rt: Runtime): McpServer {
   registerGetOfficers(server, rt);
   registerGetOwnership(server, rt);
   registerGetFilingsAndInsolvency(server, rt);
+  registerGetRegulatoryStatus(server, rt);
   registerScreenSanctions(server, rt);
   registerKybCheck(server);
   return server;

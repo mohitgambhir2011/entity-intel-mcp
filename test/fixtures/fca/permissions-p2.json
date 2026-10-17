@@ -1,0 +1,154 @@
+{
+  "Status": "FSR-API-02-03-00",
+  "ResultInfo": {
+    "Previous": "https://register.fca.org.uk/services/V0.1/Firm/759676/Permissions?pgnp=1",
+    "page": "2",
+    "per_page": "20",
+    "total_count": "34"
+  },
+  "Message": "Ok. Firm permission found",
+  "Data": {
+    "Acting as a CBTL lender": [
+      {
+        "Acting as a CBTL lender": [
+          "1"
+        ]
+      }
+    ],
+    "Acting as a CBTL arranger": [
+      {
+        "Acting as a CBTL arranger": [
+          "1"
+        ]
+      }
+    ],
+    "Acting as a CBTL advisor": [
+      {
+        "Acting as a CBTL advisor": [
+          "1"
+        ]
+      }
+    ],
+    "Acting as a CBTL administrator": [
+      {
+        "Acting as a CBTL administrator": [
+          "1"
+        ]
+      }
+    ],
+    "CBTL Status": [
+      {
+        "CBTL Status": [
+          "Registered"
+        ]
+      }
+    ],
+    "CBTL Effective Date": [
+      {
+        "CBTL Effective Date": [
+          "06/04/2017"
+        ]
+      }
+    ],
+    "Agreeing to carry on a regulated activity": [
+      {
+        "Limitation": [
+          "The firm can only agree to carry on the regulated activities specified in this Notice."
+        ]
+      }
+    ],
+    "Dealing in investments as principal": [
+      {
+        "Customer Type": [
+          "Eligible Counterparty",
+          "Professional"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Option (excluding a commodity option and an option on a commodity future)",
+          "Commodity option and option on commodity future",
+          "Future (excluding a commodity future and a rolling spot forex contract)",
+          "Commodity Future",
+          "Contract for Differences (excluding a spread bet and, a rolling spot forex contract and a binary bet)",
+          "Spread Bet",
+          "Rolling spot forex contract",
+          "Rights to or interests in investments (Contractually Based Investments)"
+        ]
+      },
+      {
+        "Limitation": [
+          "Investment activity in \"rights to or interests in investments (security)\" and \"rights to or interests in investments (contractually based investment)\" is limited to the investment types granted for this activity."
+        ]
+      }
+    ],
+    "Causing dematerialised instructions to be sent": [
+      {
+        "Customer Type": [
+          "Retail (Investment)",
+          "Professional"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Share",
+          "Debenture",
+          "Government and public security",
+          "Warrant",
+          "Certificates representing certain security",
+          "Unit",
+          "Rights to or interests in investments (Security)",
+          "Alternative Debenture",
+          "Personal pension scheme",
+          "Stakeholder pension scheme"
+        ]
+      },
+      {
+        "Limitation": [
+          "Investment activity in \"rights to or interests in investments (security)\" and \"rights to or interests in investments (contractually based investment)\" is limited to the investment types granted for this activity."
+        ]
+      }
+    ],
+    "Issuing Electronic Money": [
+      {
+        "Customer Type": [
+          "Retail (Investment)",
+          "Professional"
+        ]
+      },
+      {
+        "Investment Type": [
+          "Issuing Electronic Money"
+        ]
+      }
+    ],
+    "Providing Credit Information Services": [
+      {
+        "Limitation": [
+          "This permission is limited to not carrying out credit repair services"
+        ]
+      }
+    ],
+    "Exercising/having right to exercise lender's rights and duties under a regulated credit agreement (excluding high-cost short-term credit, bill of sale agreement, and home collected credit agreement)": [
+      {
+        "Limitation Not Found": [
+          "Valid limitation not present"
+        ]
+      }
+    ],
+    "Entering into regulated credit agreement as Lender (Excluding high-cost short-term credit, bill of sale agreement, and home collected credit agreement)": [
+      {
+        "Limitation Not Found": [
+          "Valid limitation not present"
+        ]
+      }
+    ],
+    "Debt-counselling": [
+      {
+        "Limitation": [
+          "Limited to debt counselling excluding giving advice about debt management plans. In this limitation “debt management plans” is defined as: “a non-statutory agreement between a customer and one or more of the customer's lenders the aim of which is to discharge or liquidate the customer's debts, by making regular payments to a third party which administers the plan and distributes the money to the lenders”."
+        ]
+      }
+    ]
+  }
+}

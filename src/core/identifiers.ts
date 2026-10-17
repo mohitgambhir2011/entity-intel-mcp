@@ -92,6 +92,12 @@ export function normalizeFiBusinessId(input: string): string | undefined {
   return check === Number(m[2]) ? `${body}-${m[2]}` : undefined;
 }
 
+/** FCA firm reference number: 3 to 7 digits. */
+export function normalizeFrn(input: string): string | undefined {
+  const raw = stripSeparators(input).replace(/^FRN/, "");
+  return /^[0-9]{3,7}$/.test(raw) ? raw : undefined;
+}
+
 /** A Finnish VAT number is "FI" plus the business ID without its hyphen. */
 export const finnishVatFromBusinessId = (id: string): string => `FI${id.replace("-", "")}`;
 

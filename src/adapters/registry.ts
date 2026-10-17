@@ -1,10 +1,11 @@
 import type { Config } from "../core/config.js";
 import type { IdentifierScheme } from "../core/types.js";
 import { createCompaniesHouseAdapter } from "./companies-house/index.js";
+import { createFcaAdapter } from "./fca/index.js";
 import { finlandAdapter } from "./fi-prh/index.js";
 import { gleifAdapter } from "./gleif/index.js";
 import { norwayAdapter } from "./no-brreg/index.js";
-import type { SourceAdapter } from "./types.js";
+import type { Capability, SourceAdapter } from "./types.js";
 import { viesAdapter } from "./vies/index.js";
 
 /**
@@ -20,6 +21,8 @@ export interface AdapterInfo {
   requiredEnv: string[];
   /** Identifier schemes this adapter can look up. */
   schemes: IdentifierScheme[];
+  /** The families beyond identity this source provides (when it provides any). */
+  provides?: Capability[];
   /** Whether the adapter is implemented yet. */
   implemented: boolean;
   /** Builds the adapter. Only called when it is enabled. */
@@ -56,6 +59,7 @@ export const ADAPTERS: AdapterInfo[] = [
     label: "Companies House",
     requiredEnv: ["COMPANIES_HOUSE_API_KEY"],
     schemes: ["GB_CRN"],
+    provides: ["officers", "controllers", "filings", "charges", "insolvency"],
     implemented: true,
     create: (config) => createCompaniesHouseAdapter(config.companiesHouseApiKey),
   },
@@ -65,7 +69,9 @@ export const ADAPTERS: AdapterInfo[] = [
     label: "FCA Register",
     requiredEnv: ["FCA_AUTH_EMAIL", "FCA_AUTH_KEY"],
     schemes: ["FCA_FRN"],
-    implemented: false,
+    provides: ["regulatory"],
+    implemented: true,
+    create: (config) => createFcaAdapter(config.fcaAuthEmail, config.fcaAuthKey),
   },
   {
     id: "no",
@@ -73,6 +79,7 @@ export const ADAPTERS: AdapterInfo[] = [
     label: "Bronnoysund Register Centre (Enhetsregisteret)",
     requiredEnv: [],
     schemes: ["NO_ORGNR"],
+    provides: ["officers"],
     implemented: true,
     create: () => norwayAdapter,
   },

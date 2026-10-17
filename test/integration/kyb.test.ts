@@ -43,6 +43,7 @@ describe("kyb_check prompt", () => {
       "get_entity",
       "get_officers",
       "get_ownership",
+      "get_regulatory_status",
       "get_filings_and_insolvency",
       "screen_sanctions",
     ]) {

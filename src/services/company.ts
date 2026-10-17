@@ -75,6 +75,11 @@ export function buildProfile(
     "filings",
     "get_filings_and_insolvency",
   );
+  profile.coverage.families.regulatory = family(
+    findRegistry(rt, profile, "regulatory"),
+    "regulatory",
+    "get_regulatory_status",
+  );
   profile.coverage.families.insolvency = family(
     findRegistry(rt, profile, "insolvency"),
     "insolvency",
@@ -102,7 +107,9 @@ export function findRegistry(
 ): RegistryHandle | undefined {
   for (const adapter of rt.adapters) {
     if (!adapter[capability]) continue;
-    const identifier = profile.identifiers.find((i) => adapter.supports(i));
+    const reaches = (i: Identifier): boolean =>
+      adapter.covers ? adapter.covers(capability, i) : adapter.supports(i);
+    const identifier = profile.identifiers.find(reaches);
     if (identifier) return { adapter, identifier };
   }
   return undefined;
@@ -126,6 +133,7 @@ const FAMILY_LABEL: Record<Capability, string> = {
   filings: "Filing",
   charges: "Charge",
   insolvency: "Insolvency",
+  regulatory: "Regulatory",
 };
 
 /**
@@ -149,8 +157,15 @@ export function unavailableBecause(
     }
   }
 
+  // A switched-off source that would provide this family for this company: it covers one of the
+  // company's identifiers, or its country, and (when the catalogue says) offers the family.
   const off = rt.statuses.find(
-    (s) => !s.enabled && s.implemented && s.schemes.some((sc) => schemes.has(sc)),
+    (s) =>
+      !s.enabled &&
+      s.implemented &&
+      (!s.provides || s.provides.includes(capability)) &&
+      (s.schemes.some((sc) => schemes.has(sc)) ||
+        (s.provides !== undefined && s.country === profile.jurisdiction)),
   );
   if (off) {
     return {

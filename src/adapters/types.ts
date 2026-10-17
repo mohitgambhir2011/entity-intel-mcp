@@ -1,4 +1,5 @@
 import type { ControllersResult, OfficersResult, UnavailableReason } from "../core/people.js";
+import type { RegulatoryResult } from "../core/regulatory.js";
 import type { ChargesResult, FilingsResult, InsolvencyResult } from "../core/records.js";
 import type { Cache } from "../infra/cache.js";
 import type { HttpClient } from "../infra/http.js";
@@ -11,7 +12,15 @@ import type {
 } from "../core/types.js";
 
 /** The data families an adapter can provide beyond identity. */
-export type Capability = "officers" | "controllers" | "filings" | "charges" | "insolvency";
+export type Capability =
+  "officers" | "controllers" | "filings" | "charges" | "insolvency" | "regulatory";
+
+/** What is known about a company when looking for it on a regulator's register. */
+export interface RegulatoryQuery {
+  identifiers: Identifier[];
+  /** Legal, former and trading names, best first. */
+  names: string[];
+}
 
 export interface FilingsQuery {
   category?: string;
@@ -70,6 +79,14 @@ export interface SourceAdapter {
   charges?(identifier: Identifier, ctx: AdapterContext): Promise<ChargesResult | undefined>;
   /** Optional: insolvency cases and practitioners. undefined = no such company. */
   insolvency?(identifier: Identifier, ctx: AdapterContext): Promise<InsolvencyResult | undefined>;
+  /**
+   * Optional: can this adapter provide `capability` for a company known by this identifier? Used
+   * when the family is reached through a different identifier than the one it looks up (the FCA
+   * Register is found from a Companies House number). Defaults to `supports`.
+   */
+  covers?(capability: Capability, identifier: Identifier): boolean;
+  /** Optional: the firm on a regulator's register for this company. undefined = none found. */
+  regulatory?(company: RegulatoryQuery, ctx: AdapterContext): Promise<RegulatoryResult | undefined>;
   /** Optional name search. */
   search?(query: string, ctx: AdapterContext, limit?: number): Promise<SearchHit[]>;
 }

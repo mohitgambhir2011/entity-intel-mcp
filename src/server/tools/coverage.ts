@@ -26,7 +26,9 @@ export function registerCoverage(server: McpServer, rt: Runtime): void {
         const warnings: string[] = [];
         if (enabled === 0) warnings.push("No source adapters are enabled");
         // From the enabled adapters, so the list can not go stale when a country is added.
-        const countriesWith = (family: "officers" | "controllers" | "filings"): string =>
+        const countriesWith = (
+          family: "officers" | "controllers" | "filings" | "regulatory",
+        ): string =>
           [...new Set(rt.adapters.filter((a) => a[family] && a.country).map((a) => a.country!))]
             .sort()
             .join(", ") || "none enabled";
@@ -41,9 +43,10 @@ export function registerCoverage(server: McpServer, rt: Runtime): void {
               `officers (${countriesWith("officers")}: get_officers)`,
               `ownership (${countriesWith("controllers")}: get_ownership)`,
               `filings, charges, insolvency (${countriesWith("filings")}: get_filings_and_insolvency)`,
+              `regulatory status (${countriesWith("regulatory")}: get_regulatory_status)`,
               "sanctions (screen_sanctions)",
             ],
-            familiesNotYetSupported: ["regulatory"],
+            familiesNotYetSupported: [],
           },
         });
       }),

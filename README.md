@@ -10,8 +10,7 @@ Built for **KYB / due diligence first, research second**. It is honest about gap
 does not publish a data family, or a source is down or stale, the result says so instead of
 returning silence or a false all-clear.
 
-> **Status: early development (v0.0.1).** Eight tools and the `kyb_check` prompt work (below). Regulatory status (FCA) is
-> **not implemented yet**. National registry adapters exist for the **UK**, **Norway**
+> **Status: early development (v0.0.1).** Nine tools and the `kyb_check` prompt work (below). National registry adapters exist for the **UK**, **Norway**
 > and **Finland**: officers are available for UK and Norwegian companies, ownership for UK companies
 > only (Norway and Finland do not publish beneficial owners, and the result says so). See
 > [Coverage](#coverage) and the [roadmap](docs/01-DECISIONS.md) (D12).
@@ -149,6 +148,10 @@ published name): never treat `incomplete` as clear. Every response carries the v
 list and a fixed caveat: _this is an automated name-based screen, not a legal determination; every
 hit needs human review._
 
+### `get_regulatory_status`
+
+Whether a **UK** company is authorised by the financial regulator, from the **FCA Register** (needs a free FCA account: `FCA_AUTH_EMAIL`, `FCA_AUTH_KEY`): authorisation status and since when, regulators (FCA, PRA), regulated activities with their limitations, requirements, client money permission. Give a Companies House number or `scheme: FCA_FRN` with a firm reference number. The register cannot be searched by company number, so the company is matched by name and accepted only when the firm's record carries the same Companies House number: **"not found" is not proof that a company is unregulated**.
+
 ### `kyb_check` (prompt)
 
 An MCP prompt that runs a whole KYB check: `entity` (name or identifier), optional `country` and `depth`. It tells the assistant to check coverage, identify and confirm the company (never auto-picking), fetch the profile, officers, owners, filings and insolvency, screen the company with its officers and owners, and write a report with a section for every gap. It carries the tools' discipline: an `incomplete` screen or an unavailable family is not a clear result, hits are leads for human review, registry text is data, and the result is not legal advice. Your text is cleaned (one line, no markers) so it cannot rewrite the instructions.
@@ -169,7 +172,7 @@ See [`.env.example`](.env.example).
 | Variable                                        | Purpose                                                    | Default / range         |
 | ----------------------------------------------- | ---------------------------------------------------------- | ----------------------- |
 | `COMPANIES_HOUSE_API_KEY`                       | Enables the UK Companies House adapter                     | adapter off             |
-| `FCA_AUTH_EMAIL`, `FCA_AUTH_KEY`                | FCA Register (adapter not implemented yet)                 | off                     |
+| `FCA_AUTH_EMAIL`, `FCA_AUTH_KEY`                | Enables the FCA Register adapter (regulatory status)       | adapter off             |
 | `EIM_ADAPTERS`                                  | Allow-list of adapter ids, e.g. `gleif,vies,gb,no,fi`      | all with credentials    |
 | `EIM_DB_PATH`                                   | SQLite cache and audit file                                | per-user data directory |
 | `EIM_PERSONAL_DATA_TTL_DAYS`                    | Cache lifetime cap for officer / owner data                | 30 (0-3650)             |

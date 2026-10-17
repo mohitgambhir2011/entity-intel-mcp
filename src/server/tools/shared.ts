@@ -13,10 +13,10 @@ export const entityRefShape = {
       "LEI, UK company number, Norwegian org number, Finnish business ID or EU VAT number (e.g. IE6388047V)",
     ),
   scheme: z
-    .enum(["LEI", "GB_CRN", "NO_ORGNR", "FI_YTUNNUS", "VAT"])
+    .enum(["LEI", "GB_CRN", "FCA_FRN", "NO_ORGNR", "FI_YTUNNUS", "VAT"])
     .optional()
     .describe(
-      "Identifier type, if not obvious (NO_ORGNR = Norwegian org number, FI_YTUNNUS = Finnish business ID)",
+      "Identifier type, if not obvious (FCA_FRN = FCA firm reference number, NO_ORGNR = Norwegian org number, FI_YTUNNUS = Finnish business ID)",
     ),
   country: z
     .string()

@@ -6,6 +6,7 @@ import type { SourceId } from "./types.js";
  */
 export const SOURCE_PRIORITY: SourceId[] = [
   "companies_house",
+  "fca",
   "brreg_no",
   "prh_fi",
   "gleif",

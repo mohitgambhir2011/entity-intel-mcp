@@ -1,0 +1,18 @@
+{
+  "Status": "FSR-API-04-01-00",
+  "ResultInfo": {
+    "page": "1",
+    "per_page": "20",
+    "total_count": "1"
+  },
+  "Message": "Ok. Search successful",
+  "Data": [
+    {
+      "URL": "https://register.fca.org.uk/services/V0.1/Firm/759676",
+      "Status": "Authorised",
+      "Reference Number": "759676",
+      "Type of business or Individual": "Firm",
+      "Name": "Barclays Bank UK PLC (Postcode: E14 5HP)"
+    }
+  ]
+}

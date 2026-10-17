@@ -110,12 +110,31 @@ export function recordsRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   };
 }
 
+/** The FCA Register: Barclays Bank UK PLC (FRN 759676); any other search finds nothing. */
+export function fcaRoutes(): Record<string, FakeRoute | FakeRoute[]> {
+  const F = "https://register.fca.org.uk/services/V0.1";
+  const f = (path: string): FakeRoute => ({ body: fixtureText(path) });
+  return {
+    [`${F}/Firm/759676/Permissions?pgnp=2`]: f("fca/permissions-p2.json"),
+    [`${F}/Firm/759676/Permissions`]: f("fca/permissions-p1.json"),
+    [`${F}/Firm/759676/Regulators`]: f("fca/regulators.json"),
+    [`${F}/Firm/759676/Requirements`]: f("fca/requirements.json"),
+    [`${F}/Firm/759676`]: f("fca/firm-759676.json"),
+    [`${F}/Firm/`]: f("fca/firm-notfound.json"),
+    [`${F}/Search?q=759676`]: f("fca/search-frn.json"),
+    [`${F}/Search?q=BARCLAYS`]: f("fca/search-barclays.json"),
+    [`${F}/Search?q=`]: f("fca/search-none.json"),
+    [`${CH}/company/09740322`]: f("companies_house/company-barclays-uk.json"),
+  };
+}
+
 /** Recorded responses for the Tesco PLC golden entity and a few VAT numbers. */
 export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   return {
     ...peopleRoutes(),
     ...nordicRoutes(),
     ...recordsRoutes(),
+    ...fcaRoutes(),
     [`${GLEIF}/lei-records/2138002P5RNKC5W2JZ46`]: { body: fixtureText("gleif/lei-tesco.json") },
     [`${GLEIF}/lei-records?filter[entity.registeredAs]=00445790`]: {
       body: fixtureText("gleif/by-registration-tesco.json"),
