@@ -2,6 +2,7 @@ import type { Config } from "../core/config.js";
 import type { IdentifierScheme } from "../core/types.js";
 import { createCompaniesHouseAdapter } from "./companies-house/index.js";
 import { createFcaAdapter } from "./fca/index.js";
+import { irelandAdapter } from "./ie-cro/index.js";
 import { finlandAdapter } from "./fi-prh/index.js";
 import { gleifAdapter } from "./gleif/index.js";
 import { norwayAdapter } from "./no-brreg/index.js";
@@ -98,7 +99,8 @@ export const ADAPTERS: AdapterInfo[] = [
     label: "Companies Registration Office",
     requiredEnv: [],
     schemes: ["IE_CRO"],
-    implemented: false,
+    implemented: true,
+    create: () => irelandAdapter,
   },
 ];
 

@@ -101,6 +101,7 @@ function mergeNames(partials: PartialEntity[]): EntityName[] {
 export const REGISTRY_IDS: [string, string, string][] = [
   ["GB_CRN", "GB", "CH"],
   ["FCA_FRN", "GB", "FCA"],
+  ["IE_CRO", "IE", "CRO"],
   ["NO_ORGNR", "NO", "BR"],
   ["FI_YTUNNUS", "FI", "PRH"],
 ];

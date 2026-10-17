@@ -47,7 +47,7 @@ export async function searchEntities(rt: Runtime, input: SearchInput): Promise<S
   const warnings: string[] = [];
   if (/^\d{6,9}$/.test(query.replace(/\s/g, "")) && !country) {
     warnings.push(
-      "This looks like a company number; add country=GB, country=NO or country=FI to look it up in that register",
+      "This looks like a company number; add country=GB, country=IE, country=NO or country=FI to look it up in that register",
     );
   }
 

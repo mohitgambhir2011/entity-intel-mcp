@@ -34,6 +34,7 @@ Read-only, idempotent. `openWorldHint` is true except for `check_coverage`.
 | `LEI` | `2138002P5RNKC5W2JZ46` | ISO 17442; checksum validated |
 | `GB_CRN` | `00445790`, `SC123456` | Companies House number; digits are zero-padded to 8; bare digits need `country=GB` |
 | `FCA_FRN` | `759676` | FCA firm reference number, 3-7 digits; only with `scheme` (bare digits are ambiguous). Entity id `GB:FCA:<frn>`; links to the firm's Companies House number |
+| `IE_CRO` | `249885` | Irish company number, 1-7 digits, no check digit; only with `scheme` or `country=IE` (bare digits are ambiguous). Entity id `IE:CRO:<number>`. An Irish VAT number (`IE6388047V`) stays a VAT number |
 | `NO_ORGNR` | `923609016`, `923 609 016`, `NO923609016MVA` | Norwegian organisation number: 9 digits, mod-11 check digit (validated before any request). The `NO...MVA` VAT form is recognised without a scheme; bare digits need `country=NO` |
 | `FI_YTUNNUS` | `0112038-9`, `01120389`, `112038-9` | Finnish business ID: 7 digits and a check digit (validated before any request); the hyphenated form is recognised without a scheme, bare digits need `country=FI`; the leading zero may be omitted |
 | `VAT` | `IE6388047V`, `FI01120389` | EU/VIES prefix (`EL` for Greece, `XI` Northern Ireland). `GB` VAT is not covered. A Finnish VAT number is linked to the business ID; a Norwegian one (`NO...MVA`) is read as `NO_ORGNR`, also with `scheme=VAT` |
@@ -87,7 +88,7 @@ country and address; call `get_entity` with the chosen `entityId`.
 
 ## `get_entity`
 
-Arguments: `entity_id` **or** `identifier`; optional `scheme` (`LEI|GB_CRN|FCA_FRN|NO_ORGNR|FI_YTUNNUS|VAT`), `country`, `fresh`.
+Arguments: `entity_id` **or** `identifier`; optional `scheme` (`LEI|GB_CRN|FCA_FRN|IE_CRO|NO_ORGNR|FI_YTUNNUS|VAT`), `country`, `fresh`.
 
 `data` is the merged profile:
 

@@ -6,6 +6,7 @@ All notable changes. Dates are absolute. Versions follow semver; 0.x may change 
 
 ### Added
 
+- **Ireland, no key (D44).** `ie-cro` adapter on the CRO open data portal: identity of all Irish companies (current and dissolved), status from the register's wording, name search with query cleaning, `IE_CRO` identifier and `IE:CRO:<number>` entity id, LEI crosswalk (RA000402), ownership declared `restricted_access`. `scripts/live-ireland.ts`. Eighth `xhigh` review: 5 findings.
 - **FCA Register adapter and `get_regulatory_status`** (D43): authorisation status, regulators, permissions with limitations and requirements for UK firms; a company is found by name and confirmed by its Companies House number; `FCA_FRN` identifier and `GB:FCA:<frn>` entity id; catalogue `provides` so a missing key is blamed only for its own families. `scripts/live-fca.ts`. Seventh `xhigh` review: 6 findings. The `kyb_check` prompt now includes the regulatory step.
 - **`kyb_check` prompt** (D42): a guided KYB check across all tools with a gaps-first report. Sixth `xhigh` review: 4 findings fixed with tests.
 - **`get_filings_and_insolvency`** (UK, Companies House, D41): filing history (paged, optional category), charges with outstanding / satisfied counts, and insolvency cases with practitioners, each family with its own availability state. `scripts/live-records.ts`. Fifth `xhigh` code review: 9 findings fixed with regression tests.

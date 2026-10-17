@@ -10,7 +10,7 @@ Built for **KYB / due diligence first, research second**. It is honest about gap
 does not publish a data family, or a source is down or stale, the result says so instead of
 returning silence or a false all-clear.
 
-> **Status: early development (v0.0.1).** Nine tools and the `kyb_check` prompt work (below). National registry adapters exist for the **UK**, **Norway**
+> **Status: early development (v0.0.1).** Nine tools and the `kyb_check` prompt work (below). National registry adapters exist for the **UK**, **Ireland**, **Norway** and **Finland**. National registry adapters exist for the **UK**, **Norway**
 > and **Finland**: officers are available for UK and Norwegian companies, ownership for UK companies
 > only (Norway and Finland do not publish beneficial owners, and the result says so). See
 > [Coverage](#coverage) and the [roadmap](docs/01-DECISIONS.md) (D12).
@@ -190,6 +190,7 @@ dates, address.
 | Source                | Countries             | Identity                                                 |   Officers    | Owners            |     Filings     | Regulatory | Insolvency | Sanctions |
 | --------------------- | --------------------- | -------------------------------------------------------- | :-----------: | ----------------- | :-------------: | :--------: | :--------: | --------- |
 | Companies House (key) | GB                    | yes                                                      |      yes      | yes (PSC chain)   | yes (+ charges) |     -      |    yes     | -         |
+| CRO open data         | IE                    | yes (incl. LEI crosswalk)                                |   not built   | not public        |        -        |     -      |     -      | -         |
 | Enhetsregisteret      | NO                    | yes (incl. LEI and VAT crosswalk)                        |  yes (roles)  | not public        |        -        |     -      |     -      | -         |
 | PRH open data         | FI                    | yes (incl. LEI and VAT crosswalk; status inferred)       | not published | not public        |        -        |     -      |     -      | -         |
 | GLEIF                 | LEI holders worldwide | yes                                                      |       -       | parents (planned) |        -        |     -      |     -      | -         |

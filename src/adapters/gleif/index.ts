@@ -4,6 +4,7 @@ import {
   isValidLei,
   normalizeFiBusinessId,
   normalizeGbCompanyNumber,
+  normalizeIeCro,
   normalizeNoOrgnr,
 } from "../../core/identifiers.js";
 import { makeStatus } from "../../core/types.js";
@@ -38,6 +39,13 @@ interface RegistryRule {
 }
 
 const REGISTRIES: RegistryRule[] = [
+  {
+    ra: "RA000402", // Companies Registration Office, Ireland
+    scheme: "IE_CRO",
+    country: "IE",
+    parse: normalizeIeCro,
+    spellings: (v) => [v],
+  },
   {
     ra: "RA000585", // Companies House
     scheme: "GB_CRN",

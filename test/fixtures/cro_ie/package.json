@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "result": {
+    "resources": [
+      {
+        "id": "3fef41bc-b8f4-4b10-8434-ce51c29b1bba",
+        "name": "Company Records",
+        "format": "CSV",
+        "datastore_active": true
+      }
+    ]
+  }
+}

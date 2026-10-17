@@ -87,6 +87,16 @@ Licence/terms: all three are official publications intended for public use. Redi
 - Chain verified end to end: Tesco Stores Limited (00519500) <- Tesco Holdings Limited (00243011) <- Tesco Plc (00445790, exempt). Havin Bank (01074897) <- Banco Central De Cuba (foreign, not followable).
 - Each company costs 1 request (PSC), plus 1 more when it has no controllers (exemptions or statements). The rate limit (600 / 5 min) is protected by the 30-company budget per call.
 
+## Ireland: CRO open data (verified live 2026-10-17, `scripts/live-ireland.ts`)
+
+- `https://opendata.cro.ie` is a CKAN portal. Dataset `companies` ("Company Records", CC BY 4.0, daily, EU high-value dataset) has one datastore resource (`3fef41bc-...`, found through `package_show?id=companies`). No key. Over 850,000 rows, 457,000 of them dissolved.
+- `datastore_search?resource_id=&filters={"company_num":249885}` -> `result.records[]` with `company_num` (number), `company_name`, `company_status_code` and `company_status` (the codes differ for one wording: `Normal` is 1151, 1051, 1153, 1141), `company_type_code` / `company_type`, `company_reg_date`, `comp_dissolved_date`, `company_status_date`, `company_address_1..4`, `eircode`, `nace_v2_code`, `last_ar_date`, `last_accounts_date`. Dates look like `1998-01-29T00:00:00`. A non-numeric filter gives an error body.
+- Name search: `q={"company_name":"..."}` (full text, every word must match, case-insensitive); operators and punctuation in the text do not break it (HTTP 200) but `O'Brien (Ireland) Ltd` found nothing while `O Brien` found 959, hence the query cleaning. `datastore_search_sql` works but is not used.
+- Status wordings seen: Normal, Dissolved, Dissolved-20 years, Strike Off Listed, Liquidation, Ceased IRL, Dissolved PostMerger, Ceased, Struck Off, Deleted CB Merger, De-Registered ICAV, Conv. to IndProvSoc, Administration (UK), Deleted CB Conversion, Deleted per SE merge, Deleted as per SE Tr, Liquidation (UK), Examinership, Liquidation stayed, Dissolved by Divis, De-Registered Investment Company, Administration. About 45 company types.
+- GLEIF: registration authority `RA000402`, `registeredAs` is the plain number (Ryanair Holdings: 249885 -> `635400BR2ROC1FVEBQ56`).
+- Not in the open data: directors, shareholders, filings. The CRO web services (`services.cro.ie`) are reported by third parties to need sign-up and to return officers (UNVERIFIED, not built). The beneficial ownership register is closed to the public. Bulk director data is a paid licence (third-party figures disagree: UNVERIFIED).
+- Fixtures: the liquidation and strike-off rows have their addresses replaced with synthetic ones.
+
 ## FCA Financial Services Register (verified live 2026-10-17, `scripts/live-fca.ts`)
 
 - Base `https://register.fca.org.uk/services/V0.1`, headers `X-Auth-Email` and `X-Auth-Key`. **Every reply is HTTP 200**, including not found and invalid input; the outcome is in the body: `Status` (e.g. `FSR-API-02-01-00`) and `Message` (`Ok...`). Codes ending `-11` mean nothing found (`Firm not found`, `No search result found`), `-21` is `Bad Request: Invalid Input` (also returned for endpoints that do not exist, such as `/Disciplinary`). No rate-limit headers are returned: the limit is unverified.

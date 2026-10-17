@@ -9,6 +9,7 @@ export const SOURCE_PRIORITY: SourceId[] = [
   "fca",
   "brreg_no",
   "prh_fi",
+  "cro_ie",
   "gleif",
   "vies",
 ];

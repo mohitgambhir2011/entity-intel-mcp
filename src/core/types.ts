@@ -4,7 +4,8 @@ export type CountryCode = string;
 export type ISODate = string;
 export type ISODateTime = string;
 
-export type SourceId = "gleif" | "vies" | "companies_house" | "fca" | "brreg_no" | "prh_fi";
+export type SourceId =
+  "gleif" | "vies" | "companies_house" | "fca" | "brreg_no" | "prh_fi" | "cro_ie";
 
 export interface Provenance {
   source: SourceId;

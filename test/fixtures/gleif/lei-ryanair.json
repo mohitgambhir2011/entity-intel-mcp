@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-10-17T00:00:00Z"
+    }
+  },
+  "data": {
+    "type": "lei-records",
+    "id": "635400BR2ROC1FVEBQ56",
+    "attributes": {
+      "lei": "635400BR2ROC1FVEBQ56",
+      "entity": {
+        "legalName": {
+          "name": "Ryanair Holdings Public Limited Company",
+          "language": "en-IE"
+        },
+        "otherNames": [],
+        "transliteratedOtherNames": [],
+        "legalAddress": {
+          "language": "en-IE",
+          "addressLines": [
+            "Ryanair Dublin Office",
+            "Airside Business Park",
+            "Swords"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "Dublin",
+          "region": "IE-D",
+          "country": "IE",
+          "postalCode": "K67NY94"
+        },
+        "headquartersAddress": {
+          "language": "en-IE",
+          "addressLines": [
+            "Ryanair Dublin Office",
+            "Airside Business Park",
+            "Swords"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "Dublin",
+          "region": "IE-D",
+          "country": "IE",
+          "postalCode": "K67NY94"
+        },
+        "registeredAt": {
+          "id": "RA000402",
+          "other": null
+        },
+        "registeredAs": "249885",
+        "jurisdiction": "IE",
+        "category": "GENERAL",
+        "legalForm": {
+          "id": "VYAX",
+          "other": null
+        },
+        "associatedEntity": {
+          "lei": null,
+          "name": null
+        },
+        "status": "ACTIVE",
+        "expiration": {
+          "date": null,
+          "reason": null
+        },
+        "successorEntity": {
+          "lei": null,
+          "name": null
+        },
+        "successorEntities": [],
+        "creationDate": "1996-06-04T23:00:00Z",
+        "subCategory": null,
+        "otherAddresses": [],
+        "eventGroups": []
+      },
+      "registration": {
+        "initialRegistrationDate": "2016-12-21T00:00:00Z",
+        "lastUpdateDate": "2025-12-16T00:00:00Z",
+        "status": "ISSUED",
+        "nextRenewalDate": "2026-12-21T00:00:00Z",
+        "managingLou": "635400DZBUIMTBCXGA12",
+        "corroborationLevel": "FULLY_CORROBORATED",
+        "validatedAt": {
+          "id": "RA000402",
+          "other": null
+        },
+        "validatedAs": "249885",
+        "otherValidationAuthorities": []
+      },
+      "bic": null,
+      "mic": null,
+      "ocid": "ie/249885",
+      "qcc": "QIEMUAC5TH",
+      "gem": null,
+      "spglobal": [
+        "413817"
+      ],
+      "conformityFlag": "CONFORMING"
+    },
+    "relationships": {
+      "managing-lou": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/managing-lou"
+        }
+      },
+      "lei-issuer": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/lei-issuer"
+        }
+      },
+      "field-modifications": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/field-modifications"
+        }
+      },
+      "direct-parent": {
+        "links": {
+          "reporting-exception": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/direct-parent-reporting-exception"
+        }
+      },
+      "ultimate-parent": {
+        "links": {
+          "reporting-exception": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/ultimate-parent-reporting-exception"
+        }
+      },
+      "direct-children": {
+        "links": {
+          "relationship-records": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/direct-child-relationships",
+          "related": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/direct-children"
+        }
+      },
+      "ultimate-children": {
+        "links": {
+          "relationship-records": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/ultimate-child-relationships",
+          "related": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/ultimate-children"
+        }
+      },
+      "isins": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56/isins"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.gleif.org/api/v1/lei-records/635400BR2ROC1FVEBQ56"
+    }
+  }
+}

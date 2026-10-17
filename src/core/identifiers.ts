@@ -92,6 +92,14 @@ export function normalizeFiBusinessId(input: string): string | undefined {
   return check === Number(m[2]) ? `${body}-${m[2]}` : undefined;
 }
 
+/** Irish company number (CRO): 1 to 7 digits, no check digit; leading zeros are not significant. */
+export function normalizeIeCro(input: string): string | undefined {
+  const raw = stripSeparators(input);
+  if (!/^[0-9]{1,7}$/.test(raw)) return undefined;
+  const n = raw.replace(/^0+/, "");
+  return n === "" ? undefined : n;
+}
+
 /** FCA firm reference number: 3 to 7 digits. */
 export function normalizeFrn(input: string): string | undefined {
   const raw = stripSeparators(input).replace(/^FRN/, "");
@@ -191,6 +199,10 @@ export function detectIdentifier(
   if (cc === "FI") {
     const fi = normalizeFiBusinessId(raw);
     if (fi) return { scheme: "FI_YTUNNUS", value: fi, country: "FI" };
+  }
+  if (cc === "IE") {
+    const ie = normalizeIeCro(raw);
+    if (ie) return { scheme: "IE_CRO", value: ie, country: "IE" };
   }
   const vat = parseVat(raw);
   if (vat && hasVatShape(vat)) return { scheme: "VAT", value: raw, country: vat.country };

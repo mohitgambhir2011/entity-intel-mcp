@@ -128,6 +128,32 @@ export function fcaRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   };
 }
 
+/** Ireland's CRO open data: Ryanair Holdings plus a dissolved, a liquidated and a strike-off-listed company. */
+export function croRoutes(): Record<string, FakeRoute | FakeRoute[]> {
+  const C = "https://opendata.cro.ie/api/3/action";
+  const R = "3fef41bc-b8f4-4b10-8434-ce51c29b1bba";
+  const f = (path: string): FakeRoute => ({ body: fixtureText(path) });
+  const by = (n: number): string =>
+    `${C}/datastore_search?resource_id=${R}&filters=${encodeURIComponent(JSON.stringify({ company_num: n }))}`;
+  return {
+    [`${C}/package_show`]: f("cro_ie/package.json"),
+    [by(249885)]: f("cro_ie/ryanair-holdings.json"),
+    [by(279457)]: f("cro_ie/dissolved.json"),
+    [by(283902)]: f("cro_ie/liquidation.json"),
+    [by(581002)]: f("cro_ie/strike-off.json"),
+    [`${C}/datastore_search?resource_id=${R}&filters=`]: f("cro_ie/empty.json"),
+    [`${C}/datastore_search?resource_id=${R}&q=${encodeURIComponent(JSON.stringify({ company_name: "Ryanair" }))}`]:
+      f("cro_ie/search-ryanair.json"),
+    [`${C}/datastore_search?resource_id=${R}&q=`]: {
+      body: JSON.stringify({ success: true, result: { records: [], total: 0 } }),
+    },
+    [`${GLEIF}/lei-records/635400BR2ROC1FVEBQ56`]: f("gleif/lei-ryanair.json"),
+    [`${GLEIF}/lei-records?filter[entity.registeredAs]=249885`]: f(
+      "gleif/by-registration-ryanair.json",
+    ),
+  };
+}
+
 /** Recorded responses for the Tesco PLC golden entity and a few VAT numbers. */
 export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   return {
@@ -135,6 +161,7 @@ export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
     ...nordicRoutes(),
     ...recordsRoutes(),
     ...fcaRoutes(),
+    ...croRoutes(),
     [`${GLEIF}/lei-records/2138002P5RNKC5W2JZ46`]: { body: fixtureText("gleif/lei-tesco.json") },
     [`${GLEIF}/lei-records?filter[entity.registeredAs]=00445790`]: {
       body: fixtureText("gleif/by-registration-tesco.json"),

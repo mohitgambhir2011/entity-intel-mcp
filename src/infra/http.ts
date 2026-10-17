@@ -271,5 +271,6 @@ export const DEFAULT_HOST_RULES: Record<string, RateLimitRule> = {
   // No published limits (UNVERIFIED): conservative fair-use rates.
   "data.brreg.no": { max: 10, windowMs: 1000 },
   "avoindata.prh.fi": { max: 5, windowMs: 1000 },
+  "opendata.cro.ie": { max: 5, windowMs: 1000 },
   "www.treasury.gov": { max: 3, windowMs: 60_000 },
 };

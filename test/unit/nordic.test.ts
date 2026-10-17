@@ -636,7 +636,7 @@ describe("Shared code: review regressions", () => {
 
   it("tells the user about every supported scheme and country when it can not tell what an identifier is", () => {
     expect(() => resolveRef({ identifier: "@@@@" })).toThrow(/FI_YTUNNUS/);
-    expect(() => resolveRef({ identifier: "@@@@" })).toThrow(/GB, NO or FI/);
+    expect(() => resolveRef({ identifier: "@@@@" })).toThrow(/GB, IE, NO or FI/);
   });
 
   it("leaves Norwegian and Finnish numbers out of identifier matching against the lists", () => {

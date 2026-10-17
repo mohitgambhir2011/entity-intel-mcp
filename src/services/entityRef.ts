@@ -5,6 +5,7 @@ import {
   makeIdentifier,
   normalizeFiBusinessId,
   normalizeFrn,
+  normalizeIeCro,
   normalizeGbCompanyNumber,
   normalizeNoOrgnr,
   parseVat,
@@ -23,6 +24,7 @@ export const SUPPORTED_SCHEMES = [
   "LEI",
   "GB_CRN",
   "FCA_FRN",
+  "IE_CRO",
   "NO_ORGNR",
   "FI_YTUNNUS",
   "VAT",
@@ -47,6 +49,10 @@ function fromEntityId(id: string): Identifier {
   if (parts[0] === "GB" && parts[1] === "FCA" && parts[2]) {
     const n = normalizeFrn(parts[2]);
     if (n) return makeIdentifier("FCA_FRN", n, { country: "GB" });
+  }
+  if (parts[0] === "IE" && parts[1] === "CRO" && parts[2]) {
+    const n = normalizeIeCro(parts[2]);
+    if (n) return makeIdentifier("IE_CRO", n, { country: "IE" });
   }
   if (parts[0] === "NO" && parts[1] === "BR" && parts[2]) {
     const n = normalizeNoOrgnr(parts[2]);
@@ -95,6 +101,11 @@ function fromIdentifier(raw: string, scheme?: string, country?: string): Identif
       if (!n) throw new InvalidInputError("Not a valid FCA firm reference number (3 to 7 digits)");
       return makeIdentifier("FCA_FRN", n, { country: "GB", validated: false });
     }
+    if (upper === "IE_CRO") {
+      const n = normalizeIeCro(value);
+      if (!n) throw new InvalidInputError("Not a valid Irish company number (1 to 7 digits)");
+      return makeIdentifier("IE_CRO", n, { country: "IE" });
+    }
     if (upper === "NO_ORGNR") {
       const n = normalizeNoOrgnr(value);
       if (!n)
@@ -127,7 +138,7 @@ function fromIdentifier(raw: string, scheme?: string, country?: string): Identif
   if (!detected) {
     throw new InvalidInputError(
       `Could not tell what kind of identifier this is. Pass scheme (${SUPPORTED_SCHEMES.join(", ")}), ` +
-        "or country (GB, NO or FI) for a bare company number.",
+        "or country (GB, IE, NO or FI) for a bare company number.",
     );
   }
   return makeIdentifier(detected.scheme, detected.value, { country: detected.country });
