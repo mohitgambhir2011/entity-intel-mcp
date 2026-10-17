@@ -1,0 +1,165 @@
+{
+  "kind": "officer-list",
+  "items_per_page": 100,
+  "start_index": 0,
+  "total_results": 6,
+  "active_count": 3,
+  "resigned_count": 3,
+  "inactive_count": 0,
+  "items": [
+    {
+      "etag": "fixture0",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_on": "2025-04-14",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture0",
+        "officer": {
+          "appointments": "/officers/fixture0/appointments"
+        }
+      },
+      "name": "EXAMPLE, Jane Alice",
+      "officer_role": "secretary",
+      "person_number": "100000000000"
+    },
+    {
+      "etag": "fixture1",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_on": "2018-09-24",
+      "is_pre_1992_appointment": false,
+      "country_of_residence": "United Kingdom",
+      "date_of_birth": {
+        "month": 2,
+        "year": 1961
+      },
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture1",
+        "officer": {
+          "appointments": "/officers/fixture1/appointments"
+        }
+      },
+      "name": "SAMPLE, John Peter",
+      "nationality": "British",
+      "officer_role": "director",
+      "person_number": "100000000001",
+      "identity_verification_details": {
+        "anti_money_laundering_supervisory_bodies": [
+          "Faculty Office of the Archbishop of Canterbury (FO)"
+        ],
+        "appointment_verification_end_on": "9999-12-31",
+        "appointment_verification_start_on": "2026-07-01",
+        "authorised_corporate_service_provider_name": "DE PINNA LLP ACSP",
+        "identity_verified_on": "2025-07-29",
+        "preferred_name": "Melissa Bethell"
+      }
+    },
+    {
+      "etag": "fixture2",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_on": "2021-06-01",
+      "is_pre_1992_appointment": false,
+      "country_of_residence": "England",
+      "date_of_birth": {
+        "month": 3,
+        "year": 1962
+      },
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture2",
+        "officer": {
+          "appointments": "/officers/fixture2/appointments"
+        }
+      },
+      "name": "TESTER, Maria",
+      "nationality": "Belgian",
+      "officer_role": "director",
+      "person_number": "100000000002",
+      "identity_verification_details": {
+        "appointment_verification_end_on": "9999-12-31",
+        "appointment_verification_start_on": "2026-07-01"
+      }
+    },
+    {
+      "etag": "fixture3",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_before": "1991-06-07",
+      "is_pre_1992_appointment": true,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture3",
+        "officer": {
+          "appointments": "/officers/fixture3/appointments"
+        }
+      },
+      "name": "DEMO, Robert James",
+      "nationality": "British",
+      "officer_role": "secretary",
+      "resigned_on": "2004-03-15",
+      "person_number": "100000000003"
+    },
+    {
+      "etag": "fixture4",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_on": "2016-07-01",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture4",
+        "officer": {
+          "appointments": "/officers/fixture4/appointments"
+        }
+      },
+      "name": "PLACEHOLDER, Anna",
+      "officer_role": "secretary",
+      "resigned_on": "2016-08-10",
+      "person_number": "100000000004"
+    },
+    {
+      "etag": "fixture5",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_on": "2006-12-14",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture5",
+        "officer": {
+          "appointments": "/officers/fixture5/appointments"
+        }
+      },
+      "name": "FIXTURE, Thomas William",
+      "nationality": "British",
+      "officer_role": "secretary",
+      "resigned_on": "2015-01-12",
+      "person_number": "100000000005"
+    }
+  ],
+  "links": {
+    "self": "/company/00445790/officers"
+  }
+}

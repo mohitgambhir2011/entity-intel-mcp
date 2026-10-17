@@ -31,14 +31,13 @@ export function registerCoverage(server: McpServer, rt: Runtime): void {
           data: {
             adapters,
             sanctionsLists: rt.sanctions.status(),
-            familiesSupported: ["identity", "sanctions (screen_sanctions)"],
-            familiesNotYetSupported: [
-              "officers",
-              "ownership",
-              "filings",
-              "regulatory",
-              "insolvency",
+            familiesSupported: [
+              "identity",
+              "officers (GB only: get_officers)",
+              "ownership (GB only: get_ownership)",
+              "sanctions (screen_sanctions)",
             ],
+            familiesNotYetSupported: ["filings", "regulatory", "insolvency"],
           },
         });
       }),

@@ -1,0 +1,190 @@
+{
+  "active_count": 0,
+  "etag": "c630c630c498a097b3b50a4c7b005f960061147f",
+  "items": [
+    {
+      "etag": "fixture0",
+      "address": {
+        "address_line_1": "Park Road",
+        "address_line_2": "Moseley",
+        "locality": "Birmingham",
+        "postal_code": "B13 8AB",
+        "premises": "4"
+      },
+      "appointed_on": "2008-03-07",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture0",
+        "officer": {
+          "appointments": "/officers/fixture0/appointments"
+        }
+      },
+      "name": "CREDITREFORM (SECRETARIES) LIMITED",
+      "officer_role": "corporate-secretary",
+      "resigned_on": "2008-03-10",
+      "person_number": "128439990001"
+    },
+    {
+      "etag": "fixture1",
+      "address": {
+        "address_line_1": "Cedar Road",
+        "country": "England",
+        "locality": "Sutton",
+        "postal_code": "SM2 5DA",
+        "premises": "19"
+      },
+      "appointed_on": "2011-05-27",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture1",
+        "officer": {
+          "appointments": "/officers/fixture1/appointments"
+        }
+      },
+      "name": "HARMER SLATER LIMITED",
+      "officer_role": "corporate-secretary",
+      "resigned_on": "2023-04-05",
+      "identification": {
+        "identification_type": "uk-limited-company",
+        "registration_number": "07167165"
+      },
+      "person_number": "160423970001"
+    },
+    {
+      "etag": "fixture2",
+      "address": {
+        "address_line_1": "New Bond Street",
+        "country": "United Kingdom",
+        "locality": "London",
+        "postal_code": "W1S 1RR",
+        "premises": "72"
+      },
+      "appointed_on": "2009-04-27",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture2",
+        "officer": {
+          "appointments": "/officers/fixture2/appointments"
+        }
+      },
+      "name": "INCORPORATE SECRETARIAT LIMITED",
+      "officer_role": "corporate-secretary",
+      "resigned_on": "2011-05-27",
+      "identification": {
+        "identification_type": "eea",
+        "place_registered": "ENGLAND, UK",
+        "registration_number": "4243262"
+      },
+      "person_number": "118905790001"
+    },
+    {
+      "etag": "fixture3",
+      "address": {
+        "address_line_1": "Bridge Street",
+        "address_line_2": "Southwick",
+        "locality": "Fareham",
+        "postal_code": "PO17 6DZ",
+        "premises": "The Old Laundry",
+        "region": "Hampshire"
+      },
+      "appointed_on": "2008-03-07",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture3",
+        "officer": {
+          "appointments": "/officers/fixture3/appointments"
+        }
+      },
+      "name": "UK COMPANY SECRETARY LTD",
+      "officer_role": "corporate-secretary",
+      "resigned_on": "2009-04-27",
+      "person_number": "110730280002"
+    },
+    {
+      "etag": "fixture4",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_on": "2008-03-07",
+      "is_pre_1992_appointment": false,
+      "country_of_residence": "Belarus",
+      "date_of_birth": {
+        "month": 5,
+        "year": 1964
+      },
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture4",
+        "officer": {
+          "appointments": "/officers/fixture4/appointments"
+        }
+      },
+      "name": "MOCK, Sarah Jane",
+      "nationality": "Belarusian",
+      "officer_role": "director",
+      "resigned_on": "2024-03-07",
+      "person_number": "100000000004"
+    },
+    {
+      "etag": "fixture5",
+      "address": {
+        "address_line_1": "1 Example Street",
+        "locality": "Exampletown",
+        "postal_code": "EX1 1AA",
+        "country": "United Kingdom"
+      },
+      "appointed_on": "2008-08-18",
+      "is_pre_1992_appointment": false,
+      "country_of_residence": "United Kingdom",
+      "date_of_birth": {
+        "month": 6,
+        "year": 1965
+      },
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture5",
+        "officer": {
+          "appointments": "/officers/fixture5/appointments"
+        }
+      },
+      "name": "EXAMPLE, Jane Alice",
+      "nationality": "British",
+      "officer_role": "director",
+      "resigned_on": "2008-09-18",
+      "person_number": "100000000005"
+    },
+    {
+      "etag": "fixture6",
+      "address": {
+        "address_line_1": "Park Road",
+        "address_line_2": "Moseley",
+        "locality": "Birmingham",
+        "postal_code": "B13 8AB",
+        "premises": "4",
+        "region": "West Midlands"
+      },
+      "appointed_on": "2008-03-07",
+      "is_pre_1992_appointment": false,
+      "links": {
+        "self": "/company/FIXTURE/appointments/fixture6",
+        "officer": {
+          "appointments": "/officers/fixture6/appointments"
+        }
+      },
+      "name": "CREDITREFORM (DIRECTORS) LIMITED",
+      "officer_role": "corporate-director",
+      "resigned_on": "2008-03-10",
+      "person_number": "128440000001"
+    }
+  ],
+  "items_per_page": 100,
+  "kind": "officer-list",
+  "links": {
+    "self": "/company/06527449/officers"
+  },
+  "resigned_count": 7,
+  "inactive_count": 0,
+  "start_index": 0,
+  "total_results": 7
+}

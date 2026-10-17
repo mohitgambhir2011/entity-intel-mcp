@@ -189,8 +189,16 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
     jurisdiction,
     families: {
       identity: { state: partials.length > 0 ? "available" : "unavailable", sourcesTried },
-      officers: { state: "not_yet_supported", sourcesTried: [] },
-      ownership: { state: "not_yet_supported", sourcesTried: [] },
+      officers: {
+        state: "available",
+        sourcesTried: [],
+        note: "UK companies only: call get_officers",
+      },
+      ownership: {
+        state: "available",
+        sourcesTried: [],
+        note: "UK companies only: call get_ownership",
+      },
       filings: { state: "not_yet_supported", sourcesTried: [] },
       regulatory: { state: "not_yet_supported", sourcesTried: [] },
       insolvency: { state: "not_yet_supported", sourcesTried: [] },

@@ -30,13 +30,38 @@ export function sanctionsRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   };
 }
 
+/**
+ * Officers, PSC and the Tesco group chain (Tesco Stores -> Tesco Holdings -> Tesco PLC, which is
+ * exempt from PSC reporting as a listed company). Individuals are synthetic; companies are real.
+ * Sub-resource URLs must be listed before the plain company URL they share a prefix with.
+ */
+export function peopleRoutes(): Record<string, FakeRoute | FakeRoute[]> {
+  const f = (name: string): FakeRoute => ({ body: fixtureText(`companies_house/${name}.json`) });
+  const notFound: FakeRoute = { status: 404, body: "" };
+  return {
+    [`${CH}/company/00445790/officers`]: f("officers-tesco"),
+    [`${CH}/company/00445790/persons-with-significant-control-statements`]: notFound,
+    [`${CH}/company/00445790/persons-with-significant-control`]: f("tesco-psc"),
+    [`${CH}/company/00445790/exemptions`]: f("tesco-exemptions"),
+    [`${CH}/company/00519500/persons-with-significant-control`]: f("stores-psc"),
+    [`${CH}/company/00519500`]: f("profile-00519500"),
+    [`${CH}/company/00243011/persons-with-significant-control`]: f("holdings-psc"),
+    [`${CH}/company/00243011`]: f("profile-00243011"),
+    [`${CH}/company/01074897/persons-with-significant-control`]: f("havin-psc"),
+    [`${CH}/company/01074897/exemptions`]: notFound,
+    [`${CH}/company/01074897`]: f("profile-01074897"),
+  };
+}
+
 /** Recorded responses for the Tesco PLC golden entity and a few VAT numbers. */
 export function defaultRoutes(): Record<string, FakeRoute | FakeRoute[]> {
   return {
+    ...peopleRoutes(),
     [`${GLEIF}/lei-records/2138002P5RNKC5W2JZ46`]: { body: fixtureText("gleif/lei-tesco.json") },
     [`${GLEIF}/lei-records?filter[entity.registeredAs]=00445790`]: {
       body: fixtureText("gleif/by-registration-tesco.json"),
     },
+    [`${GLEIF}/lei-records?filter[entity.registeredAs]=`]: { body: JSON.stringify({ data: [] }) },
     [`${GLEIF}/lei-records?filter[entity.legalName]=`]: {
       body: fixtureText("gleif/search-tesco.json"),
     },

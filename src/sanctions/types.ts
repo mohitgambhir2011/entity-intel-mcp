@@ -86,3 +86,6 @@ export const SCREENING_CAVEAT =
   "It is not a legal determination and does not replace screening by a regulated firm. " +
   "Transliteration variants, name changes and unlisted aliases can be missed; every hit " +
   "needs human review against the official list.";
+
+/** Identifier schemes whose values are compared with the registration numbers on the lists. */
+export const SCREENED_SCHEMES: ReadonlySet<string> = new Set(["LEI", "GB_CRN", "VAT"]);

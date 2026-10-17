@@ -49,6 +49,14 @@ Retention defaults are conservative; adjust to your policy.
 When added, every sanctions result states that it is a name-based screen against the listed versions
 and is not a legal determination. Documentation never claims completeness.
 
+## Officers and beneficial owners (UK)
+- **What is returned.** As published by Companies House: names, roles, dates, nationality, occupation, month and year of birth, correspondence addresses, and PSC details. Every response carries a personal-data notice (D13). The server does not decide whether you may process it: you need a lawful basis.
+- **Storage.** Cached locally for at most `EIM_PERSONAL_DATA_TTL_DAYS` and in practice 1 hour (the Companies House profile TTL); flagged `personal` in the cache. Never written to logs. The audit log holds the company identifier only.
+- **Identifiers.** Person node ids in ownership graphs are SHA-256 hashes of the published identity: stable pseudonyms so one person is one node, **not** anonymisation (anyone who can guess the name and birth month can recompute them).
+- **Withheld identities.** Protected ("super secure") controllers are reported as redacted and are never guessed; screening treats them as not screenable (result `incomplete`).
+- **Screening individuals.** Names are matched without dates of birth, so common names can produce false positives; each individual hit warns you to confirm identity against the official list entry.
+- **Bounded output.** Officers 25 per page by default (max 100), ownership graph at most 200 nodes, related screening hits at most 25 parties.
+
 ## Sanctions lists
 - **Local matching.** Names and numbers being screened are compared on your machine against downloaded lists; they are never sent to the list publishers. (Resolving an entity first queries the registries as usual.)
 - **Download hardening.** Fixed official URLs only; https; redirects only to a short host allow-list (OFAC's CDN) and without custom headers; 150 MB cap with a streamed read; 180 s timeout; XML parsed one designation at a time with entity processing off (no expansion, XXE or billion-laughs); the document must end with its root closing tag and (OFAC) match its declared record count; a minimum plausible size is enforced; failures are never cached.

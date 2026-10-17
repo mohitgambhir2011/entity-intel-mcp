@@ -1,0 +1,44 @@
+{
+  "items_per_page": 100,
+  "items": [
+    {
+      "etag": "25e781f9b43aa31af0fd97b35f0ca498db32f736",
+      "notified_on": "2016-04-06",
+      "name": "Banco Central De Cuba",
+      "links": {
+        "self": "/company/01074897/persons-with-significant-control/corporate-entity/8kX8J1QqS99IGovyAoS6ad8Mdm8",
+        "persons_with_significant_control": {
+          "notifications": "/persons-with-significant-control/zLi_k-mRuchzZoJb4a9gsiLom5c/notifications"
+        }
+      },
+      "identification": {
+        "legal_form": "Government Body",
+        "legal_authority": "Law Of Cuba",
+        "country_registered": "Cuba",
+        "place_registered": "Registered Office",
+        "registration_number": "Not Applicable"
+      },
+      "ceased": false,
+      "kind": "corporate-entity-person-with-significant-control",
+      "address": {
+        "address_line_1": "Between Lamparilla And Amargura",
+        "country": "Cuba",
+        "locality": "Old Havana",
+        "premises": "Cuba No. 402",
+        "region": "Havana"
+      },
+      "natures_of_control": [
+        "ownership-of-shares-75-to-100-percent",
+        "voting-rights-75-to-100-percent",
+        "right-to-appoint-and-remove-directors"
+      ]
+    }
+  ],
+  "start_index": 0,
+  "total_results": 1,
+  "active_count": 1,
+  "ceased_count": 0,
+  "links": {
+    "self": "/company/01074897/persons-with-significant-control"
+  }
+}

@@ -10,9 +10,9 @@ Built for **KYB / due diligence first, research second**. It is honest about gap
 does not publish a data family, or a source is down or stale, the result says so instead of
 returning silence or a false all-clear.
 
-> **Status: early development (v0.0.1).** Five tools work (below). Officers, beneficial owners,
-> filings, regulatory status and insolvency are **not implemented yet**, and only the UK has a
-> national registry adapter. See [Coverage](#coverage) and the
+> **Status: early development (v0.0.1).** Seven tools work (below). Filings, regulatory status and
+> insolvency are **not implemented yet**, and only the UK has a national registry adapter, so
+> officers and ownership are available for UK companies only. See [Coverage](#coverage) and the
 > [roadmap](docs/01-DECISIONS.md) (D12).
 
 ## Contents
@@ -23,13 +23,15 @@ returning silence or a false all-clear.
 
 ## What you get
 
-| Question an assistant can answer                                                     | Tool                 |
-| ------------------------------------------------------------------------------------ | -------------------- |
-| "Which companies are called Tesco PLC in the UK, and which one is the listed group?" | `search_entities`    |
-| "Give me the profile of UK company 00445790 / LEI 2138002P5RNKC5W2JZ46"              | `get_entity`         |
-| "Is this LEI or VAT number valid, and what are the entity's other identifiers?"      | `resolve_identifier` |
-| "Is this company, or this name, on the UK, EU or US sanctions lists?"                | `screen_sanctions`   |
-| "What can this server actually tell me about Norway today?"                          | `check_coverage`     |
+| Question an assistant can answer                                                     | Tool                              |
+| ------------------------------------------------------------------------------------ | --------------------------------- |
+| "Which companies are called Tesco PLC in the UK, and which one is the listed group?" | `search_entities`                 |
+| "Give me the profile of UK company 00445790 / LEI 2138002P5RNKC5W2JZ46"              | `get_entity`                      |
+| "Is this LEI or VAT number valid, and what are the entity's other identifiers?"      | `resolve_identifier`              |
+| "Is this company, or this name, on the UK, EU or US sanctions lists?"                | `screen_sanctions`                |
+| "Who are its directors, and who ultimately owns and controls it?" (UK)               | `get_officers`, `get_ownership`   |
+| "Are any of its directors or owners sanctioned?" (UK)                                | `screen_sanctions` with `include` |
+| "What can this server actually tell me about Norway today?"                          | `check_coverage`                  |
 
 Design rules that shape every answer:
 
@@ -114,13 +116,23 @@ which data families are available. Takes `entity_id` **or** `identifier` (+ opti
 Validates an identifier and returns every other identifier known for the same entity (LEI to UK
 company number and back; VAT validity through VIES, including that Germany withholds names).
 
+### `get_officers`
+
+Current directors, secretaries and other officers of a **UK** company from Companies House: role, appointment / resignation dates, nationality, occupation, partial date of birth as published, address. Corporate officers carry their UK company number. Arguments: entity reference, `active_only` (default true), `role`, `limit` (default 25, max 100), `offset`. Other countries report `not_yet_supported`. **Contains personal data.**
+
+### `get_ownership`
+
+Traces who controls a **UK** company: its persons with significant control (PSC) and, for each corporate controller registered at Companies House, theirs in turn, up to `depth` levels (default 3, max 10). Returns a graph (owner-to-owned edges with the published share / voting bands and board-control flags) and the ends of the chains, each with the reason the chain stops: a natural person, a company **exempt** from PSC reporting (for example listed on a regulated market), a company's statement, all controllers ceased, a foreign or unidentified entity, a protected identity, or the depth / request limit. Bands are not multiplied along the chain. **Contains personal data.**
+
 ### `screen_sanctions`
 
 Screens a **name** (`name`, optional `type`: `person|entity|any`) **or** a resolved entity
 (`entity_id` / `identifier`) against the **UK Sanctions List**, the **EU consolidated list** and the
 **US OFAC SDN list** (`lists` to choose). An entity is screened under its legal and former names and
-its LEI / company number / VAT number. Matching is local, so the name you screen is not sent to the
-list publishers.
+its LEI / company number / VAT number. With `include: ["officers", "owners"]` (UK companies) its
+current officers and its owners (`owners_depth`, default 3) are screened too, and `overall` is the
+worst result across all of them. Matching is local, so the name you screen is not sent to the list
+publishers.
 
 Result: `match` (score >= 0.95, or an exact registration number), `possible_match` (>= 0.80),
 `no_match`, or **`incomplete`** (a list could not be loaded, is cut off or stale, or the entity has no
@@ -161,7 +173,7 @@ dates, address.
 
 | Source                | Countries             | Identity                                                 | Officers | Owners            | Filings | Regulatory | Insolvency | Sanctions |
 | --------------------- | --------------------- | -------------------------------------------------------- | :------: | ----------------- | :-----: | :--------: | :--------: | --------- |
-| Companies House (key) | GB                    | yes                                                      |    -     | -                 |    -    |     -      |     -      | -         |
+| Companies House (key) | GB                    | yes                                                      |   yes    | yes (PSC chain)   |    -    |     -      |     -      | -         |
 | GLEIF                 | LEI holders worldwide | yes                                                      |    -     | parents (planned) |    -    |     -      |     -      | -         |
 | VIES                  | EU member states + XI | VAT validity; name/address where the state releases them |    -     | -                 |    -    |     -      |     -      | -         |
 | UK Sanctions List     | UK designations       | -                                                        |    -     | -                 |    -    |     -      |     -      | yes       |
@@ -175,7 +187,11 @@ unavailable for legal reasons (for example most EU beneficial-owner registers si
 ## Limitations
 
 - **Coverage is partial by design.** Only a minority of European companies hold an LEI, and only the
-  UK has a registry adapter, so most EU companies can currently be reached by VAT number only.
+  UK has a registry adapter, so most EU companies can currently be reached by VAT number only, and
+  officers and ownership exist for UK companies only. Most EU beneficial-owner registers are closed
+  to the public (2022 court ruling), so that data may never be available there.
+- **Ownership is what the register says.** Percentages are the published bands, not exact holdings;
+  chains end at foreign entities, protected identities and the depth / request limit, and say so.
 - **Sanctions screening is name- and number-based.** It does not read dates of birth, passports or
   addresses, handles transliteration only where the lists carry the variants, and can miss unlisted
   aliases and name changes. Fuzzy matching is off for very short names (under 8 characters) to avoid

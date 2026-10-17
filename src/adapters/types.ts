@@ -1,3 +1,4 @@
+import type { ControllersResult, OfficersResult } from "../core/people.js";
 import type { Cache } from "../infra/cache.js";
 import type { HttpClient } from "../infra/http.js";
 import type {
@@ -33,6 +34,10 @@ export interface SourceAdapter {
   lookup(identifier: Identifier, ctx: AdapterContext): Promise<PartialEntity | undefined>;
   /** Optional identifier translations this source can provide. */
   readonly crosswalks?: Crosswalk[];
+  /** Optional: officers of the company this identifier names. undefined = no such company. */
+  officers?(identifier: Identifier, ctx: AdapterContext): Promise<OfficersResult | undefined>;
+  /** Optional: persons / entities with significant control (beneficial owners). */
+  controllers?(identifier: Identifier, ctx: AdapterContext): Promise<ControllersResult | undefined>;
   /** Optional name search. */
   search?(query: string, ctx: AdapterContext, limit?: number): Promise<SearchHit[]>;
 }

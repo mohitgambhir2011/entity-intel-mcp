@@ -30,6 +30,7 @@ Allowed dependencies (a module may import its own area plus):
 | File | Responsibility | Invariants |
 | --- | --- | --- |
 | `types.ts` | Shared types: `Provenance`, `Sourced<T>`, `Identifier`, `EntityStatus`, `PartialEntity`, `SearchHit`; `makeStatus()` | `EntityStatus.group` is derived from `normalized` in one table. Adding a status means adding it to that table |
+| `people.ts` | Personal-data families: `Officer`, `Controller`, `ControlNatures`, `OfficersResult`, `ControllersResult` (each with record-level provenance), `Availability<T>`, `displayPersonName` / `stripTitles`, `PERSONAL_DATA_NOTICE` | Absence is explicit (`Availability`); display names drop honorifics so they match list names |
 | `entity.ts` | `EntityProfile`, `Conflict`, `CoverageReport`, `mergeProvenance` | Provenance entries are unique per `(source, sourceRecordId)` |
 | `identifiers.ts` | Validation and detection: LEI ISO 7064 check, UK company number normalising, VAT parsing and per-country shapes, `detectIdentifier` | `parseVat` is lenient (explicit user input, VIES decides); `detectIdentifier` is strict (free text) so company names are not mistaken for VAT numbers. Bare digits are a UK number only when `country=GB` |
 | `ids.ts` | Entity ids (D20, D33): `GB:CH:<number>`, `ID:LEI:<lei>`, `ID:VAT:<vat>`, `hash:<cc>:<h>` | Ids are stable and derived, never random. `hash:` ids cannot be looked up |
@@ -73,6 +74,7 @@ Allowed dependencies (a module may import its own area plus):
 | File | Responsibility |
 | --- | --- |
 | `types.ts` | `SourceAdapter` (`supports`, `lookup`, optional `search`, optional `crosswalks`), `Crosswalk`, `AdapterContext` |
+| `companies-house/people.ts` | Officers and PSC: pure mapping (`mapOfficer`, `mapController`, `parseNatures`, `currentPscExemption`) and cached, paged fetching (100 per page, 5 pages max, flagged `truncated`) | Cached as personal data (capped TTL); the cached value carries no provenance (it describes *this* fetch, added after); exemptions count only if in force today; overlapping control bands keep the widest range |
 | `registry.ts` | **The catalogue.** `ADAPTERS` lists every source (implemented or planned) with id, country, label, `requiredEnv`, `schemes`, `create`. `adapterStatuses()` decides enabled/disabled with a reason; `buildAdapters()` instantiates the enabled ones |
 | `gleif/` | LEI lookup, name search, and the crosswalk UK company number -> LEI. Validates the JSON:API body before caching; GLEIF `INACTIVE` maps to `unknown` (not "ended") |
 | `vies/` | VAT validity. `---` means "withheld by the member state". A body without a boolean `isValid`, or with `errorWrappers`, is `unavailable` and **never cached** |
@@ -86,6 +88,10 @@ for failures; `undefined` only for "no such record"; full `Provenance`. Checklis
 
 | File | Responsibility | Invariants |
 | --- | --- | --- |
+| `company.ts` | `resolveCompany`: resolve a seed to an entity and its UK number once; `whyUnavailable` (not yet supported vs requires credentials vs no such record) | Officer / PSC tools hang off the same entity as `get_entity` |
+| `officers.ts` | `getOfficers`: filter (active, role), sort (current first, newest first), page; availability states | Outage = `error` state + warning, never an empty list |
+| `ownership.ts` | `getOwnership`: breadth-first walk up the PSC chain; levels fetched 5 at a time; budget 30 companies, 200 nodes; cycles safe; one node per person; terminal reasons; `cutBy` | A root failure is an `error`, not an empty graph; `depth` is by design, the other cuts lose information |
+| `related.ts` | `collectRelated`: officers and/or owners as screening subjects, fetched concurrently from an already-resolved company; reasons for incompleteness | Anything that makes the party list incomplete sets the block's `incomplete` |
 | `entityRef.ts` | Tool arguments -> one seed `Identifier` (`entity_id`, or `identifier` + `scheme`/`country`) | Rejects ambiguous or malformed input with an actionable `InvalidInputError`; names are never accepted |
 | `gather.ts` | From a seed identifier: run every enabled adapter that supports it, follow newly revealed identifiers (up to 3 rounds), run crosswalks concurrently with lookups | One warning per failing source; disabled-but-relevant adapters are named in a warning with the reason; `fromCache` is true only if all data was cached |
 | `merge.ts` | `PartialEntity[] -> EntityProfile`: priority per `sources.ts`, conflicts recorded, provenance merged only from sources that agree, entity id chosen | A value from a source that said "unknown" never outranks a real value and is never credited as corroboration |
@@ -100,7 +106,7 @@ for failures; `undefined` only for "no such record"; full `Provenance`. Checklis
 | `server.ts` | Creates the `McpServer`, sets `instructions` (registry text is data), registers tools |
 | `envelope.ts` | `ok()` builds `{ summary, warnings, data, meta, disclaimer? }`; `fail()`; `guard()` maps `InvalidInputError` to a tool error and anything else to a generic error (details to stderr) |
 | `tools/shared.ts` | Flat entity-reference argument shape, read-only annotations |
-| `tools/search.ts`, `getEntity.ts`, `resolveIdentifier.ts`, `screenSanctions.ts`, `coverage.ts` | One file per tool: parse, call one service, shape the envelope, write one audit row |
+| `tools/search.ts`, `getEntity.ts`, `getOfficers.ts`, `getOwnership.ts`, `resolveIdentifier.ts`, `screenSanctions.ts`, `coverage.ts` | One file per tool: parse, call one service, shape the envelope, write one audit row |
 
 Rule: no business logic here. `summary` and `warnings` are written by the server and must not
 contain registry text.

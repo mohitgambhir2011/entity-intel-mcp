@@ -6,6 +6,10 @@ All notable changes. Dates are absolute. Versions follow semver; 0.x may change 
 
 ### Added
 
+- **`get_officers` and `get_ownership`** (UK, Companies House): officers with roles, dates and published personal details; the PSC chain followed upwards (default 3 levels, max 10; 30 companies per call fetched 5 at a time) with owner-to-owned edges, control bands, and a reason where each chain ends (D38).
+- **`screen_sanctions` `include` / `owners_depth`**: also screen an entity's current officers and owners; `overall` is the worst result and is `incomplete` whenever a requested group could not be fully screened (D39).
+- Third `xhigh` code review (officers, ownership, related screening): 13 defects fixed with regression tests.
+
 - **`screen_sanctions` tool and the `sanctions/` module**: UK Sanctions List, EU consolidated list and OFAC SDN downloaded (once per 24 h), parsed per designation, cached as snapshots and matched locally by name (exact, reordered, fuzzy, containment, low-quality-alias cap) and by entity registration number. Results are `match`, `possible_match`, `no_match` or `incomplete`, always with list version dates and a caveat (D36, D37).
 - `HttpClient.getText` for bulk downloads (size and time overrides, allow-listed redirect hosts, streamed decoding).
 - Staleness guard: a warning after 14 days and `incomplete` after 45 days.

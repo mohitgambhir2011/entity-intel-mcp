@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Runtime } from "../runtime.js";
 import { registerCoverage } from "./tools/coverage.js";
 import { registerGetEntity } from "./tools/getEntity.js";
+import { registerGetOfficers } from "./tools/getOfficers.js";
+import { registerGetOwnership } from "./tools/getOwnership.js";
 import { registerResolveIdentifier } from "./tools/resolveIdentifier.js";
 import { registerScreenSanctions } from "./tools/screenSanctions.js";
 import { registerSearch } from "./tools/search.js";
@@ -24,6 +26,8 @@ export function createServer(rt: Runtime): McpServer {
   registerSearch(server, rt);
   registerGetEntity(server, rt);
   registerResolveIdentifier(server, rt);
+  registerGetOfficers(server, rt);
+  registerGetOwnership(server, rt);
   registerScreenSanctions(server, rt);
   return server;
 }

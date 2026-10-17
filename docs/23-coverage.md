@@ -18,6 +18,7 @@ State words are used precisely:
 | --- | --- | --- | --- | --- |
 | Companies House (GB) | Free key, 600 req / 5 min per key | 2026-10-17 | Company profile, status, former names, registered address, SIC (not yet mapped), search | OGL v3.0 attribution carried in provenance. Dormancy is not in the status field (it is in the accounts type), so `dormant` is never produced yet. Overseas companies' addresses are labelled GB |
 | GLEIF | Free, no key | 2026-10-17 | LEI record: legal name, addresses, legal form (ELF code), jurisdiction, registration status and renewal, registration authority + number (gives the UK number crosswalk), name search | Only LEI holders. `INACTIVE` is mapped to `unknown`, not "ended". Name search is broad |
+| Companies House officers and PSC (GB) | same key | 2026-10-17 | Current and resigned officers (role, dates, nationality, occupation, month/year of birth, address, corporate officers' UK numbers); persons with significant control with share / voting bands and board-control flags; PSC exemptions and statements | Individuals are personal data (D13). Percentages are bands. Overseas entities' beneficial owners follow the same endpoint but have not been exercised. Registry text is untrusted |
 | UK Sanctions List (FCDO) | Free, no key; 22 MB XML | 2026-10-17 | 6,408 designations (people, entities, ships), names + aliases with quality, regime, designation date, UK company numbers of entities | Replaced the OFSI Consolidated List (closed 2026-01-28). Dates of birth, passports and ids are deliberately not read |
 | EU consolidated sanctions list | Free, public token URL; 26 MB XML | 2026-10-17 | 6,234 designations, names + aliases, programme, registration numbers of enterprises | Token URL is fixed and public; override with EIM_EU_SANCTIONS_URL if it rotates |
 | US OFAC SDN list | Free; 29 MB XML via a redirect to Treasury's CDN | 2026-10-17 | 19,457 entries, names + aka with strength, programmes, company / VAT / registration numbers of entities | Redirect to an amazonaws.com host is explicitly allowed (no credentials sent) |
@@ -27,7 +28,7 @@ State words are used precisely:
 
 | Wave | Countries | Source | Access (as assessed) | Identity | Officers | Owners | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Core | GB | Companies House | free key | yes | planned | planned (PSC) | Filings, charges, insolvency planned |
+| Core | GB | Companies House | free key | yes | **done** | **done** (PSC chain) | Filings, charges, insolvency planned |
 | Core | GB | FCA Register | free key (verified 2026-10-17) | planned | planned | - | Regulatory status; headers `X-Auth-Email`/`X-Auth-Key` verified, rate limit unverified |
 | Core | EU | GLEIF Level 2 | free | planned | - | partial: only entities that report parents | Direct/ultimate parent relationships |
 | Core | all | UK, EU, OFAC sanctions lists | free downloads | - | - | - | **Done**: `screen_sanctions`, local index, 24 h refresh |
@@ -44,8 +45,8 @@ State words are used precisely:
 | Family | Typical reality |
 | --- | --- |
 | Identity | Widely available for LEI holders, VAT-registered traders and UK companies. Most EU companies without an LEI are reachable only by VAT number until their national register adapter exists |
-| Officers | Public in the UK and Nordics; mixed elsewhere; contains personal data (D13) |
-| Beneficial owners | **Restricted** in most EU registers since the 2022 CJEU ruling (public access removed; obliged entities only). The server will report `unavailable: restricted_access` rather than an empty list. UK PSC data remains public |
+| Officers | **Implemented for the UK** (`get_officers`). Public in the UK and Nordics; mixed elsewhere; contains personal data (D13) |
+| Beneficial owners | **Implemented for the UK PSC register** (`get_ownership`). **Restricted** in most EU registers since the 2022 CJEU ruling (public access removed; obliged entities only). The server will report `unavailable: restricted_access` rather than an empty list. UK PSC data remains public |
 | Filings, accounts | Document links only; availability varies |
 | Regulatory | UK (FCA) planned; EU needs ESMA / national regulator registers |
 | Insolvency, charges | UK via Companies House; EU insolvency registers are national and fragmented |

@@ -120,6 +120,20 @@ it returns `found: false` as a normal result, not an error.
             "notes": [] } }
 ```
 
+## `get_officers`
+
+Arguments: entity reference (`entity_id` or `identifier`, optional `scheme`, `country`, `fresh`), `active_only` (default true), `role` (`director|secretary|llp_member|manager|other`), `limit` (1-100, default 25), `offset`.
+
+`data.officers` is an availability object: `available` with `officers[]` (current first, then newest appointment), `matching` (after filters), `registryTotal`, `activeCount`, `resignedCount`, `truncated` and record-level `provenance`; or `not_yet_supported` (company outside Companies House); `unavailable` with `requires_credentials` / `no_such_record`; or `error`. Each officer: `kind` (`person|corporate`), `name` as published ("SURNAME, Forenames"), `displayName` ("Forenames SURNAME", titles dropped), `role` + `sourceRole`, `appointedOn`, `resignedOn`, `active`, `birth` (month and year, as the register publishes), `nationality`, `countryOfResidence`, `occupation`, `address`, `corporateIdentifier` (UK number of a corporate officer). Up to 500 officers are fetched (5 pages); more is flagged as `truncated`. Carries a personal-data `disclaimer`.
+
+## `get_ownership`
+
+Arguments: entity reference, `depth` (1-10, default 3), `include_ceased` (default false), `include_persons` (default true; false only counts individuals in `personsOmitted`).
+
+`data.ownership` (availability object as above) holds a graph: `nodes[]` (`nodeId`, `kind entity|person`, `name`, `level`, `terminal` + `terminalDetail` where a chain ends), `edges[]` (`from` = controller, `to` = controlled company, `natures{ codes, sharesMin/Max, votingMin/Max, appointsDirectors, significantInfluence }`, `notifiedOn`, `ceasedOn`, `active`), `ultimateOwners[]` (nodes nobody in the graph owns), `depthReached`, `companiesExpanded` (at most 30 per call), `truncated` and `cutBy` (`depth` is by design; `budget`, `size`, `error`, `registry` lose information), `provenance[]`.
+
+Terminal reasons: `natural_person`, `exempt` (only exemptions in force today), `statement` (e.g. "no person or entity with significant control"), `all_ceased`, `no_controllers_published`, `not_followable` (registered outside Companies House or without details), `redacted` (protected identity), `depth_limit`, `budget`, `error`. Person node ids are pseudonymous hashes of the published identity (one person = one node across the graph). Real example (`00519500`): Tesco Stores Limited <- Tesco Holdings Limited (75-100% shares and voting, right to appoint directors) <- Tesco Plc (terminal `exempt`: shares traded on a regulated market).
+
 ## `screen_sanctions`
 
 Arguments: `name` (2-200 chars) **or** an entity (`entity_id` / `identifier` + optional `scheme`, `country`); `type` (`person|entity|any`, for names); `lists` (subset of `UK|EU|OFAC_SDN`, default all); `fresh` (re-download the lists).
@@ -161,6 +175,8 @@ Every response carries the list versions and the caveat in `disclaimer`. Identif
   }
 }
 ```
+
+**Officers and owners.** With `include: ["officers", "owners"]` (needs `entity_id` / `identifier`, UK companies) the response gains `data.overall` (the worst result across the entity and every party) and `data.related`: `officers` and `owners` blocks (`requested`, `state`, `subjects`, `notScreenable`, `incomplete`), `screened` (names screened, personal data), and `hits[]` for parties with a `match` / `possible_match` (`relations`, `description`, `result`, `score`, up to 3 hits without list remarks; at most 25 parties). Officers are current ones (up to 100); owners are followed `owners_depth` levels (default 3). `overall` is `incomplete` when a requested group is unavailable, was cut short by an error, the request budget or size, has more than 100 officers, or contains protected identities; reaching the depth limit is stated in a warning but does not by itself force `incomplete`. Individuals are matched by name only, so any hit on a person warns you to confirm identity.
 
 Hit `basis`: `exact_identifier`, `exact_name` (primary designated name), `alias` (an alias matched exactly), `fuzzy_name`. `weakAlias: true` marks a match to a low-quality alias. `remarks` is list text (untrusted, capped at 300 characters).
 

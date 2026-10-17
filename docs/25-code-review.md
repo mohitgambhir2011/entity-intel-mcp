@@ -71,7 +71,12 @@ review of this codebase (2026-10-17) found 15 defects, all fixed with regression
 | Free-text "identifier" extraction | Dates and "Organization Established Date" values indexed as registration numbers | One `acceptIdentifier()` (shape, digit, not a date) and an explicit allow-list of id types |
 | Silent truncation | A cut-off XML file parsed fine into a partial list | Closing root tag, declared record count, minimum size; never cache a failed check |
 | A clean result from nothing | A blank name or a nameless entity returned `no_match` | Reject degenerate input; `incomplete` when nothing could be screened by name |
+| Unobserved promise started early | A background lookup that could reject before it was awaited (crash risk in Node) | Attach a handler at creation; test with a slow dependency and a failing one |
+| A stale fact presented as current | An expired PSC exemption reported as exempt | Check dates against today; test with expired / future / current cases |
+| An outage shown as an empty result | Root company unreadable -> one-node 'available' graph | Error state; tests per failure position (root vs higher up) |
 | Shell-escaped regexes | A lost backslash silently broke matching | Read generated files back; tests with real inputs |
 | Privacy drift | Audit log stored names despite "metadata only" | Hash free text; test the audit rows |
+
+The third `xhigh` review (officers, ownership and related-party screening, 2026-10-17) found 13 more defects, all fixed with tests in `test/integration/people-review.test.ts`.
 
 The second `xhigh` review (sanctions module, 2026-10-17) found 13 more defects, all fixed with tests in `test/unit/sanctions-review.test.ts` and `test/integration/sanctions.test.ts`. A live run after the review then exposed the stale OFSI feed, which no review of the code could have found: **review the code, then run it against the real world.**

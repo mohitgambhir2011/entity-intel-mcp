@@ -2,7 +2,6 @@ import { SourceError } from "../../core/errors.js";
 import { normalizeGbCompanyNumber } from "../../core/identifiers.js";
 import { makeStatus } from "../../core/types.js";
 import type {
-  Address,
   EntityStatus,
   LegalForm,
   NormalizedStatus,
@@ -12,19 +11,8 @@ import type {
 } from "../../core/types.js";
 import { TTL } from "../../infra/cache.js";
 import { iso, type AdapterContext, type SourceAdapter } from "../types.js";
-
-const BASE = "https://api.company-information.service.gov.uk";
-const LICENCE = "Open Government Licence v3.0";
-
-interface ChAddress {
-  address_line_1?: string;
-  address_line_2?: string;
-  premises?: string;
-  locality?: string;
-  region?: string;
-  postal_code?: string;
-  country?: string;
-}
+import { fetchControllers, fetchOfficers } from "./people.js";
+import { authHeader, BASE, LICENCE, mapAddress, type ChAddress } from "./shared.js";
 
 interface ChCompany {
   company_name: string;
@@ -87,30 +75,6 @@ const LEGAL_FORMS: Record<string, LegalForm["normalized"]> = {
   "industrial-and-provident-society": "cooperative",
 };
 
-function mapAddress(a: ChAddress | undefined): Address | undefined {
-  if (!a) return undefined;
-  const lines = [a.premises, a.address_line_1, a.address_line_2].filter(
-    (l): l is string => typeof l === "string" && l !== "",
-  );
-  const parts = [...lines, a.locality, a.region, a.postal_code, a.country].filter(
-    (p): p is string => typeof p === "string" && p !== "",
-  );
-  if (parts.length === 0) return undefined;
-  return {
-    lines,
-    locality: a.locality,
-    region: a.region,
-    postalCode: a.postal_code,
-    country: "GB",
-    formatted: parts.join(", "),
-  };
-}
-
-function authHeader(key: string): Record<string, string> {
-  // Companies House uses HTTP Basic with the API key as the username and an empty password.
-  return { authorization: `Basic ${Buffer.from(`${key}:`).toString("base64")}` };
-}
-
 export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceAdapter {
   const requireKey = (): string => {
     if (!apiKey) {
@@ -127,6 +91,16 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
     id: "companies_house",
 
     supports: (id) => id.scheme === "GB_CRN",
+
+    async officers(identifier, ctx) {
+      const number = normalizeGbCompanyNumber(identifier.value);
+      return number ? fetchOfficers(ctx, authHeader(requireKey()), number) : undefined;
+    },
+
+    async controllers(identifier, ctx) {
+      const number = normalizeGbCompanyNumber(identifier.value);
+      return number ? fetchControllers(ctx, authHeader(requireKey()), number) : undefined;
+    },
 
     async lookup(identifier, ctx: AdapterContext): Promise<PartialEntity | undefined> {
       const number = normalizeGbCompanyNumber(identifier.value);
