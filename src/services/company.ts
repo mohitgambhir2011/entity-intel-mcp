@@ -56,6 +56,7 @@ export function buildProfile(
     const why = unavailableBecause(rt, profile, capability);
     return {
       state: why.state === "not_yet_supported" ? "not_yet_supported" : "unavailable",
+      ...(why.state === "unavailable" ? { reason: why.reason } : {}),
       sourcesTried: [],
       note: why.state === "available" ? undefined : why.detail,
     };

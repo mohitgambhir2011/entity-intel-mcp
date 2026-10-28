@@ -1,3 +1,4 @@
+import type { UnavailableReason } from "./people.js";
 import type {
   Address,
   EntityName,
@@ -21,6 +22,11 @@ export type FamilyState = "available" | "not_yet_supported" | "unavailable" | "e
 
 export interface FamilyCoverage {
   state: FamilyState;
+  /**
+   * Why the family is unavailable, in the same vocabulary as the family tools (D28), so a client
+   * does not have to read the prose in `note`. Present only when `state` is "unavailable".
+   */
+  reason?: UnavailableReason;
   sourcesTried: SourceId[];
   note?: string;
 }

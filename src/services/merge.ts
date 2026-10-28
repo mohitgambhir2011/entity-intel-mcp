@@ -200,7 +200,10 @@ export function mergePartials(partials: PartialEntity[], sourcesTried: SourceId[
   const coverage: CoverageReport = {
     jurisdiction,
     families: {
-      identity: { state: partials.length > 0 ? "available" : "unavailable", sourcesTried },
+      identity:
+        partials.length > 0
+          ? { state: "available", sourcesTried }
+          : { state: "unavailable", reason: "no_such_record", sourcesTried },
       // officers, ownership, filings and insolvency depend on which sources are enabled: buildProfile fills them in.
       sanctions: {
         state: "available",

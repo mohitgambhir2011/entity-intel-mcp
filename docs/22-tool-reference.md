@@ -102,7 +102,7 @@ Arguments: `entity_id` **or** `identifier`; optional `scheme` (`LEI|GB_CRN|FCA_F
 | `incorporationDate`, `dissolutionDate` | ISO dates, as published. Norway: the founding date only (never the date the unit entered the register). Finland: the trade-register registration. Sources can differ by a day (Nokia: PRH 1896-12-19, GLEIF 1896-12-18), which appears in `conflicts` |
 | `registeredAddress`, `headquartersAddress` | Lines + formatted string |
 | `conflicts[]` | `{ field, values: [{ value, provenance }] }` where sources disagree; the headline value is the home registry's |
-| `coverage.families` | Per data family: `available`, `not_yet_supported`, `unavailable`, `error`, with sources tried and a `note`. `officers` and `ownership` are worked out for this company (a Finnish profile says officers are not published; a Norwegian one says ownership is restricted) |
+| `coverage.families` | Per data family: `available`, `not_yet_supported`, `unavailable`, `error`, with sources tried, a `note` and, **only when `unavailable`**, a machine-readable `reason` (`restricted_access`, `not_published_by_source`, `requires_credentials`, `not_enabled`, `requires_paid_access`, `no_such_record`; the same value the family tool returns, D45). `available` here means the family can be fetched with the named tool, not that it was fetched. `officers` and `ownership` are worked out for this company (a Finnish profile says officers are not published; a Norwegian one says ownership is restricted) |
 | `sources` | Sources that contributed |
 
 Every value is `{ value, provenance: [{ source, sourceRecordId, sourceUrl?, retrievedAt, fromCache, licence? }] }`.

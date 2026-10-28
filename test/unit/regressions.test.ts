@@ -285,3 +285,13 @@ describe("review: audit log does not store free-text names", () => {
     expect(auditSubject("jane q. smith consulting")).toBe(s); // stable, case-insensitive
   });
 });
+
+describe("E7 review: an unavailable family always carries a reason", () => {
+  it("identity with no source records is unavailable with reason no_such_record", () => {
+    const merged = mergePartials([], []);
+    expect(merged.coverage.families.identity).toMatchObject({
+      state: "unavailable",
+      reason: "no_such_record",
+    });
+  });
+});
