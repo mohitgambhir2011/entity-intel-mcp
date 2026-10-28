@@ -143,7 +143,23 @@ Arguments: entity reference, `depth` (1-10, default 3), `include_ceased` (defaul
 
 Companies outside the UK: Norway and Finland answer `unavailable` with `restricted_access` and a detail saying beneficial owners are not published openly there; other countries answer `not_yet_supported`.
 
+**Structured edges (E4, additive).** Every edge also carries `edgeId` (stable across calls for the same holding: it does not change when the controller ceases, and does change when the band changes), `interestTypes` (`shareholding`, `votingRights`, `appointmentOfBoard`, `otherInfluenceOrControl`), `share` and `votes` as `{min, max}` percent bands (**absent when the register states none: unknown, not zero**), `control` {`appointsBoard`, `significantInfluence`, `votingOver25`} and `evidenceRef` (`<source>:<sourceRecordId>` of the register read that listed it, found in `provenance`). A node with terminal `statement` also carries `noController`: true only when the company's own statement says nobody has significant control (a real answer), false for "details not confirmed" and similar (not an answer). `natures` is unchanged.
+
 Terminal reasons: `natural_person`, `exempt` (only exemptions in force today), `statement` (e.g. "no person or entity with significant control"), `all_ceased`, `no_controllers_published`, `not_followable` (registered outside Companies House or without details), `redacted` (protected identity), `depth_limit`, `budget`, `error`. Person node ids are pseudonymous hashes of the published identity (one person = one node across the graph). Real example (`00519500`): Tesco Stores Limited <- Tesco Holdings Limited (75-100% shares and voting, right to appoint directors) <- Tesco Plc (terminal `exempt`: shares traded on a regulated market).
+
+## `get_group_structure`
+
+Arguments: entity reference (`entity_id` or `identifier`, optional `scheme`, `country`, `fresh`), `direction` (`parents|children|both`, default both), `children_limit` (1-100, default 25).
+
+GLEIF Level 2 relationships are **accounting consolidation** between legal entities (a parent consolidates a child), not shareholdings: use them as "the parent controls the child", never as a percentage. Only companies with an LEI are covered.
+
+`data.groupStructure` is an availability object. `available` holds `lei`, and (as asked) `directParent`, `ultimateParent`, `directChildren`, `ultimateChildrenTotal` and `provenance[]`:
+
+- a **parent link** has `state`: `reported` (`parent` {lei, name, jurisdiction, entityStatus, entityId}, `relationship` {type `IS_DIRECTLY_CONSOLIDATED_BY` / `IS_ULTIMATELY_CONSOLIDATED_BY`, status, startDate, endDate, accountingPeriod, corroboration {level, documents, reference (https only)}, lastUpdated}); `reporting_exception` (`category`, `reason` such as `NON_CONSOLIDATING`, `NATURAL_PERSONS`, `NO_LEI`, `NON_PUBLIC`: the entity's own statement of why it names no parent, which is an answer); `not_reported` (GLEIF holds neither: **unknown, not "no parent"**); or `error`;
+- `directChildren` is `available` (`total` as GLEIF reports it, `items[]` of parties, `truncated` when fewer are listed than reported) or `error`. A child's relationship period and corroboration are not in the list: call this tool on the child;
+- `entityId` of a party is the home-registry id when GLEIF carries a number we understand (for example `GB:CH:00243011`, the same id `get_ownership` uses), else `ID:LEI:<lei>`.
+
+A company without an LEI answers `unavailable` with reason `no_such_record` (and a detail saying this is not evidence of having no parent); `not_enabled` if GLEIF is switched off by `EIM_ADAPTERS`. The parents and the children fail independently, each in its own state, with a warning. Real example (Tesco PLC, `2138002P5RNKC5W2JZ46`): both parent links are `reporting_exception` / `NON_CONSOLIDATING`, 32 direct children, the first being TESCO HOLDINGS LIMITED (`GB:CH:00243011`).
 
 ## `get_filings_and_insolvency`
 

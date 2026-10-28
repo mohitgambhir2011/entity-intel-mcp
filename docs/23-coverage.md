@@ -34,7 +34,7 @@ State words are used precisely:
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Core | GB | Companies House | free key | yes | **done** | **done** (PSC chain) | **Filings, charges, insolvency done** (`get_filings_and_insolvency`); documents not fetched |
 | Core | GB | FCA Register | free key (verified 2026-10-17) | link only | - | - | **Regulatory status done** (`get_regulatory_status`); individuals and disciplinary history planned; rate limit unverified |
-| Core | EU | GLEIF Level 2 | free | planned | - | partial: only entities that report parents | Direct/ultimate parent relationships |
+| Core | all LEI holders | GLEIF Level 2 | free | - | - | **group structure done** (`get_group_structure`): parents, parent reporting exceptions, direct children | Accounting consolidation, not shareholdings; legal entities only; only LEI holders |
 | Core | all | UK, EU, OFAC sanctions lists | free downloads | - | - | - | **Done**: `screen_sanctions`, local index, 24 h refresh |
 | 1 | NO | Bronnoysund | free, no key (verified) | **done** | **done** (roles incl. birth date) | restricted | Filings and sub-units not built |
 | 1 | FI | PRH open data | free, no key (verified) | **done** | not published | restricted | Name search is broad; status inferred; officers sit in the non-open trade-register extract |

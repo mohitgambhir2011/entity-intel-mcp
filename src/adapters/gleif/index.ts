@@ -17,8 +17,10 @@ import type {
   Provenance,
   SearchHit,
 } from "../../core/types.js";
+import { makeEntityId, makeIdentifierEntityId } from "../../core/ids.js";
 import { TTL } from "../../infra/cache.js";
 import { iso, type AdapterContext, type SourceAdapter } from "../types.js";
+import { fetchGroupStructure } from "./group.js";
 
 const BASE = "https://api.gleif.org/api/v1";
 const HEADERS = { accept: "application/vnd.api+json" };
@@ -30,6 +32,8 @@ const HEADERS = { accept: "application/vnd.api+json" };
  */
 interface RegistryRule {
   ra: string;
+  /** Registry part of our entity ids for this authority (`GB:CH:...`). */
+  registry: string;
   scheme: IdentifierScheme;
   country: string;
   /** Local number from GLEIF's registeredAs, or undefined if it is not a valid one. */
@@ -41,6 +45,7 @@ interface RegistryRule {
 const REGISTRIES: RegistryRule[] = [
   {
     ra: "RA000402", // Companies Registration Office, Ireland
+    registry: "CRO",
     scheme: "IE_CRO",
     country: "IE",
     parse: normalizeIeCro,
@@ -48,6 +53,7 @@ const REGISTRIES: RegistryRule[] = [
   },
   {
     ra: "RA000585", // Companies House
+    registry: "CH",
     scheme: "GB_CRN",
     country: "GB",
     parse: normalizeGbCompanyNumber,
@@ -55,6 +61,7 @@ const REGISTRIES: RegistryRule[] = [
   },
   {
     ra: "RA000472", // Enhetsregisteret
+    registry: "BR",
     scheme: "NO_ORGNR",
     country: "NO",
     parse: normalizeNoOrgnr,
@@ -62,6 +69,7 @@ const REGISTRIES: RegistryRule[] = [
   },
   {
     ra: "RA000188", // Finnish trade register (PRH)
+    registry: "PRH",
     scheme: "FI_YTUNNUS",
     country: "FI",
     parse: normalizeFiBusinessId,
@@ -71,6 +79,22 @@ const REGISTRIES: RegistryRule[] = [
 
 const ruleFor = (ra: string | null | undefined): RegistryRule | undefined =>
   REGISTRIES.find((r) => r.ra === ra);
+
+/**
+ * The entity id for an entity GLEIF describes: the home-registry id when GLEIF carries a registry
+ * number we understand (so a group member lines up with the same company elsewhere), else the LEI.
+ */
+export function localEntityId(
+  ra: string | undefined,
+  registeredAs: string | undefined,
+  lei: string,
+): string {
+  const rule = ruleFor(ra);
+  const local = rule && registeredAs ? rule.parse(registeredAs) : undefined;
+  return rule && local
+    ? makeEntityId(rule.country, rule.registry, local)
+    : makeIdentifierEntityId("LEI", lei);
+}
 
 interface GleifAddress {
   addressLines?: string[] | null;
@@ -305,6 +329,8 @@ export const gleifAdapter: SourceAdapter = {
       fromCache: res.fromCache,
     });
   },
+
+  groupStructure: (lei, opts, ctx) => fetchGroupStructure(lei, opts, ctx, localEntityId),
 
   async search(query, ctx: AdapterContext, limit = 10): Promise<SearchHit[]> {
     const q = query.trim();

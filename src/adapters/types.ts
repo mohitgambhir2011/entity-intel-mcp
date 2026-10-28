@@ -1,3 +1,4 @@
+import type { GroupDirection, GroupStructure } from "../core/group.js";
 import type { ControllersResult, OfficersResult, UnavailableReason } from "../core/people.js";
 import type { RegulatoryResult } from "../core/regulatory.js";
 import type { ChargesResult, FilingsResult, InsolvencyResult } from "../core/records.js";
@@ -87,6 +88,15 @@ export interface SourceAdapter {
   covers?(capability: Capability, identifier: Identifier): boolean;
   /** Optional: the firm on a regulator's register for this company. undefined = none found. */
   regulatory?(company: RegulatoryQuery, ctx: AdapterContext): Promise<RegulatoryResult | undefined>;
+  /**
+   * Optional: the corporate group of the entity this LEI names (GLEIF Level 2, E1). undefined =
+   * no such LEI. Parents and children fail independently, each in its own state.
+   */
+  groupStructure?(
+    lei: string,
+    opts: { direction: GroupDirection; childrenLimit: number },
+    ctx: AdapterContext,
+  ): Promise<GroupStructure | undefined>;
   /** Optional name search. */
   search?(query: string, ctx: AdapterContext, limit?: number): Promise<SearchHit[]>;
 }

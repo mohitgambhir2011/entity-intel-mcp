@@ -6,6 +6,7 @@ import { registerGetEntity } from "./tools/getEntity.js";
 import { registerGetFilingsAndInsolvency } from "./tools/getFilingsAndInsolvency.js";
 import { registerGetOfficers } from "./tools/getOfficers.js";
 import { registerGetRegulatoryStatus } from "./tools/getRegulatoryStatus.js";
+import { registerGetGroupStructure } from "./tools/getGroupStructure.js";
 import { registerGetOwnership } from "./tools/getOwnership.js";
 import { registerResolveIdentifier } from "./tools/resolveIdentifier.js";
 import { registerScreenSanctions } from "./tools/screenSanctions.js";
@@ -32,6 +33,7 @@ export function createServer(rt: Runtime): McpServer {
   registerResolveIdentifier(server, rt);
   registerGetOfficers(server, rt);
   registerGetOwnership(server, rt);
+  registerGetGroupStructure(server, rt);
   registerGetFilingsAndInsolvency(server, rt);
   registerGetRegulatoryStatus(server, rt);
   registerScreenSanctions(server, rt);

@@ -59,6 +59,12 @@ export interface OwnershipNode {
   level: number;
   terminal?: TerminalReason;
   terminalDetail?: string;
+  /**
+   * With terminal `statement`: true only when every statement is the company's own declaration that
+   * no person or entity has significant control (a real answer). Other statements ("details not
+   * confirmed", "steps not completed") are not answers, so this stays false for them.
+   */
+  noController?: boolean;
   /** Registration details of a corporate controller we could not follow. */
   registration?: Controller["registration"];
   person?: {
@@ -68,11 +74,40 @@ export interface OwnershipNode {
   };
 }
 
+export type InterestType =
+  "shareholding" | "votingRights" | "appointmentOfBoard" | "otherInfluenceOrControl";
+
+/** A percent band exactly as the register publishes it (inclusive both ends). */
+export interface PercentBand {
+  min: number;
+  max: number;
+}
+
 export interface OwnershipEdge {
+  /**
+   * Stable across calls for the same holding: derived from controller, controlled company, the date
+   * the interest was notified and the register's nature codes. Ceasing does not change it (the same
+   * edge becomes inactive); a changed band does (a new edge supersedes the old one).
+   */
+  edgeId: string;
   /** The controller. */
   from: string;
   /** The controlled company. */
   to: string;
+  /** Machine-friendly view of `natures` (E4); `natures` stays for compatibility. */
+  interestTypes: InterestType[];
+  /** Shareholding band, absent when the register states no share (it is then unknown, not zero). */
+  share?: PercentBand;
+  /** Voting-rights band, absent when none is stated. */
+  votes?: PercentBand;
+  control: {
+    appointsBoard: boolean;
+    significantInfluence: boolean;
+    /** A voting band whose lower bound is at least 25%. */
+    votingOver25: boolean;
+  };
+  /** `<source>:<sourceRecordId>` of the register read that listed this edge (see `provenance`). */
+  evidenceRef: string;
   natures: ControlNatures;
   notifiedOn?: string;
   ceasedOn?: string;
@@ -138,6 +173,60 @@ const personNodeId = (c: Controller): string =>
     )
     .digest("hex")
     .slice(0, 12);
+
+const NO_CONTROLLER_STATEMENTS: ReadonlySet<string> = new Set([
+  // Companies House spells the first one with a typo; both are accepted.
+  "no-individual-or-entity-with-signficant-control",
+  "no-individual-or-entity-with-significant-control",
+]);
+
+/** True only if there is at least one statement and every one says nobody has significant control. */
+export const isNoControllerStatement = (statements: { code: string }[]): boolean =>
+  statements.length > 0 && statements.every((s) => NO_CONTROLLER_STATEMENTS.has(s.code));
+
+/**
+ * The structured form of one controller's interest in a company (E4). Pure, so the mapping is tested
+ * on its own. A missing share is left missing: the caller treats it as unknown.
+ */
+export function structureEdge(
+  c: Pick<Controller, "natures" | "notifiedOn" | "ceasedOn" | "active">,
+  from: string,
+  to: string,
+  evidenceRef: string,
+): OwnershipEdge {
+  const n = c.natures;
+  const interestTypes: InterestType[] = [];
+  if (n.sharesMin !== undefined) interestTypes.push("shareholding");
+  if (n.votingMin !== undefined) interestTypes.push("votingRights");
+  if (n.appointsDirectors) interestTypes.push("appointmentOfBoard");
+  if (n.significantInfluence) interestTypes.push("otherInfluenceOrControl");
+  const band = (min?: number, max?: number): PercentBand | undefined =>
+    min === undefined ? undefined : { min, max: max ?? 100 };
+  const edgeId =
+    "psc:" +
+    createHash("sha256")
+      .update([from, to, c.notifiedOn ?? "", [...n.codes].sort().join(",")].join("|"))
+      .digest("hex")
+      .slice(0, 16);
+  return {
+    edgeId,
+    from,
+    to,
+    interestTypes,
+    share: band(n.sharesMin, n.sharesMax),
+    votes: band(n.votingMin, n.votingMax),
+    control: {
+      appointsBoard: n.appointsDirectors === true,
+      significantInfluence: n.significantInfluence === true,
+      votingOver25: (n.votingMin ?? 0) >= 25,
+    },
+    evidenceRef,
+    natures: n,
+    notifiedOn: c.notifiedOn,
+    ceasedOn: c.ceasedOn,
+    active: c.active,
+  };
+}
 
 const idsOf = (ids: (Identifier | undefined)[]): OwnershipNode["identifiers"] =>
   ids
@@ -233,6 +322,7 @@ async function walk(
 
   const nodes = new Map<string, OwnershipNode>();
   const edges: OwnershipEdge[] = [];
+  const edgeIds = new Set<string>();
   const provenance: Provenance[] = [];
   const queued = new Set<string>([rootNumber.value]);
   let expanded = 0;
@@ -317,6 +407,7 @@ async function walk(
         } else if (res.statements.length > 0) {
           node.terminal = "statement";
           node.terminalDetail = res.statements.map((s) => s.description).join("; ");
+          node.noController = isNoControllerStatement(res.statements);
         } else if (res.controllers.length > 0) {
           node.terminal = "all_ceased";
           node.terminalDetail = `All ${res.controllers.length} controller(s) on the register have ceased (include_ceased shows them)`;
@@ -399,14 +490,18 @@ async function walk(
             } satisfies OwnershipNode);
         }
         nodes.set(child.nodeId, child);
-        edges.push({
-          from: child.nodeId,
-          to: node.nodeId,
-          natures: c.natures,
-          notifiedOn: c.notifiedOn,
-          ceasedOn: c.ceasedOn,
-          active: c.active,
-        });
+        const edge = structureEdge(
+          c,
+          child.nodeId,
+          node.nodeId,
+          `${res.provenance.source}:${res.provenance.sourceRecordId}`,
+        );
+        // Two identical listings (same person, date and natures) must not share an id: the register's
+        // own order decides which is first, so the suffix is deterministic.
+        let id = edge.edgeId;
+        for (let k = 2; edgeIds.has(id); k++) id = `${edge.edgeId}#${k}`;
+        edgeIds.add(id);
+        edges.push({ ...edge, edgeId: id });
       }
     }
     frontier = next;

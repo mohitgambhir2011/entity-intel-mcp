@@ -44,6 +44,7 @@ export function registerCoverage(server: McpServer, rt: Runtime): void {
               `ownership (${countriesWith("controllers")}: get_ownership)`,
               `filings, charges, insolvency (${countriesWith("filings")}: get_filings_and_insolvency)`,
               `regulatory status (${countriesWith("regulatory")}: get_regulatory_status)`,
+              "group structure (LEI holders, any country: get_group_structure)",
               "sanctions (screen_sanctions)",
             ],
             familiesNotYetSupported: [],
