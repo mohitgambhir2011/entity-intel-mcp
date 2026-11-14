@@ -1,0 +1,29 @@
+# Smithery configuration (stdio, container build). All settings are optional: the keyless
+# sources (GLEIF, VIES, Norway, Finland, Ireland, sanctions lists) work without them.
+# Values are supplied by the user at install time and are never stored in this repository.
+runtime: "container"
+build:
+  dockerfile: "Dockerfile"
+  dockerBuildPath: "."
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      companiesHouseApiKey:
+        type: string
+        description: Companies House API key (enables UK officers, owners, filings, charges, insolvency).
+      fcaAuthEmail:
+        type: string
+        description: FCA Register account email (enables UK regulatory status).
+      fcaAuthKey:
+        type: string
+        description: FCA Register API key (enables UK regulatory status).
+  commandFunction: |-
+    (config) => {
+      const env = {};
+      if (config.companiesHouseApiKey) env.COMPANIES_HOUSE_API_KEY = config.companiesHouseApiKey;
+      if (config.fcaAuthEmail) env.FCA_AUTH_EMAIL = config.fcaAuthEmail;
+      if (config.fcaAuthKey) env.FCA_AUTH_KEY = config.fcaAuthKey;
+      return { command: "node", args: ["dist/index.js"], env };
+    }
