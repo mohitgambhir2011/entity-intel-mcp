@@ -39,8 +39,27 @@ export type OfficerRole =
   | "authorised_signatory"
   | "other";
 
+/**
+ * What the register shows about a person's identity verification (Companies House, from 2025).
+ * `not_shown` means the register shows nothing: it is NOT evidence that the person is unverified,
+ * because the register may not have rolled the field out for this company or appointment (D28).
+ */
+export interface OfficerVerification {
+  state: "verified" | "not_shown" | "unknown";
+  /** As published (YYYY-MM-DD). */
+  identityVerifiedOn?: string;
+  appointmentVerificationStartOn?: string;
+  /** Absent when the register's open-ended placeholder date is used. */
+  appointmentVerificationEndOn?: string;
+}
+
 export interface Officer {
   kind: "person" | "corporate";
+  /**
+   * The register's own id for this person (Companies House officer id), the same across companies.
+   * A person-level identifier: personal data, never logged. Absent when the register gives none.
+   */
+  officerRef?: string;
   /** As published, e.g. "SMITH, John". */
   name: string;
   /** "John SMITH": the form used for display and name matching. */
@@ -60,6 +79,8 @@ export interface Officer {
   address?: Address;
   /** For corporate officers registered in a registry we can follow (UK company number). */
   corporateIdentifier?: Identifier;
+  /** Persons only, and only where the source publishes this at all (UK). */
+  verification?: OfficerVerification;
 }
 
 export interface OfficersResult {

@@ -10,6 +10,7 @@ import {
   type Officer,
   type OfficerRole,
   type OfficersResult,
+  type OfficerVerification,
 } from "../../core/people.js";
 import type { Identifier } from "../../core/types.js";
 import { TTL } from "../../infra/cache.js";
@@ -50,6 +51,12 @@ interface ChOfficer {
   occupation?: string;
   address?: ChAddress;
   identification?: ChIdentification;
+  links?: { officer?: { appointments?: string } };
+  identity_verification_details?: {
+    identity_verified_on?: string;
+    appointment_verification_start_on?: string;
+    appointment_verification_end_on?: string;
+  };
 }
 
 interface ChOfficerList {
@@ -120,11 +127,44 @@ function ukIdentifier(id: ChIdentification | undefined): Identifier | undefined 
     : undefined;
 }
 
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+/** The register's open-ended placeholder: not a real date, so it is dropped rather than shown. */
+const OPEN_ENDED = "9999-12-31";
+
+function dateOnly(v: string | undefined): string | undefined {
+  return v !== undefined && DATE.test(v) && v !== OPEN_ENDED ? v : undefined;
+}
+
+/** `/officers/<id>/appointments` -> id. Anything else is ignored: the id is used to build URLs later. */
+export function officerRefFrom(link: string | undefined): string | undefined {
+  const m = /^\/officers\/([A-Za-z0-9_-]{1,64})\/appointments$/.exec(link ?? "");
+  return m?.[1];
+}
+
+/** Absent block = the register shows nothing (not_shown); a block with no usable date = unknown. */
+export function mapVerification(
+  d: ChOfficer["identity_verification_details"],
+): OfficerVerification {
+  if (!d) return { state: "not_shown" };
+  const identityVerifiedOn = dateOnly(d.identity_verified_on);
+  const appointmentVerificationStartOn = dateOnly(d.appointment_verification_start_on);
+  const appointmentVerificationEndOn = dateOnly(d.appointment_verification_end_on);
+  const state = identityVerifiedOn || appointmentVerificationStartOn ? "verified" : "unknown";
+  return {
+    state,
+    identityVerifiedOn,
+    appointmentVerificationStartOn,
+    appointmentVerificationEndOn,
+  };
+}
+
 export function mapOfficer(o: ChOfficer): Officer {
   const name = (o.name ?? "").trim();
   const corporate = Boolean(o.identification) || /^corporate-/.test(o.officer_role ?? "");
   return {
     kind: corporate ? "corporate" : "person",
+    officerRef: corporate ? undefined : officerRefFrom(o.links?.officer?.appointments),
+    verification: corporate ? undefined : mapVerification(o.identity_verification_details),
     name,
     displayName: corporate ? name : displayPersonName(name),
     role: officerRole(o.officer_role),

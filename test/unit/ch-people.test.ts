@@ -6,6 +6,8 @@ import {
   fetchOfficers,
   mapController,
   mapOfficer,
+  mapVerification,
+  officerRefFrom,
   officerRole,
   parseNatures,
 } from "../../src/adapters/companies-house/people.js";
@@ -83,6 +85,64 @@ describe("officers: mapping", () => {
     expect(
       mapOfficer({ name: "UK COMPANY SECRETARY LTD", officer_role: "corporate-secretary" }).kind,
     ).toBe("corporate");
+  });
+});
+
+describe("officers: register id and identity verification (D48)", () => {
+  it("REGRESSION: reads the register's officer id from the appointments link, strictly", () => {
+    expect(officerRefFrom("/officers/abc_DEF-123/appointments")).toBe("abc_DEF-123");
+    // Anything that could change a URL later is refused rather than passed on.
+    expect(officerRefFrom("/officers/../x/appointments")).toBeUndefined();
+    expect(officerRefFrom("/officers/a b/appointments")).toBeUndefined();
+    expect(officerRefFrom("/officers/abc/appointments?x=1")).toBeUndefined();
+    expect(officerRefFrom("https://evil.example/officers/abc/appointments")).toBeUndefined();
+    expect(officerRefFrom(undefined)).toBeUndefined();
+  });
+
+  it("REGRESSION: a missing verification block is not_shown, never 'unverified'", () => {
+    const o = mapOfficer({ name: "X, Y", officer_role: "director" });
+    expect(o.verification).toEqual({ state: "not_shown" });
+  });
+
+  it("maps published verification dates and drops the open-ended placeholder", () => {
+    const v = mapVerification({
+      identity_verified_on: "2025-07-29",
+      appointment_verification_start_on: "2026-07-01",
+      appointment_verification_end_on: "9999-12-31",
+    });
+    expect(v).toEqual({
+      state: "verified",
+      identityVerifiedOn: "2025-07-29",
+      appointmentVerificationStartOn: "2026-07-01",
+      appointmentVerificationEndOn: undefined,
+    });
+  });
+
+  it("a block with no usable date is unknown, and malformed dates are not passed on", () => {
+    expect(mapVerification({}).state).toBe("unknown");
+    expect(mapVerification({ identity_verified_on: "yesterday" })).toMatchObject({
+      state: "unknown",
+      identityVerifiedOn: undefined,
+    });
+  });
+
+  it("corporate officers carry neither an officer id nor a verification state", () => {
+    const o = mapOfficer({
+      name: "ACME LIMITED",
+      officer_role: "corporate-director",
+      links: { officer: { appointments: "/officers/abc/appointments" } },
+    });
+    expect(o.officerRef).toBeUndefined();
+    expect(o.verification).toBeUndefined();
+  });
+
+  it("the fixture's person carries id and verification through the full mapping", () => {
+    const list = fx("officers-tesco");
+    const john = list.items
+      .map(mapOfficer)
+      .find((x: { name: string }) => x.name.startsWith("SAMPLE"));
+    expect(john.officerRef).toBe("fixture1");
+    expect(john.verification.state).toBe("verified");
   });
 });
 

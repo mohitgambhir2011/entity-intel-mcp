@@ -16,6 +16,9 @@ export function registerGetOfficers(server: McpServer, rt: Runtime): void {
         "registry (UK via Companies House; Norway via Enhetsregisteret: board, CEO, auditor, signatories; other countries report 'not_yet_supported' or why the register does not provide it). " +
         "Each officer has role, appointment / resignation dates, nationality, occupation, partial " +
         "date of birth (Norway: full date) and the published address; corporate officers carry " +
+        "their registration number when it is a UK or Norwegian company. UK persons also carry officerRef " +
+        "(the register's person id, the same across companies) and verification {state verified, not_shown or " +
+        "unknown, with dates}: not_shown means the register shows nothing, not that the person is unverified. " +
         "their registration number when it is a UK or Norwegian company. Norway publishes no " +
         "appointment dates. Default is current officers only, most recently " +
         "appointed first. Takes an entity_id or identifier (use search_entities first for a name). " +
