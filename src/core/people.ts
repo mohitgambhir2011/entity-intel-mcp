@@ -95,6 +95,33 @@ export interface OfficersResult {
   provenance: Provenance;
 }
 
+/** One appointment the register lists under a person's register id (D49). No personal details. */
+export interface OfficerAppointment {
+  companyNumber: string;
+  companyName?: string;
+  /** The register's wording for the company's status, kept as published. */
+  companyStatus?: string;
+  role: OfficerRole;
+  sourceRole: string;
+  appointedOn?: string;
+  resignedOn?: string;
+  active: boolean;
+}
+
+/**
+ * Evidence about one register id, never a verdict about the person. The register can hold one
+ * person under several ids, so these counts are a LOWER BOUND on the person's appointments.
+ */
+export interface OfficerAppointmentsResult {
+  appointments: OfficerAppointment[];
+  /** All appointments the register lists under this id (active and resigned). */
+  total: number;
+  /** Counted over the appointments fetched; equals the register's number when not truncated. */
+  activeCount: number;
+  truncated: boolean;
+  provenance: Provenance;
+}
+
 /** How a person or entity controls a company. Percent bands are as published (25-50, 50-75, 75-100). */
 export interface ControlNatures {
   /** Registry codes, kept verbatim. */

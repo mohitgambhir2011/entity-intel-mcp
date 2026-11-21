@@ -8,6 +8,8 @@ import {
   type Controller,
   type ControllersResult,
   type Officer,
+  type OfficerAppointment,
+  type OfficerAppointmentsResult,
   type OfficerRole,
   type OfficersResult,
   type OfficerVerification,
@@ -15,7 +17,8 @@ import {
 import type { Identifier } from "../../core/types.js";
 import { TTL } from "../../infra/cache.js";
 import type { AdapterContext } from "../types.js";
-import { BASE, mapAddress, provenance, type Cached, type ChAddress } from "./shared.js";
+import { iso } from "../types.js";
+import { BASE, LICENCE, mapAddress, provenance, type Cached, type ChAddress } from "./shared.js";
 
 const SOURCE = "companies_house";
 
@@ -358,6 +361,100 @@ export async function fetchOfficers(
   return res.value
     ? { ...res.value, provenance: provenance(number, "officers", res.fetchedAt, res.fromCache) }
     : undefined;
+}
+
+interface ChAppointment {
+  appointed_to?: { company_number?: string; company_name?: string; company_status?: string };
+  appointed_on?: string;
+  resigned_on?: string;
+  officer_role?: string;
+}
+
+interface ChAppointmentList {
+  items?: ChAppointment[];
+  total_results?: number;
+}
+
+const APPOINTMENT_PAGE = 50;
+/** 150 appointments is far beyond any real person; beyond it the result is flagged truncated. */
+const APPOINTMENT_PAGES = 3;
+
+export function mapAppointment(a: ChAppointment): OfficerAppointment | undefined {
+  const number = normalizeGbCompanyNumber(a.appointed_to?.company_number ?? "");
+  // An entry without a usable company number cannot be followed or counted: skip it.
+  if (!number) return undefined;
+  return {
+    companyNumber: number,
+    companyName: a.appointed_to?.company_name,
+    companyStatus: a.appointed_to?.company_status,
+    role: officerRole(a.officer_role),
+    sourceRole: a.officer_role ?? "",
+    appointedOn: dateOnly(a.appointed_on),
+    resignedOn: dateOnly(a.resigned_on),
+    active: !a.resigned_on,
+  };
+}
+
+/** Appointments listed under one Companies House officer id (D49). */
+export async function fetchOfficerAppointments(
+  ctx: AdapterContext,
+  headers: Record<string, string>,
+  officerRef: string,
+): Promise<OfficerAppointmentsResult | undefined> {
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(officerRef)) return undefined;
+  const res = await ctx.cache.getOrFetch(
+    `ch:appointments:${officerRef}`,
+    { ttlSeconds: TTL.registryProfile, source: SOURCE, personal: true, fresh: ctx.fresh },
+    async (): Promise<Cached<OfficerAppointmentsResult> | null> => {
+      const items: OfficerAppointment[] = [];
+      let fetched = 0;
+      let total = 0;
+      for (let page = 0; page < APPOINTMENT_PAGES; page++) {
+        const url = `${BASE}/officers/${officerRef}/appointments?items_per_page=${APPOINTMENT_PAGE}&start_index=${page * APPOINTMENT_PAGE}`;
+        const r = await ctx.http.getJson<ChAppointmentList>(url, {
+          source: SOURCE,
+          headers,
+          allowStatus: [404],
+        });
+        if (r.status === 404) {
+          if (page === 0) return null;
+          break;
+        }
+        if (!r.body || !Array.isArray(r.body.items)) {
+          throw new SourceError(
+            `${SOURCE} returned an unexpected appointments response`,
+            SOURCE,
+            "bad_response",
+          );
+        }
+        fetched += r.body.items.length;
+        for (const a of r.body.items) {
+          const m = mapAppointment(a);
+          if (m) items.push(m);
+        }
+        total = r.body.total_results ?? fetched;
+        if (fetched >= total || r.body.items.length === 0) break;
+      }
+      return {
+        appointments: items,
+        total,
+        activeCount: items.filter((a) => a.active).length,
+        truncated: fetched < total,
+      };
+    },
+  );
+  if (!res.value) return undefined;
+  return {
+    ...res.value,
+    provenance: {
+      source: "companies_house",
+      sourceRecordId: officerRef,
+      sourceUrl: `https://find-and-update.company-information.service.gov.uk/officers/${officerRef}/appointments`,
+      retrievedAt: iso(res.fetchedAt),
+      fromCache: res.fromCache,
+      licence: LICENCE,
+    },
+  };
 }
 
 export async function fetchControllers(

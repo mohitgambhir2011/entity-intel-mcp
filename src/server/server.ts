@@ -4,6 +4,7 @@ import { registerKybCheck } from "./prompts/kybCheck.js";
 import { registerCoverage } from "./tools/coverage.js";
 import { registerGetEntity } from "./tools/getEntity.js";
 import { registerGetFilingsAndInsolvency } from "./tools/getFilingsAndInsolvency.js";
+import { registerGetOfficerAppointments } from "./tools/getOfficerAppointments.js";
 import { registerGetOfficers } from "./tools/getOfficers.js";
 import { registerGetRegulatoryStatus } from "./tools/getRegulatoryStatus.js";
 import { registerGetGroupStructure } from "./tools/getGroupStructure.js";
@@ -32,6 +33,7 @@ export function createServer(rt: Runtime): McpServer {
   registerGetEntity(server, rt);
   registerResolveIdentifier(server, rt);
   registerGetOfficers(server, rt);
+  registerGetOfficerAppointments(server, rt);
   registerGetOwnership(server, rt);
   registerGetGroupStructure(server, rt);
   registerGetFilingsAndInsolvency(server, rt);

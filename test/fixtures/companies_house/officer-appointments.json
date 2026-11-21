@@ -1,0 +1,29 @@
+{
+  "kind": "personal-appointment",
+  "items_per_page": 50,
+  "start_index": 0,
+  "total_results": 4,
+  "items": [
+    {
+      "appointed_to": { "company_number": "00000001", "company_name": "EXAMPLE ONE LIMITED", "company_status": "active" },
+      "appointed_on": "2020-03-01",
+      "officer_role": "director"
+    },
+    {
+      "appointed_to": { "company_number": "00000002", "company_name": "EXAMPLE TWO LIMITED", "company_status": "active" },
+      "appointed_on": "2021-05-10",
+      "officer_role": "director"
+    },
+    {
+      "appointed_to": { "company_number": "SC000003", "company_name": "EXAMPLE THREE LIMITED", "company_status": "dissolved" },
+      "appointed_on": "2015-01-01",
+      "resigned_on": "2019-12-31",
+      "officer_role": "secretary"
+    },
+    {
+      "appointed_to": { "company_name": "ENTRY WITHOUT A NUMBER" },
+      "appointed_on": "2018-01-01",
+      "officer_role": "director"
+    }
+  ]
+}

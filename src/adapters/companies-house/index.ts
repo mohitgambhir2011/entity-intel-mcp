@@ -12,7 +12,7 @@ import type {
 } from "../../core/types.js";
 import { TTL } from "../../infra/cache.js";
 import { iso, type AdapterContext, type SourceAdapter } from "../types.js";
-import { fetchControllers, fetchOfficers } from "./people.js";
+import { fetchControllers, fetchOfficerAppointments, fetchOfficers } from "./people.js";
 import { fetchCharges, fetchFilings, fetchInsolvency } from "./records.js";
 import { authHeader, BASE, LICENCE, mapAddress, type ChAddress } from "./shared.js";
 
@@ -113,6 +113,10 @@ export function createCompaniesHouseAdapter(apiKey: string | undefined): SourceA
     async officers(identifier, ctx) {
       const number = normalizeGbCompanyNumber(identifier.value);
       return number ? fetchOfficers(ctx, authHeader(requireKey()), number) : undefined;
+    },
+
+    async officerAppointments(officerRef, ctx) {
+      return fetchOfficerAppointments(ctx, authHeader(requireKey()), officerRef);
     },
 
     async controllers(identifier, ctx) {

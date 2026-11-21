@@ -1,5 +1,10 @@
 import type { GroupDirection, GroupStructure } from "../core/group.js";
-import type { ControllersResult, OfficersResult, UnavailableReason } from "../core/people.js";
+import type {
+  ControllersResult,
+  OfficerAppointmentsResult,
+  OfficersResult,
+  UnavailableReason,
+} from "../core/people.js";
 import type { RegulatoryResult } from "../core/regulatory.js";
 import type { ChargesResult, FilingsResult, InsolvencyResult } from "../core/records.js";
 import type { Cache } from "../infra/cache.js";
@@ -68,6 +73,11 @@ export interface SourceAdapter {
   readonly crosswalks?: Crosswalk[];
   /** Optional: officers of the company this identifier names. undefined = no such company. */
   officers?(identifier: Identifier, ctx: AdapterContext): Promise<OfficersResult | undefined>;
+  /** Optional: appointments listed under one register person id (D49). undefined = no such id. */
+  officerAppointments?(
+    officerRef: string,
+    ctx: AdapterContext,
+  ): Promise<OfficerAppointmentsResult | undefined>;
   /** Optional: persons / entities with significant control (beneficial owners). */
   controllers?(identifier: Identifier, ctx: AdapterContext): Promise<ControllersResult | undefined>;
   /** Optional: one page of the filing history, optionally limited to a registry category. */
