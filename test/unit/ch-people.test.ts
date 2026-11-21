@@ -126,6 +126,17 @@ describe("officers: register id and identity verification (D48)", () => {
     });
   });
 
+  it("REGRESSION: an appointment period without the identity-verified date is period_only, never verified", () => {
+    // Live check 2026-11-21: 8 of 11 persons with a block had only the period dates.
+    const v = mapVerification({
+      appointment_verification_start_on: "2026-07-01",
+      appointment_verification_end_on: "9999-12-31",
+    });
+    expect(v.state).toBe("period_only");
+    expect(v.identityVerifiedOn).toBeUndefined();
+    expect(v.appointmentVerificationStartOn).toBe("2026-07-01");
+  });
+
   it("corporate officers carry neither an officer id nor a verification state", () => {
     const o = mapOfficer({
       name: "ACME LIMITED",

@@ -61,6 +61,11 @@ export async function getOfficerAppointments(
         `The register lists ${res.total} appointments but only ${res.appointments.length} could be read`,
       );
     }
+    if (res.skipped > 0) {
+      warnings.push(
+        `${res.skipped} register entr${res.skipped === 1 ? "y has" : "ies have"} no usable company number and ${res.skipped === 1 ? "is" : "are"} not listed`,
+      );
+    }
     return {
       appointments: { state: "available", data: res },
       warnings,

@@ -40,6 +40,7 @@ describe("officer appointments (D49)", () => {
     const r = await fetchOfficerAppointments(ctx, headers, "abc");
     expect(r!.appointments).toHaveLength(3); // the entry without a number is skipped
     expect(r!.total).toBe(4);
+    expect(r!.skipped).toBe(1);
     expect(r!.activeCount).toBe(2);
     expect(r!.provenance).toMatchObject({ source: "companies_house", fromCache: false });
     expect((await fetchOfficerAppointments(ctx, headers, "abc"))!.provenance.fromCache).toBe(true);

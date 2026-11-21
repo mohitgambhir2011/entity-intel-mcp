@@ -19,5 +19,14 @@ if (off.officers.state !== "available") {
     states[s] = (states[s] ?? 0) + 1;
   }
   console.log(`persons: ${people.length}; verification states:`, states);
+  const split = { identityDate: 0, periodOnly: 0, blockNoDates: 0 };
+  for (const o of people) {
+    const v = o.verification;
+    if (!v || v.state === "not_shown") continue;
+    if (v.identityVerifiedOn) split.identityDate++;
+    else if (v.appointmentVerificationStartOn) split.periodOnly++;
+    else split.blockNoDates++;
+  }
+  console.log("block present, by which dates:", split);
   console.log(`with officerRef: ${people.filter((o) => o.officerRef).length}`);
 }

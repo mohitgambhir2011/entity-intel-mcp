@@ -43,9 +43,12 @@ export type OfficerRole =
  * What the register shows about a person's identity verification (Companies House, from 2025).
  * `not_shown` means the register shows nothing: it is NOT evidence that the person is unverified,
  * because the register may not have rolled the field out for this company or appointment (D28).
+ * `verified` needs the register's own identity-verified date. `period_only` means the register shows an
+ * appointment-verification period but no verified date: what that period proves is not documented by
+ * the register, so it is never reported as verified (D48, amended after the live check of 2026-11-21).
  */
 export interface OfficerVerification {
-  state: "verified" | "not_shown" | "unknown";
+  state: "verified" | "period_only" | "not_shown" | "unknown";
   /** As published (YYYY-MM-DD). */
   identityVerifiedOn?: string;
   appointmentVerificationStartOn?: string;
@@ -118,6 +121,8 @@ export interface OfficerAppointmentsResult {
   total: number;
   /** Counted over the appointments fetched; equals the register's number when not truncated. */
   activeCount: number;
+  /** Register entries without a usable company number: listed in `total` but not in `appointments`. */
+  skipped: number;
   truncated: boolean;
   provenance: Provenance;
 }

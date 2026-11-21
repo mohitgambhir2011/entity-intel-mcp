@@ -144,7 +144,10 @@ export function officerRefFrom(link: string | undefined): string | undefined {
   return m?.[1];
 }
 
-/** Absent block = the register shows nothing (not_shown); a block with no usable date = unknown. */
+/**
+ * Absent block = not_shown. `verified` only with the register's identity-verified date; a period without
+ * that date is period_only; a block with no usable date is unknown.
+ */
 export function mapVerification(
   d: ChOfficer["identity_verification_details"],
 ): OfficerVerification {
@@ -152,7 +155,11 @@ export function mapVerification(
   const identityVerifiedOn = dateOnly(d.identity_verified_on);
   const appointmentVerificationStartOn = dateOnly(d.appointment_verification_start_on);
   const appointmentVerificationEndOn = dateOnly(d.appointment_verification_end_on);
-  const state = identityVerifiedOn || appointmentVerificationStartOn ? "verified" : "unknown";
+  const state = identityVerifiedOn
+    ? "verified"
+    : appointmentVerificationStartOn || appointmentVerificationEndOn
+      ? "period_only"
+      : "unknown";
   return {
     state,
     identityVerifiedOn,
@@ -408,6 +415,7 @@ export async function fetchOfficerAppointments(
     async (): Promise<Cached<OfficerAppointmentsResult> | null> => {
       const items: OfficerAppointment[] = [];
       let fetched = 0;
+      let skipped = 0;
       let total = 0;
       for (let page = 0; page < APPOINTMENT_PAGES; page++) {
         const url = `${BASE}/officers/${officerRef}/appointments?items_per_page=${APPOINTMENT_PAGE}&start_index=${page * APPOINTMENT_PAGE}`;
@@ -431,6 +439,7 @@ export async function fetchOfficerAppointments(
         for (const a of r.body.items) {
           const m = mapAppointment(a);
           if (m) items.push(m);
+          else skipped++;
         }
         total = r.body.total_results ?? fetched;
         if (fetched >= total || r.body.items.length === 0) break;
@@ -439,6 +448,7 @@ export async function fetchOfficerAppointments(
         appointments: items,
         total,
         activeCount: items.filter((a) => a.active).length,
+        skipped,
         truncated: fetched < total,
       };
     },

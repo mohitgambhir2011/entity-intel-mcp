@@ -22,7 +22,8 @@ describe("get_officer_appointments (D49)", () => {
     expect(r.isError).toBe(false);
     const a = r.json.data.appointments;
     expect(a.state).toBe("available");
-    expect(a.data).toMatchObject({ total: 4, activeCount: 2, truncated: false });
+    expect(a.data).toMatchObject({ total: 4, activeCount: 2, skipped: 1, truncated: false });
+    expect(r.json.warnings.join(" ")).toMatch(/no usable company number/);
     expect(r.json.disclaimer).toMatch(/personal data/i);
     const rows = JSON.stringify(h.rt.storage.listAudit(5));
     expect(rows).toContain("get_officer_appointments");

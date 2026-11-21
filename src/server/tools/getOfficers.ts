@@ -17,7 +17,7 @@ export function registerGetOfficers(server: McpServer, rt: Runtime): void {
         "Each officer has role, appointment / resignation dates, nationality, occupation, partial " +
         "date of birth (Norway: full date) and the published address; corporate officers carry " +
         "their registration number when it is a UK or Norwegian company. UK persons also carry officerRef " +
-        "(the register's person id, the same across companies) and verification {state verified, not_shown or " +
+        "(the register's person id, the same across companies) and verification {state verified (only with the register's identity-verified date), period_only (a period but no verified date), not_shown or " +
         "unknown, with dates}: not_shown means the register shows nothing, not that the person is unverified. " +
         "their registration number when it is a UK or Norwegian company. Norway publishes no " +
         "appointment dates. Default is current officers only, most recently " +
